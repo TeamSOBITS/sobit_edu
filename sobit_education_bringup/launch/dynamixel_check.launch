@@ -1,0 +1,18 @@
+<launch>
+
+    <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find sobit_education_description)/model/urdf/kobuki_hexagons_asus_xtion_pro_offset_education_turtolebot.urdf.xacro'" />
+    <arg name="gui" default="True" />
+    <param name="use_gui" value="$(arg gui)"/>
+    <param name="robot_description" command="$(arg urdf_file)" />
+
+    <node pkg="sobit_education_bringup" type="dynamixel_sdk_sobit_edu" name="dynamixel_sdk_sobit_edu" output="screen"/>
+
+    <node pkg="sobit_education_bringup" type="joint_state_publisher_edu" name="joint_state_publisher_edu" output="screen"/>
+
+    <!--node pkg="sobit_education_bringup" type="fixed_joint_state_publisher_edu" name="fixed_joint_state_publisher_edu" output="screen"/-->
+    <!--node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /-->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sobit_education_description)/rviz/urdf_debug.rviz" />
+
+</launch>

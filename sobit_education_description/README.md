@@ -1,0 +1,3 @@
+# sobit_education_description
+
+sobit_educationのURDF＆Meshを入れるパッケージ．
