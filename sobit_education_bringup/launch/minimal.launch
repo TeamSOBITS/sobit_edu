@@ -8,12 +8,6 @@
 
    <param name="/use_sim_time" value="$(arg simulation)"/>
 
-   <!--include file="$(find sobit_education_bringup)/launch/includes/robot_education_turtolebot.launch.xml">
-     <arg name="base" value="$(arg base)" />
-     <arg name="stacks" value="$(arg stacks)" />
-     <arg name="3d_sensor" value="$(arg 3d_sensor)" />
-   </include-->
-
    <include file="$(find turtlebot_bringup)/launch/includes/mobile_base.launch.xml">
      <arg name="base" value="$(arg base)" />
      <arg name="serialport" value="$(arg serialport)" />
@@ -26,6 +20,5 @@
         <node pkg="sobit_education_bringup" type="joint_controller.py" name="joint_controller" output="screen"/>
     </group>
 
-    <!--node name="rviz" pkg="rviz" type="rviz"/-->
 </launch>
 
