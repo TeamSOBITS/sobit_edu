@@ -22,16 +22,17 @@ $ catkin_make
 ```
 
 ## How to use
+
 ```bash:
 $ roslaunch sobit_education_bringup minimal.launch
 $ roslaunch sobit_education_bringup 3dsensor.launch
 """
 
-### service for moving joints
+###  service for moving joints
 sobit_education/sobit_education_bringup/src/joint_controller.py
 
-### Folder in joint initialization parameters
+###  Folder in joint initialization parameters
 sobit_education/sobit_education_control/config
 
-### smach sample code folder for moving, grasping
+###  smach sample code folder for moving, grasping
 smb://150.37.224.97/ros/sobit_education_smach_sample_files/
