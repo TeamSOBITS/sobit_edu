@@ -34,7 +34,7 @@ $ roslaunch sobit_education_bringup 3dsensor.launch
 sobit_education/sobit_education_bringup/src/joint_controller.py
 ```
 
-###  Folder in joint initialization parameters
+###  Folder in joint parameters
 ```bash:
 sobit_education/sobit_education_control/config
 ```
