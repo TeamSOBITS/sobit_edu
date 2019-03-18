@@ -89,6 +89,14 @@ class JointController:
 			self.move_to_holding_pose()
 		return sobit_common_msg.srv.robot_motionResponse(True)
 
+	def check_publishers_connection(self, publisher):
+		loop_rate_to_check_connection = rospy.Rate(1)
+		while (publisher.get_num_connections() == 0 and not rospy.is_shutdown()):
+			try:
+				loop_rate_to_check_connection.sleep()
+			except rospy.ROSInterruptException:
+				pass
+
 	def move_arm_joint(self, joint_name, rad, time_from_start):
 		point = trajectory_msgs.msg.JointTrajectoryPoint()
 		point.positions.append(rad)
@@ -96,6 +104,7 @@ class JointController:
 		traj = trajectory_msgs.msg.JointTrajectory()
 		traj.joint_names.append(joint_name)
 		traj.points.append(point)
+		self.check_publishers_connection(self.pub_arm_control)
 		self.pub_arm_control.publish(traj)
 
 	def move_xtion_joint(self, joint_name, rad, time_from_start):
@@ -105,6 +114,7 @@ class JointController:
 		traj = trajectory_msgs.msg.JointTrajectory()
 		traj.joint_names.append(joint_name)
 		traj.points.append(point)
+		self.check_publishers_connection(self.pub_xtion_control)
 		self.pub_xtion_control.publish(traj)
 
 	def move_wheel(self, str_distance):
