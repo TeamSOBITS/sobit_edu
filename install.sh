@@ -24,7 +24,11 @@ apt-get install mplayer
 echo "Install smach"
 apt-get install ros-kinetic-smach*
 
+echo "Install ros-control"
+apt install ros-kinetic-ros-control*
 
+echo "Install ros-control"
+apt install ros-kinetic-joint-*
 
 echo "SETING DYNAMIXEL"
 echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6015\", SYMLINK+=\"dynamixel\", MODE=\"0666\"" > /etc/udev/rules.d/dynamixel.rules
