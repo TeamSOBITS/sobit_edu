@@ -28,7 +28,7 @@ $ roslaunch sobit_education_bringup minimal.launch
 $ roslaunch sobit_education_bringup 3dsensor.launch
 ```
 
-### service for moving joints   
+### service code for moving joints   
 
 ```bash:
 sobit_education/sobit_education_bringup/src/joint_controller.py
