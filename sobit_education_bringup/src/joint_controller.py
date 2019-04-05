@@ -21,7 +21,7 @@ class JointController:
 		self.wrist_flex_link_z_cm = 15.0
 		self.can_grasp_min_x_cm = 20.0
 		self.can_grasp_max_x_cm = 42.0
-		self.can_grasp_min_z_cm = 7.6
+		self.can_grasp_min_z_cm = -8.0
 		self.can_grasp_max_z_cm = 37.0
 
 	def move_gripper_to_target_server(self, req_msg):
@@ -30,7 +30,7 @@ class JointController:
 		if key == False:
 			rospy.logerr("gripper_move_to_target Can't Transform [%s]", target_object)
 			return sobit_common_msg.srv.gripper_moveResponse(False)
-		
+
 		rospy.loginfo("Gripper_move_to_target Target_object [%s]", target_object)
 		(trans,rot) = self.listener.lookupTransform('/base_arm_link', target_object, rospy.Time(0))
 
@@ -40,22 +40,31 @@ class JointController:
 		if object_z_cm < self.can_grasp_min_z_cm or object_z_cm > self.can_grasp_max_z_cm:
 			return sobit_common_msg.srv.gripper_moveResponse(False)
 
-		if object_z_cm < self.from_base_to_arm_flex_link_z_cm + self.arm_flex_link_z_cm:
+		if self.from_base_to_arm_flex_link_z_cm < object_z_cm < self.from_base_to_arm_flex_link_z_cm + self.arm_flex_link_z_cm:
 			print "objectがarm_flex_linkより低い場合"
 			elbow_flex_joint_sin = (self.from_base_to_arm_flex_link_z_cm + self.arm_flex_link_z_cm - object_z_cm) / self.wrist_flex_link_z_cm
 			elbow_flex_joint_rad =   math.asin(elbow_flex_joint_sin)
 			wrist_flex_joint_rad = - math.asin(elbow_flex_joint_sin)
+			arm_flex_joint_rad = 0.0
 
-		else:
+		elif self.from_base_to_arm_flex_link_z_cm < self.from_base_to_arm_flex_link_z_cm + self.arm_flex_link_z_cm < object_z_cm:
 			print "objectがarm_flex_linkより高い場合"
 			elbow_flex_joint_sin = (object_z_cm - (self.from_base_to_arm_flex_link_z_cm + self.arm_flex_link_z_cm)) / self.wrist_flex_link_z_cm
 			elbow_flex_joint_rad = - math.asin(elbow_flex_joint_sin)
 			wrist_flex_joint_rad =   math.asin(elbow_flex_joint_sin)
+			arm_flex_joint_rad = 0.0
+
+		elif object_z_cm < self.from_base_to_arm_flex_link_z_cm:
+			print "objectがfrom_base_to_arm_flex_linkより低い場合"
+			elbow_flex_joint_rad = math.atan((- object_z_cm + self.from_base_to_arm_flex_link_x_cm)/self.wrist_flex_link_z_cm) - math.radians(90.0)
+			wrist_flex_joint_rad = - math.atan((- object_z_cm + self.from_base_to_arm_flex_link_x_cm)/self.wrist_flex_link_z_cm)
+			arm_flex_joint_rad = 1.57
+
 
 		time_from_start = 0.1
 		self.move_arm_joint("arm_roll_joint"  , 0.0                 , time_from_start)
 		rospy.sleep(time_from_start)
-		self.move_arm_joint("arm_flex_joint"  , 0.0                 , time_from_start)
+		self.move_arm_joint("arm_flex_joint"  , arm_flex_joint_rad                 , time_from_start)
 		rospy.sleep(time_from_start)
 		self.move_arm_joint("elbow_flex_joint", elbow_flex_joint_rad, time_from_start)
 		rospy.sleep(time_from_start)
@@ -80,7 +89,7 @@ class JointController:
 		self.move_arm_joint("hand_motor_joint", hand_motor_joint_rad, time_from_start)
 		rospy.sleep(time_from_start)
 		return sobit_common_msg.srv.gripper_ctrlResponse(True)
-	
+
 	def move_to_registered_motion_server(self, req_msg):
 		motion_type = req_msg.motion_type
 		if motion_type == "INITIAL_POSE":
@@ -140,7 +149,7 @@ class JointController:
 		rospy.sleep(time_from_start)
 		self.move_xtion_joint("xtion_tilt_joint", 0.00, time_from_start)
 		rospy.sleep(time_from_start)
-	
+
 	def move_to_holding_pose(self):
 		time_from_start = 0.1
 		self.move_arm_joint("arm_roll_joint"  , 0.00, time_from_start)
