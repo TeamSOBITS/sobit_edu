@@ -39,8 +39,6 @@ sobit_education/sobit_education_bringup/src/joint_controller.py
 sobit_education/sobit_education_control/config
 ```
 
-### smach sample code folder for moving, grasping
+### smach sample code for moving, grasping
 
-```bash:
-smb://150.37.224.97/ros/sobit_education_smach_sample_files/
-```
+https://gitlab.com/TeamSOBITS/sobit_education/wikis/smach_sample
