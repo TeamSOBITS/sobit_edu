@@ -99,7 +99,7 @@ class JointController:
             self.move_to_initial_pose()
         elif motion_type == "HOLDING_POSE":
             self.move_to_holding_pose()
-		elif motion_type == "DETECTING_POSE":
+        elif motion_type == "DETECTING_POSE":
             self.move_to_detecting_pose()
         return sobit_common_msg.srv.robot_motionResponse(True)
 
