@@ -169,14 +169,19 @@ class JointController:
         rospy.sleep(time_from_start)
         self.move_xtion_joint("xtion_tilt_joint", 0.00, time_from_start)
         rospy.sleep(time_from_start)
-
-	def move_to_detecting_pose(self):
-		time_from_start = 0.1
+    
+    def move_to_detecting_pose(self):
+        time_from_start = 0.1
         self.move_arm_joint("arm_roll_joint", 0.00, time_from_start)
+        #rospy.sleep(time_from_start)
         self.move_arm_joint("arm_flex_joint", 0.00, time_from_start)
+        #rospy.sleep(time_from_start)
         self.move_arm_joint("elbow_flex_joint", 1.31, time_from_start)
+        #rospy.sleep(time_from_start)
         self.move_arm_joint("wrist_flex_joint", 0.00, time_from_start)
+        #rospy.sleep(time_from_start)
         self.move_arm_joint("hand_motor_joint", 0.00, time_from_start)
+        #rospy.sleep(time_from_start)
         self.move_xtion_joint("xtion_tilt_joint", 0.53, time_from_start)
         rospy.sleep(time_from_start)
 
