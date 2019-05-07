@@ -73,7 +73,7 @@ class OdomBaseController:
 				self.order_deg = self.Read_Value(req)
 				self.move_order_T = True
 
-				rospy.loginfo("order: Trun: %f(deg)" % (self.order_deg))
+				rospy.loginfo("order: Turn: %f(deg)" % (self.order_deg))
 
 
 			elif "S" in req.req_str:
@@ -104,7 +104,7 @@ class OdomBaseController:
 		send_cmd = Twist()#メッセージ変数の宣言
 		if self.move_order_T == True and self.move_order_S == False:# T　回転実行
 
-			#rospy.loginfo("Trun: %f(deg) self.moved_deg=%f[deg]",self.order_deg , self.moved_deg)
+			#rospy.loginfo("Turn: %f(deg) self.moved_deg=%f[deg]",self.order_deg , self.moved_deg)
 
 			#加速区間
 			if self.moved_deg < abs(self.order_deg) / 5:
@@ -154,7 +154,7 @@ class OdomBaseController:
 			else:
 				self.pub_twist.publish(Twist())#停止
 				self.is_move = False
-				rospy.loginfo("Trun finished")
+				rospy.loginfo("Turn finished")
 				self.turn_speed = 0
 				self.current_turn_speed = 0
 				self.order_deg = 0

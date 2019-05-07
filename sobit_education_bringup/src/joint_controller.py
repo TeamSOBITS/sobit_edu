@@ -37,9 +37,9 @@ class JointController:
 
     def move_gripper_to_target_server(self, req_msg):
         """
-            hand_motor_link を指定したtfに動かすサービス  
-            target_name : 目標のtf名  
-            shift       : 目標のtfの位置からどれだけずらすか  
+            hand_motor_link を指定したtfに動かすサービス
+            target_name : 目標のtf名
+            shift       : 目標のtfの位置からどれだけずらすか
         """
         target_object = req_msg.target_name
         key = self.listener.canTransform('/base_footprint', target_object, rospy.Time(0))  # 座標変換の可否判定
@@ -124,8 +124,6 @@ class JointController:
         motion_type = req_msg.motion_type
         if motion_type == "INITIAL_POSE":
             self.move_to_initial_pose()
-        elif motion_type == "HOLDING_POSE":
-            self.move_to_holding_pose()
         elif motion_type == "DETECTING_POSE":
             self.move_to_detecting_pose()
         return robot_motionResponse(True)
@@ -178,21 +176,9 @@ class JointController:
     def move_to_initial_pose(self):
         time_from_start_sec = 0.5
         self.add_arm_control_data_to_storage("arm_roll_joint", 0.00)
-        self.add_arm_control_data_to_storage("arm_flex_joint", 0.00)
-        self.add_arm_control_data_to_storage("elbow_flex_joint", 1.31)
-        self.add_arm_control_data_to_storage("wrist_flex_joint", 0.00)
-        self.add_arm_control_data_to_storage("hand_motor_joint", 0.00)
-        self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.00)
-        self.publish_arm_control_data(time_from_start_sec)
-        self.publish_xtion_control_data(time_from_start_sec)
-        rospy.sleep(1.0)
-
-    def move_to_holding_pose(self):
-        time_from_start_sec = 1.0
-        self.add_arm_control_data_to_storage("arm_roll_joint", 0.00)
-        self.add_arm_control_data_to_storage("arm_flex_joint", 0.00)
-        self.add_arm_control_data_to_storage("elbow_flex_joint", 1.31)
-        self.add_arm_control_data_to_storage("wrist_flex_joint", -1.31)
+        self.add_arm_control_data_to_storage("arm_flex_joint", -1.57)
+        self.add_arm_control_data_to_storage("elbow_flex_joint", 1.32)
+        self.add_arm_control_data_to_storage("wrist_flex_joint", 0.25)
         self.add_arm_control_data_to_storage("hand_motor_joint", 0.00)
         self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.00)
         self.publish_arm_control_data(time_from_start_sec)
