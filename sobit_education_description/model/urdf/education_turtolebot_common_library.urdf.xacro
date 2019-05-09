@@ -50,7 +50,7 @@
     <color rgba="1.0 0.4 0.0 1.0"/>
   </material>
 
-  <joint name="fixed" type="fixed">
+  <joint name="base_arm_fixed_joint" type="fixed">
     <parent link="plate_top_link"/>
     <child link="base_arm_link"/>
     <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
@@ -591,7 +591,7 @@
 
   <!-- rgb_link -->
   <link name="rgb_link"/>
-  <joint name="xtion_joint5" type="fixed">
+  <joint name="rgb_fixed_link" type="fixed">
     <parent link="xtion"/>
     <child link="rgb_link"/>
     <origin rpy="-1.57 0 -1.57" xyz="0.02 0.0205 0.0375"/>
@@ -602,7 +602,7 @@
 
   <!-- depth_link -->
   <link name="depth_link"/>
-  <joint name="xtion_joint6" type="fixed">
+  <joint name="depth_fixed_joint" type="fixed">
     <parent link="xtion"/>
     <child link="depth_link"/>
     <origin rpy="-1.57 0 -1.57" xyz="0.02 0.0475 0.0375"/>
