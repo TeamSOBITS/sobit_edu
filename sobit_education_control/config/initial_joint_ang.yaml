@@ -1,7 +1,0 @@
-initial_joint:
-  arm_roll_joint: 0
-  arm_flex_joint: 0
-  elbow_flex_joint: 1.31
-  wrist_flex_joint: 0
-  hand_motor_joint: 0
-  xtion_tilt_joint: 0
