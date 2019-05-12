@@ -194,5 +194,6 @@ class JointController:
 
 if __name__ == "__main__":
     rospy.init_node("joint_controller")
-    JointController()
+    jc = JointController()
+    jc.move_to_initial_pose()
     rospy.spin()

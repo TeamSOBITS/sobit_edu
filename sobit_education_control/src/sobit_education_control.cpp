@@ -7,13 +7,9 @@ int main(int argc, char *argv[]) {
   SobitEducationControl sobit_edu_ctr;
   sobit_edu_ctr.openPort();
   sobit_edu_ctr.initializeDynamixel();
-  sobit_edu_ctr.writeInitialJoint();
   controller_manager::ControllerManager cm(&sobit_edu_ctr, sobit_edu_ctr.nh_);
-  // ros::Rate rate(1 / sobit_edu_ctr.getPeriod().toSec());
-  ros::AsyncSpinner spinner(1);
-  // ros::MultiThreadedSpinner spinner(4);
+  ros::AsyncSpinner                     spinner(1);
   spinner.start();
-  ros::Duration(3).sleep();
 
   while (ros::ok()) {
     ros::Time     now = sobit_edu_ctr.getTime();
@@ -24,7 +20,6 @@ int main(int argc, char *argv[]) {
     sobit_edu_ctr.write(now, dt);
   }
   spinner.stop();
-  // spinner.spin();
 
   return 0;
 }
