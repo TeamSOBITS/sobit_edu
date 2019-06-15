@@ -99,7 +99,7 @@ class JointController:
         self.add_arm_control_data_to_storage("elbow_flex_joint", elbow_flex_joint_rad)
         self.add_arm_control_data_to_storage("wrist_flex_joint", wrist_flex_joint_rad)
         self.publish_arm_control_data(time_from_start_sec)
-        rospy.sleep(1.0)
+        rospy.sleep(2.0)
 
         turning_deg = math.degrees(math.atan(object_y_cm / object_x_cm))
         str_turning_deg = "T:" + str(turning_deg)
@@ -181,6 +181,7 @@ class JointController:
         self.add_arm_control_data_to_storage("wrist_flex_joint", 0.25)
         self.add_arm_control_data_to_storage("hand_motor_joint", 0.00)
         self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.00)
+        self.add_xtion_control_data_to_storage("xtion_pan_joint", 0.00)
         self.publish_arm_control_data(time_from_start_sec)
         self.publish_xtion_control_data(time_from_start_sec)
         rospy.sleep(1.0)

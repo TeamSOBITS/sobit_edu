@@ -88,6 +88,7 @@ void SobitCommonDynamixel::initializeDynamixel() {
       setAcceleration(i, acceleration_val);
       setVelocity(i, velocity_val);
       setGrouopRead(i);
+      setPositionIGain(i);
       if (i == 20) {
         setTorqueLimit(i);
       }
@@ -154,6 +155,14 @@ void SobitCommonDynamixel::setPosition(int id, int pos) {
 void SobitCommonDynamixel::setGrouopRead(int id) {
   dxl_addparam_result = readPositonGroup.addParam(id, ADDR_PRO_PRESENT_POSITION, LEN_PRO_PRESENT_POSITION);
   if (dxl_addparam_result != true) fprintf(stderr, "[ID:%03d] grouBulkRead addparam failed\n", id);
+}
+
+void SobitCommonDynamixel::setPositionIGain(int id) {
+  this->dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, id, POSITION_I_GAIN, (uint16_t)25, &this->dxl_error);
+  if (this->dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(this->dxl_comm_result);
+  else if (this->dxl_error != 0)
+    packetHandler->getRxPacketError(this->dxl_error);
 }
 
 int SobitCommonDynamixel::getCurrentPosition(int id) {

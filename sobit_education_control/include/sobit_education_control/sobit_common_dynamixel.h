@@ -20,6 +20,7 @@
 #define OPERATING_MODE 11
 #define ADDR_PRO_TORQUE_ENABLE 64
 #define ADDR_PRO_HARDWARE_ERROR_STATUS 70
+#define POSITION_I_GAIN 82
 #define TORQUE_LIMIT 102
 #define PROFILE_ACCELERATION 108
 #define PROFILE_VELOCITY 112
@@ -116,6 +117,7 @@ class SobitCommonDynamixel : public hardware_interface::RobotHW {
   void setTorqueLimit(int id);
   void setPosition(int id, int pos);
   void setGrouopRead(int id);
+  void setPositionIGain(int id);
   int  getCurrentPosition(int id);
   int  getCurrentSpeed(int id);
   int  getCurrentLoad(int id);

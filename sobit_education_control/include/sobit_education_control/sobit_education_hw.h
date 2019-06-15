@@ -29,10 +29,10 @@ class SobitEducationControl : public SobitEducationDynamixel {
   hardware_interface::JointStateInterface                  jnt_state_interface_;
   hardware_interface::PositionJointInterface               jnt_pos_interface_;
   joint_limits_interface::PositionJointSoftLimitsInterface jnt_limit_interface_;
-  double                                                   cmd_[6];
-  double                                                   pos_[6];
-  double                                                   vel_[6];
-  double                                                   eff_[6];
+  double                                                   cmd_[7];
+  double                                                   pos_[7];
+  double                                                   vel_[7];
+  double                                                   eff_[7];
 
  public:
   SobitEducationControl();

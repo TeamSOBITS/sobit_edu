@@ -2,15 +2,13 @@
 
 SobitEducationDynamixel::SobitEducationDynamixel() {
   used_dynamixel_id[1]  = 1;
-  used_dynamixel_id[2]  = 2;
   used_dynamixel_id[16] = 16;
   used_dynamixel_id[17] = 17;
   used_dynamixel_id[18] = 18;
   used_dynamixel_id[19] = 19;
   used_dynamixel_id[20] = 20;
 
-  used_dynamixel_name[1]  = "xtion_pan_joint";
-  used_dynamixel_name[2]  = "xtion_tilt_joint";
+  used_dynamixel_name[1]  = "xtion_tilt_joint";
   used_dynamixel_name[16] = "arm_roll_joint";
   used_dynamixel_name[17] = "arm_flex_joint";
   used_dynamixel_name[18] = "elbow_flex_joint";
@@ -27,7 +25,6 @@ void SobitEducationDynamixel::initializeDynamixel() {
       setAcceleration(i, acceleration_val);
       setVelocity(i, velocity_val);
       setGrouopRead(i);
-      setPositionIGain(i);
       if (i == 20) setTorqueLimit(i);
     }
   }
@@ -86,8 +83,6 @@ float SobitEducationDynamixel::toBit(int id, float rad) {
     return 2080 - rad * (910 / (M_PI_2));
   } else if (id == 1) {
     return MAGNIFICATION_VALUE * (rad + M_PI);
-  } else if (id == 2) {
-    return MAGNIFICATION_VALUE * (rad + M_PI);
   }
   return -1;
 }
@@ -104,8 +99,6 @@ float SobitEducationDynamixel::toRad(std::string joint_name, int bit) {
   } else if (joint_name == "hand_motor_joint") {
     return -(bit - 2080) / (910 / (M_PI_2));
   } else if (joint_name == "xtion_tilt_joint") {
-    return (bit / MAGNIFICATION_VALUE) - M_PI;
-  } else if (joint_name == "xtion_pan_joint") {
     return (bit / MAGNIFICATION_VALUE) - M_PI;
   }
 }
