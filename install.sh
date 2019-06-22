@@ -34,4 +34,7 @@ echo "SETING DYNAMIXEL"
 echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6015\", SYMLINK+=\"dynamixel\", MODE=\"0666\"" > /etc/udev/rules.d/dynamixel.rules
 sudo /etc/init.d/udev reload
 
+echo "Install sympy"
+pip install sympy
+
 echo "Install Finished"
