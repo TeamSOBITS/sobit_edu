@@ -26,16 +26,17 @@ def request(req):
     rate = rospy.Rate(10)
     xt = 0.0
 
-    # 初期の位置を保存する
-    initial_value = odometry_value
+    initial_value = odometry_value # 初期の位置を保存する
 
     # 並進運動
     if req.straight_line != 0.0 and req.turn_angle == 0.0:
         rospy.loginfo("order_Straight")
 
+        ft_before = Kp * req.straight_line # 速さ(PID制御で使用)
+
         while xt < abs(req.straight_line):
 
-            result = pid_calculation(abs(req.straight_line), xt, t1, req.max_speed) # PID制御の計算を行う
+            result = pid_calculation(abs(req.straight_line), xt, t1, req.max_speed, ft_before) # PID制御の計算を行う
 
             if req.straight_line < 0:
                 speed.linear.x = -result
@@ -44,11 +45,13 @@ def request(req):
 
             pub.publish(speed) # トピックを用いて指定の速さを送る
 
+            ft_before = result
+
             x_diff = odometry_value.pose.pose.position.x - initial_value.pose.pose.position.x
             y_diff = odometry_value.pose.pose.position.y - initial_value.pose.pose.position.y
             xt = math.sqrt(x_diff ** 2 + y_diff ** 2) # ユークリッド距離の計算
 
-            #rospy.loginfo("%s %s", xt, req.straight_line)
+            rospy.loginfo("%s %s", xt, req.straight_line)
             rate.sleep()
 
     # 回転運動
@@ -56,15 +59,17 @@ def request(req):
         rospy.loginfo("order_Trun")
 
         n = 1
-        order_value = math.radians(req.turn_angle)
+        order_value = math.radians(req.turn_angle) # 要求された角度を度数法から弧度法に変換
 
         # 初期位置を計算できる角度に変換
         initial_euler = tf.transformations.euler_from_quaternion((initial_value.pose.pose.orientation.x,initial_value.pose.pose.orientation.y,initial_value.pose.pose.orientation.z,initial_value.pose.pose.orientation.w))
 
+        ft_before = Kp * order_value # 速さ(PID制御で使用)
+
         # 制御
         while xt < abs(order_value):
 
-            result = pid_calculation(abs(order_value), xt, t1, req.max_speed) #PID制御の計算を行う
+            result = pid_calculation(abs(order_value), xt, t1, req.max_speed, ft_before) #PID制御の計算を行う
 
             if order_value < 0:
                 speed.angular.z = -result
@@ -73,20 +78,17 @@ def request(req):
 
             pub.publish(speed) # トピックを用いて指定の速さを送る
 
+            ft_before = result
+
             # オドメトリを計算できる角度に変換
             odometry_euler = tf.transformations.euler_from_quaternion((odometry_value.pose.pose.orientation.x,odometry_value.pose.pose.orientation.y,odometry_value.pose.pose.orientation.z,odometry_value.pose.pose.orientation.w))
 
             before = xt
 
-            print math.radians(odometry_euler[2])
-            print math.radians(odometry_euler[2] - initial_euler[2])
-
-
             if(-0.00314 < odometry_euler[2] - initial_euler[2] and odometry_euler[2] - initial_euler[2] < 0 and 0 < order_value):
                 continue;
             elif(0 < odometry_euler[2] - initial_euler[2] and odometry_euler[2] - initial_euler[2] < 0.00314 and order_value < 0):
                 continue;
-
 
             # コサイン類似度の計算
             if odometry_euler[2] - initial_euler[2] < 0 and 0 < order_value:
@@ -102,35 +104,29 @@ def request(req):
                 rospy.loginfo("4")
                 xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * (n-1)))
 
-            if xt < before - math.degrees(1):
+            if math.degrees(xt) < (math.degrees(before) - 0.03):
                 n += 1
-                rospy.loginfo("ok, %s", math.degrees(xt))
                 if 0 < order_value:
                     xt = abs(odometry_euler[2] - initial_euler[2] + math.radians(360 * (n-1)))
                 elif order_value < 0:
 
                     xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * (n-1)))
 
-            rospy.loginfo("%s ", math.degrees(xt))
-
-            #rospy.loginfo("%s %s", math.degrees(xt), req.turn_angle)
+            rospy.loginfo("%s %s", math.degrees(xt), req.turn_angle)
             rate.sleep()
 
     xt = 0.0
     return 'finished'
 
 # PID制御の計算を行う
-def pid_calculation(xd, xt, t1, max_speed):
-    global Kp
-    global Kv
-    global Ki
-
-    x = sympy.Symbol('x') # 変数の定義
-
+def pid_calculation(xd, xt, t1, max_speed, ft_before):
     t2 = time.time() # 処理後の時刻
     elapsed_time = t2-t1 # 経過時間
 
-    ft = Kp * (xd - xt) - Kv * sympy.diff(x.subs(x, xt), x) + Ki * sympy.integrate(xd - x.subs(x, xt), (x, 0, elapsed_time)) #PID制御
+    #x = sympy.Symbol('x') # 変数の定義
+    #ft = Kp * (xd - xt) - Kv * sympy.diff(x.subs(x, xt), x) + Ki * sympy.integrate(xd - x.subs(x, xt), (x, 0, elapsed_time)) #PID制御
+
+    ft = Kp * (xd - xt) - Kv * ft_before + Ki * (xd * elapsed_time - 0.5 * ft_before * elapsed_time ** 2)
 
     if max_speed == 0.0:
         return ft
@@ -156,9 +152,9 @@ if __name__ == '__main__':
     rospy.Service('wheel_control', wheel_control, request)
 
     # パラメータの設定
-    Kp = rospy.get_param("/proportional_control", 0.1)
+    Kp = rospy.get_param("/proportional_control", 0.5)
     Kv = rospy.get_param("/derivation_control", 0.4)
-    Ki = rospy.get_param("/integral_control", 0.3)
+    Ki = rospy.get_param("/integral_control", 0.1)
 
     print "Ready to serve"
     rospy.spin()
