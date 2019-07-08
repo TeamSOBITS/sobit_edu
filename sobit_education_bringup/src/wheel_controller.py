@@ -29,6 +29,7 @@ def request(req):
     # 初期の位置を保存する
     initial_value = odometry_value
 
+    # 並進運動
     if req.straight_line != 0.0 and req.turn_angle == 0.0:
         rospy.loginfo("order_Straight")
 
@@ -47,14 +48,20 @@ def request(req):
             y_diff = odometry_value.pose.pose.position.y - initial_value.pose.pose.position.y
             xt = math.sqrt(x_diff ** 2 + y_diff ** 2) # ユークリッド距離の計算
 
-            rospy.loginfo("%s %s", xt, req.straight_line)
+            #rospy.loginfo("%s %s", xt, req.straight_line)
             rate.sleep()
 
+    # 回転運動
     elif req.straight_line == 0.0 and req.turn_angle != 0.0:
         rospy.loginfo("order_Trun")
 
+        n = 1
         order_value = math.radians(req.turn_angle)
 
+        # 初期位置を計算できる角度に変換
+        initial_euler = tf.transformations.euler_from_quaternion((initial_value.pose.pose.orientation.x,initial_value.pose.pose.orientation.y,initial_value.pose.pose.orientation.z,initial_value.pose.pose.orientation.w))
+
+        # 制御
         while xt < abs(order_value):
 
             result = pid_calculation(abs(order_value), xt, t1, req.max_speed) #PID制御の計算を行う
@@ -66,11 +73,47 @@ def request(req):
 
             pub.publish(speed) # トピックを用いて指定の速さを送る
 
+            # オドメトリを計算できる角度に変換
             odometry_euler = tf.transformations.euler_from_quaternion((odometry_value.pose.pose.orientation.x,odometry_value.pose.pose.orientation.y,odometry_value.pose.pose.orientation.z,odometry_value.pose.pose.orientation.w))
-            initial_euler = tf.transformations.euler_from_quaternion((initial_value.pose.pose.orientation.x,initial_value.pose.pose.orientation.y,initial_value.pose.pose.orientation.z,initial_value.pose.pose.orientation.w))
-            xt = abs(odometry_euler[2] - initial_euler[2]) # ユークリッド距離の計算
 
-            rospy.loginfo("%s %s", math.degrees(xt), req.turn_angle)
+            before = xt
+
+            print math.radians(odometry_euler[2])
+            print math.radians(odometry_euler[2] - initial_euler[2])
+
+
+            if(-0.00314 < odometry_euler[2] - initial_euler[2] and odometry_euler[2] - initial_euler[2] < 0 and 0 < order_value):
+                continue;
+            elif(0 < odometry_euler[2] - initial_euler[2] and odometry_euler[2] - initial_euler[2] < 0.00314 and order_value < 0):
+                continue;
+
+
+            # コサイン類似度の計算
+            if odometry_euler[2] - initial_euler[2] < 0 and 0 < order_value:
+                rospy.loginfo("1")
+                xt = abs(odometry_euler[2] - initial_euler[2] + math.radians(360 * n))
+            elif 0 < odometry_euler[2] - initial_euler[2] and order_value < 0:
+                rospy.loginfo("2")
+                xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * n))
+            elif 0 < order_value:
+                rospy.loginfo("3")
+                xt = abs(odometry_euler[2] - initial_euler[2] + math.radians(360 * (n-1)))
+            elif order_value < 0:
+                rospy.loginfo("4")
+                xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * (n-1)))
+
+            if xt < before - math.degrees(1):
+                n += 1
+                rospy.loginfo("ok, %s", math.degrees(xt))
+                if 0 < order_value:
+                    xt = abs(odometry_euler[2] - initial_euler[2] + math.radians(360 * (n-1)))
+                elif order_value < 0:
+
+                    xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * (n-1)))
+
+            rospy.loginfo("%s ", math.degrees(xt))
+
+            #rospy.loginfo("%s %s", math.degrees(xt), req.turn_angle)
             rate.sleep()
 
     xt = 0.0
