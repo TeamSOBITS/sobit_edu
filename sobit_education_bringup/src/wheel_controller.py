@@ -125,8 +125,11 @@ def pid_calculation(xd, xt, t1, max_speed, ft_before):
 
     #x = sympy.Symbol('x') # 変数の定義
     #ft = Kp * (xd - xt) - Kv * sympy.diff(x.subs(x, xt), x) + Ki * sympy.integrate(xd - x.subs(x, xt), (x, 0, elapsed_time)) #PID制御
+    if math.degrees(xd) <= 30:
+        ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki * (xd + 0.001 - xt) * elapsed_time ** 2
+    else:
+        ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki * 0.75 * 30 / math.degrees(xd) * (xd + 0.001 - xt) * elapsed_time ** 2
 
-    ft = Kp * (xd - xt) - Kv * ft_before + Ki * (xd - xt) * elapsed_time ** 2
     if max_speed == 0.0:
         return ft
     elif max_speed < ft:
@@ -153,7 +156,7 @@ if __name__ == '__main__':
     # パラメータの設定
     Kp = rospy.get_param("/proportional_control", 0.1)
     Kv = rospy.get_param("/derivation_control", 0.4)
-    Ki = rospy.get_param("/integral_control", 0.2)
+    Ki = rospy.get_param("/integral_control", 0.8)
 
     print "Ready to serve"
     rospy.spin()
