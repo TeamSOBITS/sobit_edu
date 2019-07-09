@@ -16,10 +16,12 @@ odometry_value = Odometry() # 初期位置
 Kp = Float64()
 Kv = Float64()
 Ki = Float64()
+straight_flag = False
+trun_flag = False
 
 # サービスでの要求を読み取る
 def request(req):
-    global odometry_value
+    global odometry_value, straight_flag, turn_flag
 
     t1 = time.time() # 処理前の時刻
     speed = Twist()
@@ -36,7 +38,9 @@ def request(req):
 
         while xt < abs(req.straight_line):
 
+            straight_flag = True
             result = pid_calculation(abs(req.straight_line), xt, t1, req.max_speed, ft_before) # PID制御の計算を行う
+            straight_flag = False
 
             if req.straight_line < 0:
                 speed.linear.x = -result
@@ -69,7 +73,9 @@ def request(req):
         # 制御
         while xt < abs(order_value):
 
+            turn_flag = True
             result = pid_calculation(abs(order_value), xt, t1, req.max_speed, ft_before) #PID制御の計算を行う
+            turn_flag = False
 
             if order_value < 0:
                 speed.angular.z = -result
@@ -92,16 +98,12 @@ def request(req):
 
             # コサイン類似度の計算
             if odometry_euler[2] - initial_euler[2] < 0 and 0 < order_value:
-                rospy.loginfo("1")
                 xt = abs(odometry_euler[2] - initial_euler[2] + math.radians(360 * n))
             elif 0 < odometry_euler[2] - initial_euler[2] and order_value < 0:
-                rospy.loginfo("2")
                 xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * n))
             elif 0 < order_value:
-                rospy.loginfo("3")
                 xt = abs(odometry_euler[2] - initial_euler[2] + math.radians(360 * (n-1)))
             elif order_value < 0:
-                rospy.loginfo("4")
                 xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * (n-1)))
 
             if math.degrees(xt) < (math.degrees(before)-0.0314):
@@ -123,19 +125,19 @@ def pid_calculation(xd, xt, t1, max_speed, ft_before):
     t2 = time.time() # 処理後の時刻
     elapsed_time = t2-t1 # 経過時間
 
-    #x = sympy.Symbol('x') # 変数の定義
-    #ft = Kp * (xd - xt) - Kv * sympy.diff(x.subs(x, xt), x) + Ki * sympy.integrate(xd - x.subs(x, xt), (x, 0, elapsed_time)) #PID制御
-    if math.degrees(xd) <= 30:
-        ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki * (xd + 0.001 - xt) * elapsed_time ** 2
-    else:
-        ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki * 0.75 * 30 / math.degrees(xd) * (xd + 0.001 - xt) * elapsed_time ** 2
+    #並進運動
+    if straight_flag == True:
+        if xd <= 0.1:
+            ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki / 0.8 * (xd + 0.001 - xt) * elapsed_time ** 2
+        else:
+            ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki / 8 / xd * (xd + 0.001 - xt) * elapsed_time ** 2
 
-    if max_speed == 0.0:
-        return ft
-    elif max_speed < ft:
-        return max_speed
-    else:
-        return ft
+    #回転運動
+    elif turn_flag == True:
+        if math.degrees(xd) <= 30:
+            ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki * (xd + 0.001 - xt) * elapsed_time ** 2
+        else:
+            ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki * 0.75 * 30 / math.degrees(xd) * (xd + 0.001 - xt) * elapsed_time ** 2
 
 # 車輪のオドメトリを返す
 def odometory_save(odometry):
