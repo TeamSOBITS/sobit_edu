@@ -9,7 +9,7 @@ import tf
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
-from wheel_test.srv import wheel_control
+from sobit_common_msg.srv import wheel_control
 from tf.transformations import euler_from_quaternion
 
 odometry_value = Odometry() # 初期位置
@@ -23,7 +23,7 @@ def request(req):
 
     t1 = time.time() # 処理前の時刻
     speed = Twist()
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(20)
     xt = 0.0
 
     initial_value = odometry_value # 初期の位置を保存する
@@ -104,7 +104,7 @@ def request(req):
                 rospy.loginfo("4")
                 xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * (n-1)))
 
-            if math.degrees(xt) < (math.degrees(before) - 0.03):
+            if math.degrees(xt) < (math.degrees(before)-0.0314):
                 n += 1
                 if 0 < order_value:
                     xt = abs(odometry_euler[2] - initial_euler[2] + math.radians(360 * (n-1)))
@@ -126,8 +126,7 @@ def pid_calculation(xd, xt, t1, max_speed, ft_before):
     #x = sympy.Symbol('x') # 変数の定義
     #ft = Kp * (xd - xt) - Kv * sympy.diff(x.subs(x, xt), x) + Ki * sympy.integrate(xd - x.subs(x, xt), (x, 0, elapsed_time)) #PID制御
 
-    ft = Kp * (xd - xt) - Kv * ft_before + Ki * (xd * elapsed_time - 0.5 * ft_before * elapsed_time ** 2)
-
+    ft = Kp * (xd - xt) - Kv * ft_before + Ki * (xd - xt) * elapsed_time ** 2
     if max_speed == 0.0:
         return ft
     elif max_speed < ft:
@@ -148,13 +147,13 @@ if __name__ == '__main__':
     global Ki
 
     sub = rospy.Subscriber('/odom', Odometry, odometory_save)
-    pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size = 10)
+    pub = rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size = 20)
     rospy.Service('wheel_control', wheel_control, request)
 
     # パラメータの設定
-    Kp = rospy.get_param("/proportional_control", 0.5)
+    Kp = rospy.get_param("/proportional_control", 0.1)
     Kv = rospy.get_param("/derivation_control", 0.4)
-    Ki = rospy.get_param("/integral_control", 0.1)
+    Ki = rospy.get_param("/integral_control", 0.2)
 
     print "Ready to serve"
     rospy.spin()
