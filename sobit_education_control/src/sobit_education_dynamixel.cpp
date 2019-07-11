@@ -44,7 +44,6 @@ void SobitEducationDynamixel::writeDynamixelMotors(const trajectory_msgs::JointT
       continue;
     }
     addPositionToStorage(joint_id, joint_pos);
-    saved_dxl_goal_position[joint_id] = joint_pos;
   }
   writeGoalPositon();
 }
@@ -57,6 +56,13 @@ sensor_msgs::JointState SobitEducationDynamixel::readDynamixelMotors() {
       std::string joint_name    = used_dynamixel_name[i];
       int         dynamixel_pos = readCurrentPosition(used_dynamixel_id[i]);
       float       joint_pos     = toRad(joint_name, dynamixel_pos);
+      if (dynamixel_pos == -1) {
+        // joint_pos = toRad(joint_name, saved_dynamixel_position[i]);
+      } else {
+        saved_dxl_goal_position[i] = dynamixel_pos;
+        pose.name.push_back(joint_name);
+        pose.position.push_back(joint_pos);
+      }
       pose.name.push_back(joint_name);
       pose.position.push_back(joint_pos);
     }
@@ -75,37 +81,37 @@ int SobitEducationDynamixel::getJointNumber(std::string joint_name) {
 
 float SobitEducationDynamixel::toBit(int id, float rad) {
   if (id == 16) {
-    return MAGNIFICATION_VALUE * (rad + M_PI);
+    return 2048 + rad / (M_PI * 2) * 4096;
   } else if (id == 17) {
-    return MAGNIFICATION_VALUE * (-rad + M_PI);
+    return 2048 + rad / (M_PI * 2) * 4096;
   } else if (id == 18) {
-    return MAGNIFICATION_VALUE * (rad + M_PI);
+    return 2048 + rad / (M_PI * 2) * 4096;
   } else if (id == 19) {
-    return MAGNIFICATION_VALUE * (rad + M_PI);
+    return 2048 + rad / (M_PI * 2) * 4096;
   } else if (id == 20) {
-    return 2080 - rad * (910 / (M_PI_2));
+    return 1449 + rad / (M_PI * 2) * 4096;
   } else if (id == 1) {
-    return MAGNIFICATION_VALUE * (rad + M_PI);
+    return 2048 + rad / (M_PI * 2) * 4096;
   } else if (id == 2) {
-    return MAGNIFICATION_VALUE * (rad + M_PI);
+    return 2048 + rad / (M_PI * 2) * 4096;
   }
   return -1;
 }
 
 float SobitEducationDynamixel::toRad(std::string joint_name, int bit) {
   if (joint_name == "arm_roll_joint") {
-    return (bit / MAGNIFICATION_VALUE) - M_PI;
+    return (bit - 2048) * ((M_PI * 2) / 4096);
   } else if (joint_name == "arm_flex_joint") {
-    return -(bit / MAGNIFICATION_VALUE) + M_PI;
+    return (bit - 2048) * ((M_PI * 2) / 4096);
   } else if (joint_name == "elbow_flex_joint") {
-    return (bit / MAGNIFICATION_VALUE) - M_PI;
+    return (bit - 2048) * ((M_PI * 2) / 4096);
   } else if (joint_name == "wrist_flex_joint") {
-    return (bit / MAGNIFICATION_VALUE) - M_PI;
+    return (bit - 2048) * ((M_PI * 2) / 4096);
   } else if (joint_name == "hand_motor_joint") {
-    return -(bit - 2080) / (910 / (M_PI_2));
+    return (bit - 1449) * ((M_PI * 2) / 4096);
   } else if (joint_name == "xtion_tilt_joint") {
-    return (bit / MAGNIFICATION_VALUE) - M_PI;
+    return (bit - 2048) * ((M_PI * 2) / 4096);
   } else if (joint_name == "xtion_pan_joint") {
-    return (bit / MAGNIFICATION_VALUE) - M_PI;
+    return (bit - 2048) * ((M_PI * 2) / 4096);
   }
 }
