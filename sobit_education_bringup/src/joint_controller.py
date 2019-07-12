@@ -126,6 +126,11 @@ class JointController:
             self.move_to_initial_pose()
         elif motion_type == "DETECTING_POSE":
             self.move_to_detecting_pose()
+        elif motion_type == "XTION_RIGHT_POSE":
+            self.move_to_xtion_right_pose()
+        elif motion_type == "XTION_LEFT_POSE":
+            self.move_to_xtion_left_pose()
+
         return robot_motionResponse(True)
 
     def check_publishers_connection(self, publisher):
@@ -192,6 +197,15 @@ class JointController:
         self.publish_xtion_control_data(time_from_start)
         rospy.sleep(1.0)
 
+    def move_to_xtion_right_pose(self):
+        time_from_start = 0.5
+        self.add_xtion_control_data_to_storage("xtion_pan_joint", -1.57)
+        self.publish_xtion_control_data(time_from_start)
+
+    def move_to_xtion_left_pose(self):
+        time_from_start = 0.5
+        self.add_xtion_control_data_to_storage("xtion_pan_joint", 1.57)
+        self.publish_xtion_control_data(time_from_start)
 
 if __name__ == "__main__":
     rospy.init_node("joint_controller")
