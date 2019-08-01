@@ -22,9 +22,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(sobit_education_control src/sobit_common_dynamixel.cpp
-                                       src/sobit_education_dynamixel.cpp
-                                       src/sobit_education_control.cpp
-                                       src/sobit_education_hw.cpp)
+add_executable(sobit_education_control src/dynamixel_control.cpp
+                                       src/dynamixel_port_control.cpp
+                                       src/dynamixel_setting.cpp
+                                       src/sobit_education_control.cpp)
 target_link_libraries(sobit_education_control
  ${catkin_LIBRARIES})

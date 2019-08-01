@@ -12,7 +12,7 @@ SobitCommonDynamixel::SobitCommonDynamixel() {
   this->dxl_moving           = false;
   this->velocity_val         = 35;
   this->acceleration_val     = 3;
-  this->torque_limit_val     = 100;
+  this->torque_limit_val     = 10;
 }
 
 SobitCommonDynamixel::~SobitCommonDynamixel() {}
@@ -158,7 +158,7 @@ void SobitCommonDynamixel::setGrouopRead(int id) {
 }
 
 void SobitCommonDynamixel::setPositionIGain(int id) {
-  this->dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, id, POSITION_I_GAIN, (uint16_t)25, &this->dxl_error);
+  this->dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, id, POSITION_I_GAIN, (uint16_t)300, &this->dxl_error);
   if (this->dxl_comm_result != COMM_SUCCESS)
     packetHandler->getTxRxResult(this->dxl_comm_result);
   else if (this->dxl_error != 0)
@@ -259,7 +259,7 @@ int SobitCommonDynamixel::readCurrentPosition(int id) {
     return -1;
   } else {
     if (this->can_move == false) {
-      initializeDynamixel();
+      //initializeDynamixel();
       this->can_move = true;
     }
     // Get present position value
