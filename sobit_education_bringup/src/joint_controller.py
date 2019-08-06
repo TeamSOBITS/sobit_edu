@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+
 import rospy
 import tf
 import math
@@ -11,7 +12,7 @@ from sobit_common_msg.srv import gripper_move
 from sobit_common_msg.srv import gripper_moveResponse
 from sobit_common_msg.srv import robot_motion
 from sobit_common_msg.srv import robot_motionResponse
-from sobit_common_msg.srv import odom_base
+from sobit_common_msg.srv import wheel_control
 
 
 class JointController:
@@ -42,13 +43,16 @@ class JointController:
             shift       : 目標のtfの位置からどれだけずらすか
         """
         target_object = req_msg.target_name
-        key = self.listener.canTransform('/base_footprint', target_object, rospy.Time(0))  # 座標変換の可否判定
-        if not key:
-            rospy.logerr("gripper_move_to_target Can't Transform [%s]", target_object)
-            return gripper_moveResponse(False)
+        try:
+            self.listener.waitForTransform("base_footprint", target_object, rospy.Time(0), rospy.Duration(2.0))
+            (trans, _) = self.listener.lookupTransform("base_footprint", target_object, rospy.Time(0))
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            return False
+        except Exception as e:
+            rospy.logerr(e)
+            return False
 
-        rospy.loginfo("Gripper_move_to_target Target_object [%s]", target_object)
-        (trans, _) = self.listener.lookupTransform('/base_footprint', target_object, rospy.Time(0))
+        print trans
 
         tan_rad = math.atan((trans[1] + req_msg.shift.y) / trans[0])
         sx = math.cos(tan_rad) * req_msg.shift.x
@@ -102,13 +106,15 @@ class JointController:
         rospy.sleep(2.0)
 
         turning_deg = math.degrees(math.atan(object_y_cm / object_x_cm))
-        str_turning_deg = "T:" + str(turning_deg)
-        self.move_wheel(str_turning_deg)
+        self.move_wheel(0.0, turning_deg)
         rospy.sleep(2)
 
-        moving_cm = math.sqrt(object_x_cm**2 + object_y_cm**2) - from_base_to_hand_motor_link_x_cm
-        str_moving_cm = "S:" + str(moving_cm)
-        self.move_wheel(str_moving_cm)
+        moving_m = (math.sqrt(object_x_cm**2 + object_y_cm**2) - from_base_to_hand_motor_link_x_cm) / 100
+
+        if object_x_cm < 0:
+            moving_m = -moving_m
+
+        self.move_wheel(moving_m, 0.0)
 
         return gripper_moveResponse(True)
 
@@ -169,12 +175,12 @@ class JointController:
         self.xtion_control_data = JointTrajectory()
         self.xtion_control_data.points = [JointTrajectoryPoint()]
 
-    def move_wheel(self, str_distance):
-        rospy.wait_for_service('/robot_ctrl/odom_base_ctrl')
+    def move_wheel(self, req_straight, req_turn):
+        rospy.wait_for_service('/robot_ctrl/wheel_control')
         try:
-            wheel_ctrl_service = rospy.ServiceProxy('/robot_ctrl/odom_base_ctrl', odom_base)
-            res = wheel_ctrl_service(str_distance)
-            return res.res_str
+            wheel_ctrl_service = rospy.ServiceProxy('/robot_ctrl/wheel_control', wheel_control)
+            res = wheel_ctrl_service(req_straight, req_turn)
+            return res
         except rospy.ServiceException as e:
             print "Service call failed: %s" % e
 
@@ -201,11 +207,13 @@ class JointController:
         time_from_start = 0.5
         self.add_xtion_control_data_to_storage("xtion_pan_joint", -1.57)
         self.publish_xtion_control_data(time_from_start)
+        rospy.sleep(1.0)
 
     def move_to_xtion_left_pose(self):
         time_from_start = 0.5
         self.add_xtion_control_data_to_storage("xtion_pan_joint", 1.57)
         self.publish_xtion_control_data(time_from_start)
+        rospy.sleep(1.0)
 
 if __name__ == "__main__":
     rospy.init_node("joint_controller")

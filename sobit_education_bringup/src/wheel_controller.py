@@ -54,7 +54,7 @@ def request(req):
             y_diff = odometry_value.pose.pose.position.y - initial_value.pose.pose.position.y
             xt = math.sqrt(x_diff ** 2 + y_diff ** 2) # ユークリッド距離の計算
 
-            rospy.loginfo("%s %s", xt, req.straight_line)
+            #rospy.loginfo("%s[m] %s[m]", xt, req.straight_line)
             rate.sleep()
 
     # 回転運動
@@ -113,7 +113,7 @@ def request(req):
 
                     xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * (n-1)))
 
-            rospy.loginfo("%s %s", math.degrees(xt), req.turn_angle)
+            #rospy.loginfo("%s[deg] %s[deg]", math.degrees(xt), req.turn_angle)
             rate.sleep()
 
     xt = 0.0
