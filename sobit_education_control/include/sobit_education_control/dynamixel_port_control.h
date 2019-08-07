@@ -9,6 +9,8 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <joint_limits_interface/joint_limits_interface.h>
+#include <sobit_common_msg/current_state.h>
+#include <sobit_common_msg/current_state_array.h>
 #include <ros/ros.h>
 
 #include "sobit_education_control/dynamixel_control.h"
@@ -30,7 +32,7 @@ class DynamixelPortControl : public hardware_interface::RobotHW {
   ~DynamixelPortControl(){};
   ros::Time     getTime() const { return ros::Time::now(); }
   ros::Duration getDuration(ros::Time t) const { return (ros::Time::now() - t); }
-  void          read(ros::Time time, ros::Duration period);
+  bool          read(ros::Time time, ros::Duration period);
   void          write(ros::Time time, ros::Duration period);
 
   void setTorqueAll(bool torque);
@@ -43,8 +45,7 @@ class DynamixelPortControl : public hardware_interface::RobotHW {
   void setPositionIGain(uint8_t id, uint16_t i_gain);
   void setOperationMode(uint8_t id, uint8_t mode);
   void startUpPosition();
-  // void setDriveMode(uint8_t id, uint16_t mode);
-  // void setDelayTime(uint8_t id, uint16_t delay_time);
+  void readCurrent(ros::Time time, ros::Duration period);
 
   std::vector<dynamixel_control::DynamixelControl> joint_list_;
 
@@ -57,8 +58,10 @@ class DynamixelPortControl : public hardware_interface::RobotHW {
   hardware_interface::PositionJointInterface               jnt_pos_interface_;
   joint_limits_interface::PositionJointSoftLimitsInterface jnt_limit_interface_;
   std::unique_ptr<dynamixel::GroupBulkRead>                read_position_group_;
-  std::unique_ptr<dynamixel::GroupBulkRead>                read_temperature_group_;
+  std::unique_ptr<dynamixel::GroupBulkRead>                read_current_group_;
   std::unique_ptr<dynamixel::GroupBulkWrite>               write_position_group_;
+
+  ros::Publisher      pub_current_;
 };
 }  // namespace dynamixel_port_control
 

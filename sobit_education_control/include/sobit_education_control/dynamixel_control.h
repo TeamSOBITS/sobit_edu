@@ -128,34 +128,38 @@ class DynamixelControl {
   void setDxlPositionIGain(uint16_t set_pos_i_gain) { dxl_pos_i_gain_ = set_pos_i_gain; }
   void setParam(DynamixelJointParam set_param) { param_ = set_param; }
 
-  std::string         getJointName() { return name_; }
-  uint8_t             getDxlId() { return id_; }
-  double              getPosition() { return pos_; }
-  double*             getPositionAddr() { return &pos_; }
-  double              getVelocity() { return vel_; }
-  double*             getVelocityAddr() { return &vel_; }
-  double              getEffor() { return eff_; }
-  double*             getEffortAddr() { return &eff_; }
-  double              getCommand() { return cmd_; }
-  double*             getCommandAddr() { return &cmd_; }
-  double              getCurrent() { return current_; }
-  double              getTemprature() { return temprature_; }
-  bool                getTorque() { return torque_; }
-  uint32_t            getCenter() { return center_; }
-  uint32_t            getHome() { return home_; }
-  bool                isConnect() { return connect_; }
-  uint8_t             getOpeMode() { return ope_mode_; }
-  uint8_t*            getDxlGoalPosAddr() { return dxl_goal_pos_; }
-  uint32_t            getDxlPresentPos() { return dxl_present_pos_; }
-  uint16_t            getDxlTemprature() { return dxl_temprature_; }
-  uint32_t            getDxlVelocityLim() { return dxl_vel_lim_; }
-  uint32_t            getDxlAccelerationLim() { return dxl_acc_lim_; }
-  uint16_t            getDxlCurrentLimit() { return dxl_current_lim_; }
-  uint16_t            getDxlPositionIGain() { return dxl_pos_i_gain_; }
-  DynamixelJointParam getParam() { return param_; }
+  std::string                         getJointName() { return name_; }
+  uint8_t                             getDxlId() { return id_; }
+  double                              getPosition() { return pos_; }
+  double*                             getPositionAddr() { return &pos_; }
+  double                              getVelocity() { return vel_; }
+  double*                             getVelocityAddr() { return &vel_; }
+  double                              getEffor() { return eff_; }
+  double*                             getEffortAddr() { return &eff_; }
+  double                              getCommand() { return cmd_; }
+  double*                             getCommandAddr() { return &cmd_; }
+  double                              getCurrent() { return current_; }
+  double                              getTemprature() { return temprature_; }
+  bool                                getTorque() { return torque_; }
+  uint32_t                            getCenter() { return center_; }
+  uint32_t                            getHome() { return home_; }
+  joint_limits_interface::JointLimits getJointLimit() { return limits_; }
+  bool                                isConnect() { return connect_; }
+  uint8_t                             getOpeMode() { return ope_mode_; }
+  uint8_t*                            getDxlGoalPosAddr() { return dxl_goal_pos_; }
+  uint32_t                            getDxlPresentPos() { return dxl_present_pos_; }
+  uint16_t                            getDxlTemprature() { return dxl_temprature_; }
+  uint32_t                            getDxlVelocityLim() { return dxl_vel_lim_; }
+  uint32_t                            getDxlAccelerationLim() { return dxl_acc_lim_; }
+  uint16_t                            getDxlCurrentLimit() { return dxl_current_lim_; }
+  uint16_t                            getDxlPositionIGain() { return dxl_pos_i_gain_; }
+  DynamixelJointParam                 getParam() { return param_; }
 
   double  dxlPos2Rad(int32_t dxl_pos) { return (dxl_pos - center_) * ((M_PI * 2) / 4096); }
   int32_t rad2DxlPos(double rad) { return center_ + rad / (M_PI * 2) * 4096; }
+  double  dxlCurrent2Current(int16_t dxl_current) { return dxl_current * 2.69; }
+  uint16_t current2DxlCurrent(double current) { return (uint16_t)(current / 2.69); }
+  double  dxlCurrent2Effort(int16_t dxl_current) { return dxl_current * 2.69 * 1.79 * 0.001; }
 
  private:
   std::string name_;

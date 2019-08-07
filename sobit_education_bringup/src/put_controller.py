@@ -3,9 +3,8 @@
 import rospy
 from joint_controller import JointController
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Int32
 from sobit_common_msg.srv import put_ctrl, put_ctrlResponse
-from sobit_common_msg.msg import current_ctrl
+from sobit_common_msg.msg import current_state, current_state_array
 import tf
 import math
 
@@ -15,27 +14,28 @@ class PutControl(JointController):
     def __init__(self):
         super(PutControl, self).__init__()
         self.sub = rospy.Subscriber('/joint_states', JointState, self.joint_states_callback)
-        self.sub = rospy.Subscriber("/arduino_sensors_ros/pressure", Int32, self.arduino_pressure_callback)
-        self.pub_curr_ctrl = rospy.Publisher("/current_ctrl", current_ctrl, queue_size=10)
+        self.sub = rospy.Subscriber("/current_state_array", current_state_array, self.current_state_array_cb)
+        self.pub_curr_ctrl = rospy.Publisher("/current_ctrl", current_state, queue_size=10)
         self.servise = rospy.Service("put_controller", put_ctrl, self.down_to_arm)
         self.joint_data = JointState()
-        self.arduino_pressure_data = 0.0
+        self.arm_flex_joint_current = 16140
+    
+    def current_state_array_cb(self, msg):
+        for state in msg.current_state_array:
+            if state.name == "arm_flex_joint":
+                self.arm_flex_joint_current = state.current_ma
 
     def joint_states_callback(self, msg):
         if len(msg.name) == 7:
             self.joint_data = msg
 
-    def arduino_pressure_callback(self, msg):
-        self.arduino_pressure_data = msg.data
-
     def down_to_arm(self, msg):
         fixed_x_cm = 14.5
         now = rospy.Time.now()
         rate = rospy.Rate(5)
-        has_touched = False
-        current_data = current_ctrl()
+        current_data = current_state()
         current_data.joint_name = "hand_motor_joint"
-        current_data.current = 80
+        current_data.current_ma = 403.5
         self.pub_curr_ctrl.publish(current_data)
         try:
             self.listener.waitForTransform("base_footprint", "hand_motor_link", now, rospy.Duration(1.0))
@@ -48,23 +48,21 @@ class PutControl(JointController):
             return put_ctrlResponse(False)
         target_z_cm = trans[2] * 100 - self.from_base_to_arm_flex_link_z_cm
         target_x_cm = fixed_x_cm
-        min_z_cm = msg.place_pos_z_m * 100 - self.from_base_to_arm_flex_link_z_cm
-        current_step = (target_z_cm - min_z_cm) / 0.5
-        current_per = 80.0 / current_step
         arm_flex_link_cm = math.sqrt(self.arm_flex_link_x_cm**2 + self.arm_flex_link_z_cm**2)
         while target_z_cm > -10.0:
-            current_data.current -= current_per
-            if current_data.current > 0:
-                self.pub_curr_ctrl.publish(current_data)
             target_z_cm -= 0.5
-            """
-            if target_z_cm < min_z_cm:
-                has_touched = True
-                target_z_cm += 5.0
-                """
-            if self.arduino_pressure_data > 0:
-                has_touched = True
-                target_z_cm += 5.0
+            if self.arm_flex_joint_current < 16140:
+                for i, joint_name in enumerate(self.joint_data.name):
+                    if joint_name == "arm_flex_joint":
+                        self.add_arm_control_data_to_storage("arm_flex_joint", self.joint_data.position[i])
+                    elif joint_name == "arm_roll_joint":
+                        self.add_arm_control_data_to_storage("arm_roll_joint", self.joint_data.position[i])
+                    elif joint_name == "elbow_flex_joint":
+                        self.add_arm_control_data_to_storage("elbow_flex_joint", self.joint_data.position[i])
+                    elif joint_name == "wrist_flex_joint":
+                        self.add_arm_control_data_to_storage("wrist_flex_joint", self.joint_data.position[i])
+                self.publish_arm_control_data(0.001)
+                break
             target_rad = math.pi / 2. - math.atan2(target_z_cm, target_x_cm)
             target_dis_cm = math.sqrt(target_x_cm**2 + target_z_cm**2)
             tmp_arm_flex_joint_rad = math.acos(
@@ -77,10 +75,8 @@ class PutControl(JointController):
             self.add_arm_control_data_to_storage("arm_flex_joint", arm_flex_joint_rad)
             self.add_arm_control_data_to_storage("elbow_flex_joint", elbow_flex_joint_rad)
             self.add_arm_control_data_to_storage("wrist_flex_joint", wrist_flex_joint_rad)
-            self.publish_arm_control_data(0.001)
+            self.publish_arm_control_data(0.0001)
             rate.sleep()
-            if has_touched:
-                break
 
         return put_ctrlResponse(True)
 

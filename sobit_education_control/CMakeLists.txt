@@ -26,5 +26,4 @@ add_executable(sobit_education_control src/dynamixel_control.cpp
                                        src/dynamixel_port_control.cpp
                                        src/dynamixel_setting.cpp
                                        src/sobit_education_control.cpp)
-target_link_libraries(sobit_education_control
- ${catkin_LIBRARIES})
+target_link_libraries(sobit_education_control ${catkin_LIBRARIES})
