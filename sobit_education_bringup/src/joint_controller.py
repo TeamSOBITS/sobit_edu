@@ -42,95 +42,23 @@ class JointController(object):
             target_name : 目標のtf名
             shift       : 目標のtfの位置からどれだけずらすか
         """
-        tf_flag = False
         target_object = req_msg.target_name
 
         try:
             self.listener.waitForTransform("base_footprint", target_object, rospy.Time(0), rospy.Duration(2.0))
             (trans, _) = self.listener.lookupTransform("base_footprint", target_object, rospy.Time(0))
-            tf_flag = True
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             return False
         except Exception as e:
             rospy.logerr(e)
             return False
 
-        if tf_flag == True:
-            tan_rad = math.atan2((trans[1] + req_msg.shift.y), trans[0])
-            sx = math.cos(tan_rad) * req_msg.shift.x
-            sy = math.sin(tan_rad) * req_msg.shift.x
-            object_x_m = trans[0] + sx
-            object_y_m = trans[1] + sy
-            object_z_cm = (trans[2] + req_msg.shift.z) * 100
-
-        if tf_flag == True:
-            # パターン1(右にテーブル)
-            if 0 < trans[0] and trans[1] < 0:
-                print "パターン1"
-                tan_rad = math.atan2((trans[1] + req_msg.shift.y), trans[0])
-                sx = math.cos(tan_rad) * req_msg.shift.x
-                sy = math.sin(tan_rad) * req_msg.shift.x
-                object_x_m = trans[0] + sx
-                object_y_m = trans[1] + sy
-                object_z_cm = (trans[2] + req_msg.shift.z) * 100
-                turn_deg = math.degrees(math.atan2(object_y_m, object_x_m))  #- 180
-                print turn_deg
-
-                if object_x_m < 0:
-                    xt = -math.sqrt(object_x_m**2 + object_y_m**2)  # ユークリッド距離の計算
-                else:
-                    xt = math.sqrt(object_x_m**2 + object_y_m**2)  # ユークリッド距離の計算
-
-            # パターン2（右にテーブル）
-            elif trans[0] < 0 and trans[1] < 0:
-                print "パターン2"
-                tan_rad = math.atan2((trans[1] + req_msg.shift.y), trans[0])
-                sx = math.cos(tan_rad) * req_msg.shift.x
-                sy = math.sin(tan_rad) * req_msg.shift.x
-                object_x_m = trans[0] + sx
-                object_y_m = trans[1] + sy
-                object_z_cm = (trans[2] + req_msg.shift.z) * 100
-                turn_deg = math.degrees(math.atan2(object_y_m, object_x_m)) - 180
-                print turn_deg
-
-                if 0 < object_x_m:
-                    xt = -math.sqrt(object_x_m**2 + object_y_m**2)  # ユークリッド距離の計算
-                else:
-                    xt = math.sqrt(object_x_m**2 + object_y_m**2)  # ユークリッド距離の計算
-
-            # パターン3（左にテーブル）
-            elif 0 < trans[0] and 0 < trans[1]:
-                print "パターン3"
-                tan_rad = math.atan2((trans[1] + req_msg.shift.y), trans[0])
-                sx = math.cos(tan_rad) * req_msg.shift.x
-                sy = math.sin(tan_rad) * req_msg.shift.x
-                object_x_m = trans[0] + sx
-                object_y_m = trans[1] + sy
-                object_z_cm = (trans[2] + req_msg.shift.z) * 100
-                turn_deg = math.degrees(math.atan2(object_y_m, object_x_m))  #+ 180
-                print turn_deg
-
-                if object_x_m < 0:
-                    xt = -math.sqrt(object_x_m**2 + object_y_m**2)  # ユークリッド距離の計算
-                else:
-                    xt = math.sqrt(object_x_m**2 + object_y_m**2)  # ユークリッド距離の計算
-
-            # パターン4（左にテーブル）
-            elif trans[0] < 0 and 0 < trans[1]:
-                print "パターン4"
-                tan_rad = math.atan2((trans[1] + req_msg.shift.y), trans[0])
-                sx = math.cos(tan_rad) * req_msg.shift.x
-                sy = math.sin(tan_rad) * req_msg.shift.x
-                object_x_m = trans[0] + sx
-                object_y_m = trans[1] + sy
-                object_z_cm = (trans[2] + req_msg.shift.z) * 100
-                turn_deg = math.degrees(math.atan2(object_y_m, object_x_m)) + 180
-                print turn_deg
-
-                if 0 < object_x_m:
-                    xt = -math.sqrt(object_x_m**2 + object_y_m**2)  # ユークリッド距離の計算
-                else:
-                    xt = math.sqrt(object_x_m**2 + object_y_m**2)  # ユークリッド距離の計算
+        tan_rad = math.atan2((trans[1] + req_msg.shift.y), trans[0])
+        sx = math.cos(tan_rad) * req_msg.shift.x
+        sy = math.sin(tan_rad) * req_msg.shift.x
+        object_x_cm = (trans[0] + sx) * 100
+        object_y_cm = (trans[1] + sy) * 100
+        object_z_cm = (trans[2] + req_msg.shift.z) * 100
 
         if object_z_cm < self.can_grasp_min_z_cm or object_z_cm > self.can_grasp_max_z_cm:
             return gripper_moveResponse(False)
@@ -165,24 +93,21 @@ class JointController(object):
             from_base_to_hand_motor_link_x_cm = self.from_base_to_arm_flex_link_x_cm + self.arm_flex_link_z_cm + self.wrist_flex_link_z_cm * math.cos(
                 elbow_flex_joint_rad)
 
-        time_from_start_sec = 0.3
+        # wheelの計算
+        turn_deg = math.degrees(math.atan2(object_y_cm, object_x_cm))
+        rospy.loginfo("turn_deg : {}".format(turn_deg))
+        rospy.loginfo("obj_x_cm : {} , obj_y_cm : {}".format(object_x_cm, object_y_cm))
+        self.move_wheel(0.0, turn_deg)
+        moving_m = math.sqrt(trans[0]**2 + trans[1]**2) - from_base_to_hand_motor_link_x_cm / 100 + req_msg.shift.x
+
+        self.move_wheel(moving_m, 0.0)
+        time_from_start_sec = 1
         self.add_arm_control_data_to_storage("arm_roll_joint", 0.0)
         self.add_arm_control_data_to_storage("arm_flex_joint", arm_flex_joint_rad)
         self.add_arm_control_data_to_storage("elbow_flex_joint", elbow_flex_joint_rad)
         self.add_arm_control_data_to_storage("wrist_flex_joint", wrist_flex_joint_rad)
         self.publish_arm_control_data(time_from_start_sec)
         rospy.sleep(2.0)
-
-        #turning_deg = math.degrees(math.atan2(object_y_cm, object_x_cm))
-        self.move_wheel(0.0, turn_deg)
-        rospy.sleep(2)
-
-        #moving_m = (math.sqrt(object_x_cm**2 + object_y_cm**2) - from_base_to_hand_motor_link_x_cm) / 100
-
-        #if object_x_cm < 0:
-        #    moving_m = -moving_m
-
-        self.move_wheel(xt, 0.0)
 
         return gripper_moveResponse(True)
 
