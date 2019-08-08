@@ -22,7 +22,7 @@ class PutControl(JointController):
     
     def current_state_array_cb(self, msg):
         for state in msg.current_state_array:
-            if state.name == "arm_flex_joint":
+            if state.joint_name == "arm_flex_joint":
                 self.arm_flex_joint_current = state.current_ma
 
     def joint_states_callback(self, msg):
@@ -36,7 +36,7 @@ class PutControl(JointController):
         current_data = current_state()
         current_data.joint_name = "hand_motor_joint"
         current_data.current_ma = 403.5
-        self.pub_curr_ctrl.publish(current_data)
+        # self.pub_curr_ctrl.publish(current_data)
         try:
             self.listener.waitForTransform("base_footprint", "hand_motor_link", now, rospy.Duration(1.0))
             (trans, _) = self.listener.lookupTransform("base_footprint", "hand_motor_link", now)

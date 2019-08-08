@@ -10,14 +10,14 @@ namespace dynamixel_control {
 static const int PROTOCOL_VERSION = 2;
 static const int TORQUE_ENABLE    = 1;
 static const int TORQUE_DISABLE   = 0;
-static const int REG_LENGTH_BYTE  = 1;
-static const int REG_LENGTH_WORD  = 2;
-static const int REG_LENGTH_DWORD = 4;
+static const uint16_t REG_LENGTH_BYTE  = 1;
+static const uint16_t REG_LENGTH_WORD  = 2;
+static const uint16_t REG_LENGTH_DWORD = 4;
 
 typedef struct {
   std::string name;
-  uint32_t    address;
-  uint32_t    length;
+  uint16_t    address;
+  uint16_t    length;
   uint32_t    default_val;
 } DynamixelRegTable;
 
@@ -155,11 +155,11 @@ class DynamixelControl {
   uint16_t                            getDxlPositionIGain() { return dxl_pos_i_gain_; }
   DynamixelJointParam                 getParam() { return param_; }
 
-  double  dxlPos2Rad(int32_t dxl_pos) { return (dxl_pos - center_) * ((M_PI * 2) / 4096); }
-  int32_t rad2DxlPos(double rad) { return center_ + rad / (M_PI * 2) * 4096; }
-  double  dxlCurrent2Current(int16_t dxl_current) { return dxl_current * 2.69; }
-  uint16_t current2DxlCurrent(double current) { return (uint16_t)(current / 2.69); }
-  double  dxlCurrent2Effort(int16_t dxl_current) { return dxl_current * 2.69 * 1.79 * 0.001; }
+  double   dxlPos2Rad(int32_t dxl_pos) { return (dxl_pos - center_) * ((M_PI * 2) / 4096); }
+  int32_t  rad2DxlPos(double rad) { return center_ + rad / (M_PI * 2) * 4096; }
+  double   dxlCurrent2Current(int32_t dxl_current) { return dxl_current * 2.69; }
+  uint32_t current2DxlCurrent(double current) { return (uint32_t)(current / 2.69); }
+  double   dxlCurrent2Effort(int16_t dxl_current) { return dxl_current * 2.69 * 1.79 * 0.001; }
 
  private:
   std::string name_;

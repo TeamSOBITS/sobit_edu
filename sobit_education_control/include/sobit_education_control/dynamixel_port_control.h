@@ -25,7 +25,7 @@ typedef struct {
   uint16_t step;
   double   step_rad;
 } HomeMotionData;
-
+ 
 class DynamixelPortControl : public hardware_interface::RobotHW {
  public:
   DynamixelPortControl(ros::NodeHandle nh, dynamixel_setting::DynamixelSetting &setting);
@@ -46,6 +46,7 @@ class DynamixelPortControl : public hardware_interface::RobotHW {
   void setOperationMode(uint8_t id, uint8_t mode);
   void startUpPosition();
   void readCurrent(ros::Time time, ros::Duration period);
+  int  getCurrentLoad(int id);
 
   std::vector<dynamixel_control::DynamixelControl> joint_list_;
 

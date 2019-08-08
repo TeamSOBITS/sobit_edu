@@ -114,6 +114,16 @@ bool DynamixelPortControl::read(ros::Time time, ros::Duration period) {
     }
   }
   readCurrent(time, period);
+  /* sobit_common_msg::current_state_array current_state_array;
+  for (int i = 0; i < joint_num_; i++){
+    int dxl_id = joint_list_[i].getDxlId();
+    int current = getCurrentLoad(dxl_id);
+    sobit_common_msg::current_state current_state;
+    current_state.joint_name = joint_list_[i].getJointName();
+    current_state.current_ma = current;
+    current_state_array.current_state_array.push_back(current_state);
+  }
+  pub_current_.publish(current_state_array);*/
   return true;
 }
 
@@ -133,7 +143,7 @@ void DynamixelPortControl::readCurrent(ros::Time time, ros::Duration period) {
         dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].address,
         dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].length);
     if (dxl_getdata_result) {
-      int16_t dxl_present_current = read_current_group_->getData(
+      uint32_t dxl_present_current = read_current_group_->getData(
           dxl_id,
           dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].address,
           dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].length);
@@ -299,7 +309,7 @@ void DynamixelPortControl::initializeSettingParam() {
 }
 
 void DynamixelPortControl::startUpPosition() {
-  ros::Rate                   rate(20);
+  ros::Rate                   rate(10);
   int                         step_max = 30;
   ros::Time                   t        = getTime();
   ros::Duration               dt       = getDuration(t);
@@ -343,9 +353,9 @@ void DynamixelPortControl::startUpPosition() {
 }
 
 // Debug
-/*
-int DynamixelPortControl::getCurrentLoad(int id){
-  uint8_t dxl_error       = 0;
+
+int DynamixelPortControl::getCurrentLoad(int id) {
+  uint8_t  dxl_error = 0;
   uint16_t dxl_current;
   int      dxl_comm_result = packet_handler_->read2ByteTxRx(
       port_handler_,
@@ -361,5 +371,5 @@ int DynamixelPortControl::getCurrentLoad(int id){
   ROS_INFO("[%03d] : %d", id, dxl_current);
   return dxl_current;
 }
-*/
+
 }  // namespace dynamixel_port_control
