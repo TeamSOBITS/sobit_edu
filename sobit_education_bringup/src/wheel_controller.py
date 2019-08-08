@@ -4,7 +4,6 @@
 import rospy
 import time
 import math
-import sympy
 import tf
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64
@@ -39,7 +38,7 @@ def request(req):
         while xt < abs(req.straight_line):
 
             straight_flag = True
-            result = pid_calculation(abs(req.straight_line), xt, t1, req.max_speed, ft_before) # PID制御の計算を行う
+            result = pid_calculation(abs(req.straight_line), xt, t1, ft_before) # PID制御の計算を行う
             straight_flag = False
 
             if req.straight_line < 0:
@@ -55,7 +54,7 @@ def request(req):
             y_diff = odometry_value.pose.pose.position.y - initial_value.pose.pose.position.y
             xt = math.sqrt(x_diff ** 2 + y_diff ** 2) # ユークリッド距離の計算
 
-            rospy.loginfo("%s %s", xt, req.straight_line)
+            #rospy.loginfo("%s[m] %s[m]", xt, req.straight_line)
             rate.sleep()
 
     # 回転運動
@@ -74,7 +73,7 @@ def request(req):
         while xt < abs(order_value):
 
             turn_flag = True
-            result = pid_calculation(abs(order_value), xt, t1, req.max_speed, ft_before) #PID制御の計算を行う
+            result = pid_calculation(abs(order_value), xt, t1, ft_before) #PID制御の計算を行う
             turn_flag = False
 
             if order_value < 0:
@@ -114,14 +113,14 @@ def request(req):
 
                     xt = abs(odometry_euler[2] - initial_euler[2] - math.radians(360 * (n-1)))
 
-            rospy.loginfo("%s %s", math.degrees(xt), req.turn_angle)
+            #rospy.loginfo("%s[deg] %s[deg]", math.degrees(xt), req.turn_angle)
             rate.sleep()
 
     xt = 0.0
     return 'finished'
 
 # PID制御の計算を行う
-def pid_calculation(xd, xt, t1, max_speed, ft_before):
+def pid_calculation(xd, xt, t1, ft_before):
     t2 = time.time() # 処理後の時刻
     elapsed_time = t2-t1 # 経過時間
 
@@ -138,6 +137,8 @@ def pid_calculation(xd, xt, t1, max_speed, ft_before):
             ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki * (xd + 0.001 - xt) * elapsed_time ** 2
         else:
             ft = Kp * (xd + 0.001 - xt) - Kv * ft_before + Ki * 0.75 * 30 / math.degrees(xd) * (xd + 0.001 - xt) * elapsed_time ** 2
+
+    return ft
 
 # 車輪のオドメトリを返す
 def odometory_save(odometry):
