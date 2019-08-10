@@ -23,6 +23,7 @@ class JointController(object):
         self.servise = rospy.Service("gripper_open_and_close", gripper_ctrl, self.open_and_close_gripper_server)
         self.servise = rospy.Service("gripper_move_to_target", gripper_move, self.move_gripper_to_target_server)
         self.servise = rospy.Service("motion_ctrl", robot_motion, self.move_to_registered_motion_server)
+        self.servise = rospy.Service("xtion_ctrl", gripper_ctrl, self.xtion_control_server)
         self.listener = tf.TransformListener()
         self.arm_control_data = JointTrajectory()
         self.xtion_control_data = JointTrajectory()
@@ -42,11 +43,13 @@ class JointController(object):
             target_name : 目標のtf名
             shift       : 目標のtfの位置からどれだけずらすか
         """
+
         target_object = req_msg.target_name
 
         try:
             self.listener.waitForTransform("base_footprint", target_object, rospy.Time(0), rospy.Duration(2.0))
             (trans, _) = self.listener.lookupTransform("base_footprint", target_object, rospy.Time(0))
+            tf_flag = True
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             return False
         except Exception as e:
@@ -98,9 +101,12 @@ class JointController(object):
         rospy.loginfo("turn_deg : {}".format(turn_deg))
         rospy.loginfo("obj_x_cm : {} , obj_y_cm : {}".format(object_x_cm, object_y_cm))
         self.move_wheel(0.0, turn_deg)
-        moving_m = math.sqrt(trans[0]**2 + trans[1]**2) - from_base_to_hand_motor_link_x_cm / 100 + req_msg.shift.x
+        rospy.sleep(3.0)
 
+        moving_m = math.sqrt(trans[0]**2 + trans[1]**2) - from_base_to_hand_motor_link_x_cm / 100 + req_msg.shift.x
         self.move_wheel(moving_m, 0.0)
+        rospy.sleep(3.0)
+
         time_from_start_sec = 1
         self.add_arm_control_data_to_storage("arm_roll_joint", 0.0)
         self.add_arm_control_data_to_storage("arm_flex_joint", arm_flex_joint_rad)
@@ -113,7 +119,7 @@ class JointController(object):
 
     def open_and_close_gripper_server(self, req_msg):
         hand_motor_joint_rad = req_msg.rad
-        time_from_start_sec = 0.1
+        time_from_start_sec = 2.0
         self.add_arm_control_data_to_storage("hand_motor_joint", hand_motor_joint_rad)
         self.publish_arm_control_data(time_from_start_sec)
         rospy.sleep(time_from_start_sec)
@@ -125,12 +131,17 @@ class JointController(object):
             self.move_to_initial_pose()
         elif motion_type == "DETECTING_POSE":
             self.move_to_detecting_pose()
-        elif motion_type == "XTION_RIGHT_POSE":
-            self.move_to_xtion_right_pose()
-        elif motion_type == "XTION_LEFT_POSE":
-            self.move_to_xtion_left_pose()
 
         return robot_motionResponse(True)
+
+    def xtion_control_server(self, req_msg):
+        xtion_pan_rad = req_msg.rad
+        time_from_start = 0.5
+        self.add_xtion_control_data_to_storage("xtion_pan_joint", xtion_pan_rad)
+        self.publish_xtion_control_data(time_from_start)
+        rospy.sleep(1.0)
+
+        return gripper_ctrlResponse(True)
 
     def check_publishers_connection(self, publisher):
         loop_rate_to_check_connection = rospy.Rate(1)
@@ -181,8 +192,8 @@ class JointController(object):
         time_from_start_sec = 0.5
         self.add_arm_control_data_to_storage("arm_roll_joint", 0.00)
         self.add_arm_control_data_to_storage("arm_flex_joint", -1.57)
-        self.add_arm_control_data_to_storage("elbow_flex_joint", 1.32)
-        self.add_arm_control_data_to_storage("wrist_flex_joint", 0.25)
+        self.add_arm_control_data_to_storage("elbow_flex_joint", 1.30)
+        self.add_arm_control_data_to_storage("wrist_flex_joint", 0.40)
         self.add_arm_control_data_to_storage("hand_motor_joint", 0.00)
         self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.00)
         self.add_xtion_control_data_to_storage("xtion_pan_joint", 0.00)
@@ -195,19 +206,6 @@ class JointController(object):
         self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.53)
         self.publish_xtion_control_data(time_from_start)
         rospy.sleep(1.0)
-
-    def move_to_xtion_right_pose(self):
-        time_from_start = 0.5
-        self.add_xtion_control_data_to_storage("xtion_pan_joint", -1.57)
-        self.publish_xtion_control_data(time_from_start)
-        rospy.sleep(1.0)
-
-    def move_to_xtion_left_pose(self):
-        time_from_start = 0.5
-        self.add_xtion_control_data_to_storage("xtion_pan_joint", 1.57)
-        self.publish_xtion_control_data(time_from_start)
-        rospy.sleep(1.0)
-
 
 if __name__ == "__main__":
     rospy.init_node("joint_controller")
