@@ -89,11 +89,16 @@ class JointController(object):
 
         elif object_z_cm < self.from_base_to_arm_flex_link_z_cm:
             print "objectがarm_flex_jointより低い場合"
-            elbow_flex_joint_sin = (self.from_base_to_arm_flex_link_z_cm - self.arm_flex_link_x_cm - object_z_cm) / self.wrist_flex_link_z_cm
-            elbow_flex_joint_rad = -math.asin(elbow_flex_joint_sin)
-            wrist_flex_joint_rad = -elbow_flex_joint_rad
+            #elbow_flex_joint_sin = (self.from_base_to_arm_flex_link_z_cm - self.arm_flex_link_x_cm - object_z_cm) / self.wrist_flex_link_z_cm
+            #elbow_flex_joint_rad = -math.asin(elbow_flex_joint_sin)
+            #wrist_flex_joint_rad = -elbow_flex_joint_rad
+            elbow_flex_joint_cos = (self.from_base_to_arm_flex_link_z_cm - self.arm_flex_link_x_cm - object_z_cm) / self.wrist_flex_link_z_cm
+            elbow_flex_joint_rad = -math.acos(elbow_flex_joint_cos)
+            wrist_flex_joint_rad = -math.asin(elbow_flex_joint_cos)
+            print elbow_flex_joint_rad
+            print wrist_flex_joint_rad
             arm_flex_joint_rad = 1.57
-            from_base_to_hand_motor_link_x_cm = self.from_base_to_arm_flex_link_x_cm + self.arm_flex_link_z_cm + self.wrist_flex_link_z_cm * math.cos(
+            from_base_to_hand_motor_link_x_cm = self.from_base_to_arm_flex_link_x_cm + self.arm_flex_link_x_cm + self.wrist_flex_link_z_cm * math.cos(
                 elbow_flex_joint_rad)
 
         # wheelの計算
@@ -131,6 +136,8 @@ class JointController(object):
             self.move_to_initial_pose()
         elif motion_type == "DETECTING_POSE":
             self.move_to_detecting_pose()
+        elif motion_type == "HIGHT_POSE":
+            self.move_to_hight_pose()
 
         return robot_motionResponse(True)
 
@@ -205,6 +212,19 @@ class JointController(object):
         time_from_start = 0.5
         self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.53)
         self.publish_xtion_control_data(time_from_start)
+        rospy.sleep(1.0)
+
+    def move_to_hight_pose(self):
+        time_from_start_sec = 0.5
+        self.add_arm_control_data_to_storage("arm_roll_joint", 0.00)
+        self.add_arm_control_data_to_storage("arm_flex_joint", 0.00)
+        self.add_arm_control_data_to_storage("elbow_flex_joint", 0.00)
+        self.add_arm_control_data_to_storage("wrist_flex_joint", 0.00)
+        self.add_arm_control_data_to_storage("hand_motor_joint", 0.00)
+        self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.00)
+        self.add_xtion_control_data_to_storage("xtion_pan_joint", 0.00)
+        self.publish_arm_control_data(time_from_start_sec)
+        self.publish_xtion_control_data(time_from_start_sec)
         rospy.sleep(1.0)
 
 if __name__ == "__main__":
