@@ -22,23 +22,18 @@ DynamixelPortControl::DynamixelPortControl(ros::NodeHandle nh, dynamixel_setting
 
   packet_handler_ = dynamixel::PacketHandler::getPacketHandler(dynamixel_control::PROTOCOL_VERSION);
   port_handler_   = dynamixel::PortHandler::getPortHandler(setting.getPortName().c_str());
-  read_position_group_.reset(new dynamixel::GroupBulkRead(port_handler_, packet_handler_));
-  read_current_group_.reset(new dynamixel::GroupBulkRead(port_handler_, packet_handler_));
+  read_status_group_.reset(new dynamixel::GroupBulkRead(port_handler_, packet_handler_));
   write_position_group_.reset(new dynamixel::GroupBulkWrite(port_handler_, packet_handler_));
 
   for (int i = 0; i < joint_num_; i++) {
     uint8_t dxl_id = joint_list_[i].getDxlId();
-    if (!read_position_group_->addParam(
-            dxl_id,
-            dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_POSITION].address,
-            dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_POSITION].length)) {
-      ROS_ERROR("[ID:%03d] groupBulkReadPosition addparam failed.", dxl_id);
-    }
-    if (!read_current_group_->addParam(
+    if (!read_status_group_->addParam(
             dxl_id,
             dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].address,
-            dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].length)) {
-      ROS_ERROR("[ID:%03d] groupBulkReadTemp addparam failed.", dxl_id);
+            dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_POSITION].length
+                + dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].length
+                + dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_VELOCITY].length)) {
+      ROS_ERROR("[ID:%03d] groupBulkReadStatus addparam failed.", dxl_id);
     }
   }
 
@@ -89,22 +84,29 @@ DynamixelPortControl::DynamixelPortControl(ros::NodeHandle nh, dynamixel_setting
 }
 
 bool DynamixelPortControl::read(ros::Time time, ros::Duration period) {
-  // read_position
+  // read_status
   dxl_res_            = true;
-  int dxl_comm_result = read_position_group_->txRxPacket();
+  int dxl_comm_result = read_status_group_->txRxPacket();
   if (dxl_comm_result != COMM_SUCCESS) {
     dxl_res_ = false;
-    ROS_ERROR("group_position_read->txRxPacket failed.");
+    ROS_ERROR("group_status_read->txRxPacket failed.");
     return false;
   }
+  readPosition(time, period);
+  readVelocity(time, period);
+  readCurrent(time, period);
+  return true;
+}
+
+void DynamixelPortControl::readPosition(ros::Time time, ros::Duration period) {
   for (int i = 0; i < joint_num_; i++) {
     uint8_t dxl_id             = joint_list_[i].getDxlId();
-    bool    dxl_getdata_result = read_position_group_->isAvailable(
+    bool    dxl_getdata_result = read_status_group_->isAvailable(
         dxl_id,
         dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_POSITION].address,
         dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_POSITION].length);
     if (dxl_getdata_result) {
-      int32_t present_pos = read_position_group_->getData(
+      int32_t present_pos = read_status_group_->getData(
           dxl_id,
           dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_POSITION].address,
           dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_POSITION].length);
@@ -113,37 +115,37 @@ bool DynamixelPortControl::read(ros::Time time, ros::Duration period) {
       joint_list_[i].setPosition(rad);
     }
   }
-  readCurrent(time, period);
-  /* sobit_common_msg::current_state_array current_state_array;
-  for (int i = 0; i < joint_num_; i++){
-    int dxl_id = joint_list_[i].getDxlId();
-    int current = getCurrentLoad(dxl_id);
-    sobit_common_msg::current_state current_state;
-    current_state.joint_name = joint_list_[i].getJointName();
-    current_state.current_ma = current;
-    current_state_array.current_state_array.push_back(current_state);
+}
+
+void DynamixelPortControl::readVelocity(ros::Time time, ros::Duration period) {
+  for (int i = 0; i < joint_num_; i++) {
+    uint8_t dxl_id             = joint_list_[i].getDxlId();
+    bool    dxl_getdata_result = read_status_group_->isAvailable(
+        dxl_id,
+        dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_VELOCITY].address,
+        dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_VELOCITY].length);
+    if (dxl_getdata_result) {
+      int32_t present_vel = read_status_group_->getData(
+          dxl_id,
+          dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_VELOCITY].address,
+          dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_VELOCITY].length);
+      joint_list_[i].setDxlPresentVel(present_vel);
+      double vel = joint_list_[i].dxlVel2RadPS(present_vel);
+      joint_list_[i].setVelocity(vel);
+    }
   }
-  pub_current_.publish(current_state_array);*/
-  return true;
 }
 
 void DynamixelPortControl::readCurrent(ros::Time time, ros::Duration period) {
-  dxl_res_            = true;
-  int dxl_comm_result = read_current_group_->txRxPacket();
-  if (dxl_comm_result != COMM_SUCCESS) {
-    dxl_res_ = false;
-    ROS_ERROR("group_position_read->txRxPacket failed.");
-    return;
-  }
   sobit_common_msg::current_state_array current_state_array;
   for (int i = 0; i < joint_num_; i++) {
     uint8_t dxl_id             = joint_list_[i].getDxlId();
-    bool    dxl_getdata_result = read_current_group_->isAvailable(
+    bool    dxl_getdata_result = read_status_group_->isAvailable(
         dxl_id,
         dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].address,
         dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].length);
     if (dxl_getdata_result) {
-      uint32_t dxl_present_current = read_current_group_->getData(
+      uint32_t dxl_present_current = read_status_group_->getData(
           dxl_id,
           dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].address,
           dynamixel_control::DYNAMIXEL_REG_TABLE[dynamixel_control::TABLE_ID_PRESENT_CURRENT].length);
@@ -309,8 +311,8 @@ void DynamixelPortControl::initializeSettingParam() {
 }
 
 void DynamixelPortControl::startUpPosition() {
-  ros::Rate                   rate(10);
-  int                         step_max = 30;
+  ros::Rate                   rate(20);
+  int                         step_max = 60;
   ros::Time                   t        = getTime();
   ros::Duration               dt       = getDuration(t);
   std::vector<HomeMotionData> home_motion_data_vec;

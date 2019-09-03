@@ -143,10 +143,10 @@ class JointController(object):
 
     def xtion_control_server(self, req_msg):
         xtion_pan_rad = req_msg.rad
-        time_from_start = 0.5
+        time_from_start_sec = 3.0
         self.add_xtion_control_data_to_storage("xtion_pan_joint", xtion_pan_rad)
-        self.publish_xtion_control_data(time_from_start)
-        rospy.sleep(1.0)
+        self.publish_xtion_control_data(time_from_start_sec)
+        rospy.sleep(time_from_start_sec)
 
         return gripper_ctrlResponse(True)
 
@@ -196,7 +196,7 @@ class JointController(object):
             print "Service call failed: %s" % e
 
     def move_to_initial_pose(self):
-        time_from_start_sec = 0.5
+        time_from_start_sec = 5.0
         self.add_arm_control_data_to_storage("arm_roll_joint", 0.00)
         self.add_arm_control_data_to_storage("arm_flex_joint", -1.57)
         self.add_arm_control_data_to_storage("elbow_flex_joint", 1.30)
@@ -206,16 +206,16 @@ class JointController(object):
         self.add_xtion_control_data_to_storage("xtion_pan_joint", 0.00)
         self.publish_arm_control_data(time_from_start_sec)
         self.publish_xtion_control_data(time_from_start_sec)
-        rospy.sleep(1.0)
+        rospy.sleep(time_from_start_sec)
 
     def move_to_detecting_pose(self):
-        time_from_start = 0.5
+        time_from_start_sec = 3.0
         self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.53)
-        self.publish_xtion_control_data(time_from_start)
-        rospy.sleep(1.0)
+        self.publish_xtion_control_data(time_from_start_sec)
+        rospy.sleep(time_from_start_sec)
 
     def move_to_hight_pose(self):
-        time_from_start_sec = 0.5
+        time_from_start_sec = 5.0
         self.add_arm_control_data_to_storage("arm_roll_joint", 0.00)
         self.add_arm_control_data_to_storage("arm_flex_joint", 0.00)
         self.add_arm_control_data_to_storage("elbow_flex_joint", 0.00)
@@ -225,10 +225,11 @@ class JointController(object):
         self.add_xtion_control_data_to_storage("xtion_pan_joint", 0.00)
         self.publish_arm_control_data(time_from_start_sec)
         self.publish_xtion_control_data(time_from_start_sec)
-        rospy.sleep(1.0)
+        rospy.sleep(time_from_start_sec)
+
 
 if __name__ == "__main__":
     rospy.init_node("joint_controller")
     jc = JointController()
-    jc.move_to_initial_pose()
+    # jc.move_to_initial_pose()
     rospy.spin()

@@ -3,8 +3,8 @@
 namespace dynamixel_control {
 DynamixelControl::DynamixelControl(std::string name,
                                    uint8_t     dxl_id,
-                                   uint32_t    center,
-                                   uint32_t    home,
+                                   int32_t    center,
+                                   int32_t    home,
                                    uint8_t     mode,
                                    uint32_t    dxl_vel_lim,
                                    uint32_t    dxl_acc_lim,

@@ -7,9 +7,9 @@
 #include <joint_limits_interface/joint_limits_rosparam.h>
 
 namespace dynamixel_control {
-static const int PROTOCOL_VERSION = 2;
-static const int TORQUE_ENABLE    = 1;
-static const int TORQUE_DISABLE   = 0;
+static const int      PROTOCOL_VERSION = 2;
+static const int      TORQUE_ENABLE    = 1;
+static const int      TORQUE_DISABLE   = 0;
 static const uint16_t REG_LENGTH_BYTE  = 1;
 static const uint16_t REG_LENGTH_WORD  = 2;
 static const uint16_t REG_LENGTH_DWORD = 4;
@@ -99,8 +99,8 @@ class DynamixelControl {
  public:
   DynamixelControl(std::string name,
                    uint8_t     dxl_id,
-                   uint32_t    center,
-                   uint32_t    home,
+                   int32_t     center,
+                   int32_t     home,
                    uint8_t     mode,
                    uint32_t    dxl_vel_lim,
                    uint32_t    dxl_acc_lim,
@@ -121,7 +121,9 @@ class DynamixelControl {
   void setConnect(bool set_connect) { connect_ = set_connect; }
   void setOpeMode(uint8_t set_ope_mode) { ope_mode_ = set_ope_mode; }
   void setLimits(joint_limits_interface::JointLimits& set_limits) { limits_ = set_limits; }
-  void setDxlPresentPos(uint32_t set_dxl_pos) { dxl_present_pos_ = set_dxl_pos; }
+  void setDxlPresentPos(int32_t set_dxl_pos) { dxl_present_pos_ = set_dxl_pos; }
+  void setDxlPresentVel(int32_t set_dxl_vel) { dxl_present_vel_ = set_dxl_vel; }
+  void setDxlPresentAcc(int32_t set_dxl_acc) { dxl_present_acc_ = set_dxl_acc; }
   void setDxlVelocityLim(uint32_t set_dxl_vel_lim) { dxl_vel_lim_ = set_dxl_vel_lim; }
   void setDxlAccelerationLim(uint32_t set_dxl_acc_lim) { dxl_acc_lim_ = set_dxl_acc_lim; }
   void setDxlTorqueLimit(uint16_t set_torque_lim) { dxl_current_lim_ = set_torque_lim; }
@@ -141,13 +143,15 @@ class DynamixelControl {
   double                              getCurrent() { return current_; }
   double                              getTemprature() { return temprature_; }
   bool                                getTorque() { return torque_; }
-  uint32_t                            getCenter() { return center_; }
-  uint32_t                            getHome() { return home_; }
+  int32_t                             getCenter() { return center_; }
+  int32_t                             getHome() { return home_; }
   joint_limits_interface::JointLimits getJointLimit() { return limits_; }
   bool                                isConnect() { return connect_; }
   uint8_t                             getOpeMode() { return ope_mode_; }
   uint8_t*                            getDxlGoalPosAddr() { return dxl_goal_pos_; }
-  uint32_t                            getDxlPresentPos() { return dxl_present_pos_; }
+  int32_t                             getDxlPresentPos() { return dxl_present_pos_; }
+  int32_t                             getDxlPresentVel() { return dxl_present_vel_; }
+  int32_t                             getDxlPresentAcc() { return dxl_present_acc_; }
   uint16_t                            getDxlTemprature() { return dxl_temprature_; }
   uint32_t                            getDxlVelocityLim() { return dxl_vel_lim_; }
   uint32_t                            getDxlAccelerationLim() { return dxl_acc_lim_; }
@@ -160,6 +164,7 @@ class DynamixelControl {
   double   dxlCurrent2Current(int32_t dxl_current) { return dxl_current * 2.69; }
   uint32_t current2DxlCurrent(double current) { return (uint32_t)(current / 2.69); }
   double   dxlCurrent2Effort(int16_t dxl_current) { return dxl_current * 2.69 * 1.79 * 0.001; }
+  double   dxlVel2RadPS(int32_t dxl_vel) { return dxl_vel * 0.229 * 0.1047; }
 
  private:
   std::string name_;
@@ -171,8 +176,8 @@ class DynamixelControl {
   double      current_;
   double      temprature_;
   bool        torque_;
-  uint32_t    center_;
-  uint32_t    home_;
+  int32_t     center_;
+  int32_t     home_;
   bool        connect_;
   uint8_t     ope_mode_;
 
@@ -180,6 +185,8 @@ class DynamixelControl {
 
   uint8_t  dxl_goal_pos_[4];
   int32_t  dxl_present_pos_;
+  int32_t  dxl_present_vel_;
+  int32_t  dxl_present_acc_;
   uint16_t dxl_temprature_;
   uint32_t dxl_vel_lim_;
   uint32_t dxl_acc_lim_;

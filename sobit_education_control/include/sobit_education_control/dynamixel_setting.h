@@ -24,8 +24,8 @@ static const std::string KEY_POSITION_I_GAIN = "/pos_i_gain";
 typedef struct {
   std::string name;
   uint8_t     id;
-  uint16_t    center;
-  uint16_t    home;
+  int16_t    center;
+  int16_t    home;
   uint8_t     mode;
   uint32_t    vel;
   uint32_t    acc;

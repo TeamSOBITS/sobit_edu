@@ -18,11 +18,11 @@
 
 namespace dynamixel_port_control {
 typedef struct {
-  uint16_t home;
+  int16_t home;
   double   home_rad;
-  uint16_t start;
+  int16_t start;
   double   start_rad;
-  uint16_t step;
+  int16_t step;
   double   step_rad;
 } HomeMotionData;
  
@@ -45,6 +45,8 @@ class DynamixelPortControl : public hardware_interface::RobotHW {
   void setPositionIGain(uint8_t id, uint16_t i_gain);
   void setOperationMode(uint8_t id, uint8_t mode);
   void startUpPosition();
+  void readPosition(ros::Time time, ros::Duration period);
+  void readVelocity(ros::Time time, ros::Duration period);
   void readCurrent(ros::Time time, ros::Duration period);
   int  getCurrentLoad(int id);
 
@@ -58,7 +60,7 @@ class DynamixelPortControl : public hardware_interface::RobotHW {
   hardware_interface::JointStateInterface                  jnt_state_interface_;
   hardware_interface::PositionJointInterface               jnt_pos_interface_;
   joint_limits_interface::PositionJointSoftLimitsInterface jnt_limit_interface_;
-  std::unique_ptr<dynamixel::GroupBulkRead>                read_position_group_;
+  std::unique_ptr<dynamixel::GroupBulkRead>                read_status_group_;
   std::unique_ptr<dynamixel::GroupBulkRead>                read_current_group_;
   std::unique_ptr<dynamixel::GroupBulkWrite>               write_position_group_;
 
