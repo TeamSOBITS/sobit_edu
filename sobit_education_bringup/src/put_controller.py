@@ -19,7 +19,7 @@ class PutControl(JointController):
         self.servise = rospy.Service("put_controller", put_ctrl, self.down_to_arm)
         self.joint_data = JointState()
         self.arm_flex_joint_current = 16140
-    
+
     def current_state_array_cb(self, msg):
         for state in msg.current_state_array:
             if state.joint_name == "arm_flex_joint":
@@ -30,7 +30,7 @@ class PutControl(JointController):
             self.joint_data = msg
 
     def down_to_arm(self, msg):
-        fixed_x_cm = 14.5
+        fixed_x_cm = 25.0
         now = rospy.Time.now()
         rate = rospy.Rate(5)
         current_data = current_state()
@@ -51,7 +51,7 @@ class PutControl(JointController):
         arm_flex_link_cm = math.sqrt(self.arm_flex_link_x_cm**2 + self.arm_flex_link_z_cm**2)
         while target_z_cm > -10.0:
             target_z_cm -= 0.5
-            if self.arm_flex_joint_current < 16140:
+            if self.arm_flex_joint_current < 13140:
                 for i, joint_name in enumerate(self.joint_data.name):
                     if joint_name == "arm_flex_joint":
                         self.add_arm_control_data_to_storage("arm_flex_joint", self.joint_data.position[i])
