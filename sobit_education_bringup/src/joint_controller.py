@@ -124,7 +124,7 @@ class JointController(object):
 
     def open_and_close_gripper_server(self, req_msg):
         hand_motor_joint_rad = req_msg.rad
-        time_from_start_sec = 2.0
+        time_from_start_sec = req_msg.sec
         self.add_arm_control_data_to_storage("hand_motor_joint", hand_motor_joint_rad)
         self.publish_arm_control_data(time_from_start_sec)
         rospy.sleep(time_from_start_sec)
@@ -143,7 +143,7 @@ class JointController(object):
 
     def xtion_control_server(self, req_msg):
         xtion_pan_rad = req_msg.rad
-        time_from_start_sec = 3.0
+        time_from_start_sec = req_msg.sec
         self.add_xtion_control_data_to_storage("xtion_pan_joint", xtion_pan_rad)
         self.publish_xtion_control_data(time_from_start_sec)
         rospy.sleep(time_from_start_sec)
