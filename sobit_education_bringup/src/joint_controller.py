@@ -23,7 +23,8 @@ class JointController(object):
         self.servise = rospy.Service("gripper_open_and_close", gripper_ctrl, self.open_and_close_gripper_server)
         self.servise = rospy.Service("gripper_move_to_target", gripper_move, self.move_gripper_to_target_server)
         self.servise = rospy.Service("motion_ctrl", robot_motion, self.move_to_registered_motion_server)
-        self.servise = rospy.Service("xtion_ctrl", gripper_ctrl, self.xtion_control_server)
+        self.servise = rospy.Service("xtion_pan_ctrl", gripper_ctrl, self.xtion_pan_control_server)
+        self.servise = rospy.Service("xtion_tilt_ctrl", gripper_ctrl, self.xtion_tilt_control_server)
         self.listener = tf.TransformListener()
         self.arm_control_data = JointTrajectory()
         self.xtion_control_data = JointTrajectory()
@@ -141,10 +142,19 @@ class JointController(object):
 
         return robot_motionResponse(True)
 
-    def xtion_control_server(self, req_msg):
+    def xtion_pan_control_server(self, req_msg):
         xtion_pan_rad = req_msg.rad
         time_from_start_sec = req_msg.sec
         self.add_xtion_control_data_to_storage("xtion_pan_joint", xtion_pan_rad)
+        self.publish_xtion_control_data(time_from_start_sec)
+        rospy.sleep(time_from_start_sec)
+
+        return gripper_ctrlResponse(True)
+    
+    def xtion_tilt_control_server(self, req_msg):
+        xtion_tilt_rad = req_msg.rad
+        time_from_start_sec = req_msg.sec
+        self.add_xtion_control_data_to_storage("xtion_tilt_joint", xtion_tilt_rad)
         self.publish_xtion_control_data(time_from_start_sec)
         rospy.sleep(time_from_start_sec)
 
