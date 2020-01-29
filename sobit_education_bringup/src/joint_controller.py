@@ -209,8 +209,8 @@ class JointController(object):
         time_from_start_sec = 5.0
         self.add_arm_control_data_to_storage("arm_roll_joint", 0.00)
         self.add_arm_control_data_to_storage("arm_flex_joint", -1.57)
-        self.add_arm_control_data_to_storage("elbow_flex_joint", 1.30)
-        self.add_arm_control_data_to_storage("wrist_flex_joint", 0.40)
+        self.add_arm_control_data_to_storage("elbow_flex_joint", 1.39)
+        self.add_arm_control_data_to_storage("wrist_flex_joint", 0.16)
         self.add_arm_control_data_to_storage("hand_motor_joint", 0.00)
         self.add_xtion_control_data_to_storage("xtion_tilt_joint", 0.00)
         self.add_xtion_control_data_to_storage("xtion_pan_joint", 0.00)
@@ -241,5 +241,5 @@ class JointController(object):
 if __name__ == "__main__":
     rospy.init_node("joint_controller")
     jc = JointController()
-    # jc.move_to_initial_pose()
+    jc.move_to_initial_pose()
     rospy.spin()
