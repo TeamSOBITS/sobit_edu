@@ -32,17 +32,17 @@ dynamixel_port:
   port_name: "/dev/dynamixel"
   baud_rate: 115200
   joints:
-   # - arm_roll_joint
-   # - arm_flex_joint
-   # - elbow_flex_joint
-   # - wrist_flex_joint
-   # - hand_motor_joint
+    - arm_roll_joint
+    - arm_flex_joint
+    - elbow_flex_joint
+    - wrist_flex_joint
+    - hand_motor_joint
     - xtion_pan_joint
     - xtion_tilt_joint
-  #arm_roll_joint: {id: 16, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300}
-  #arm_flex_joint: {id: 17, center: 2048, home: 1024, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
-  #elbow_flex_joint: {id: 18, center: 2048, home: 3000, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
-  #wrist_flex_joint: {id: 19, center: 2048, home: 2210, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
-  #hand_motor_joint: {id: 20, center: 1449, home: 1449, mode: 5, vel: 0, acc: 0, pos_i_gain: 0, lim: 200 }
+  arm_roll_joint: {id: 16, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300}
+  arm_flex_joint: {id: 17, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
+  elbow_flex_joint: {id: 18, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
+  wrist_flex_joint: {id: 19, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
+  hand_motor_joint: {id: 20, center: 2048, home: 3000, mode: 5, vel: 0, acc: 0, pos_i_gain: 0, lim: 200 }
   xtion_pan_joint: {id: 1, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
   xtion_tilt_joint: {id: 2, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
