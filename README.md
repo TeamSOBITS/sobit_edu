@@ -28,6 +28,8 @@ $ roslaunch sobit_education_bringup minimal.launch
 $ roslaunch sobit_education_bringup 3dsensor.launch
 ```
 
+## [How to use sobit_education_library](/sobit_education_library)
+
 ### service code for moving joints   
 
 ```bash:
