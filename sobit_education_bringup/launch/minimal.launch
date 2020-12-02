@@ -18,11 +18,6 @@
    </include>
 
   <include file="$(find sobit_education_control)/launch/sobit_education_control.launch"/>
-    <!-- kobuki_controller -->
-    <group ns = "robot_ctrl">
-        <node pkg="sobit_education_bringup" type="wheel_controller.py" name="wheel_controll" output="screen"/>
-        <node pkg="sobit_education_bringup" type="joint_controller.py" name="joint_controller" output="screen"/>
-        <node pkg="sobit_education_bringup" type="put_controller.py" name="put_controller" output="screen"/>
-    </group>
+  <include file="$(find sobit_education_library)/launch/load_sobit_education_pose.launch"/>
 
 </launch>

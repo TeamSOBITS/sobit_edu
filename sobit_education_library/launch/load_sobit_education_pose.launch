@@ -1,3 +1,3 @@
 <launch>
-    <rosparam command="load" file="$(find sobit_turtlebot_library)/config/sobit_education_pose.yaml"/>
+    <rosparam command="load" file="$(find sobit_education_library)/config/sobit_education_pose.yaml"/>
 </launch>
