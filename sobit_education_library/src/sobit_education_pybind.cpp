@@ -1,6 +1,6 @@
 #include <sobit_education_library/sobit_education_controller.hpp>
 
-using namespace sobit;
+using namespace sobit_education;
 namespace py = pybind11;
 
 PYBIND11_MODULE(sobit_education_module, m) {
