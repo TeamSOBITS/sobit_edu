@@ -69,5 +69,7 @@ int main(int argc, char** argv) {
       }
     }
   }
+
+  sobit_edu.setTorqueAll(false);
   spinner.stop();
 }
