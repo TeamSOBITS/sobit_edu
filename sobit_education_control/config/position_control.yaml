@@ -29,7 +29,7 @@ xtion_trajectory_controller:
   allow_partial_joints_goal: true
 
 dynamixel_port:
-  port_name: "/dev/dynamixel"
+  port_name: "/dev/input/dynamixel1"
   baud_rate: 115200
   joints:
     - arm_roll_joint
@@ -40,9 +40,9 @@ dynamixel_port:
     - xtion_pan_joint
     - xtion_tilt_joint
   arm_roll_joint: {id: 16, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300}
-  arm_flex_joint: {id: 17, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
-  elbow_flex_joint: {id: 18, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
-  wrist_flex_joint: {id: 19, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
-  hand_motor_joint: {id: 20, center: 2048, home: 3000, mode: 5, vel: 0, acc: 0, pos_i_gain: 0, lim: 200 }
+  arm_flex_joint: {id: 17, center: 2048, home: 3072, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
+  elbow_flex_joint: {id: 18, center: 2048, home: 1150, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
+  wrist_flex_joint: {id: 19, center: 2048, home: 1846, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
+  hand_motor_joint: {id: 20, center: 2048, home: 1900, mode: 5, vel: 0, acc: 0, pos_i_gain: 0, lim: 200 }
   xtion_pan_joint: {id: 1, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
   xtion_tilt_joint: {id: 2, center: 2048, home: 2048, mode: 3, vel: 0, acc: 0, pos_i_gain: 300 }
