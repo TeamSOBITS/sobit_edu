@@ -1,46 +1,32 @@
-# ROS Package for Sobit education
+# ROS Package for SOBIT EDU
 
-The project is ROS package to control the sobit_education
+SOBIT EDUを動かすために必要なリポジトリです．
+
+※ 初めてロボットを動かす場合は，必ずロボットを動かしたことのある先輩方に付き添ってもらいながらロボットを動かしましょう．
+
+## SOBIT EDU
+![](sobit_education_bringup/img/sobit_edu.png)
 
 ## Prerequisites
-
-- OS: Ubuntu 16.04  
-- ROS distribution: Kinetic Kame
-
-## How to Install
-
-```bash:
-$ cd ~/catkin_ws/src
-$ git clone https://gitlab.com/TeamSOBITS/sobit_education.git
-$ git clone https://gitlab.com/TeamSOBITS/sobit_common_msg.git
-$ git clone https://github.com/ROBOTIS-GIT/DynamixelSDK.git
-$ cd sobit_education
-$ chmod 755 install.sh
-$ sudo ./install.sh
-$ cd ~/catkin_ws
-$ catkin_make
-```
+以下の環境で動作します．
+- OS: Ubuntu 18.04 
+- ROS distribution: melodic Kame
 
 ### How to use
+まず，以下のコマンドを入力して，SOBIT EDUを動かすための環境設定を行います．
+この設定は，初回のみに行う作業ですので，1度行ったことのある人は飛ばしてください．
+
+※ 開発するPCで，SOBIT MINIやSOBIT PROを動かしたことがある場合も，この作業は必要ありません．
 
 ```bash:
-$ roslaunch sobit_education_bringup minimal.launch
-$ roslaunch sobit_education_bringup 3dsensor.launch
+$ cd sobit_education
+$ bash sobit_setup.sh
 ```
 
-## [How to use sobit_education_library](/sobit_education_library)
-
-### service code for moving joints   
+以下のコマンドを入力することで，SOBIT EDUを起動することができます．
+これにより，SOBIT EDUのモータやRGB-Dカメラ，測域センサ(Lidar)などのデバイスが起動します．
+また，それと同時にRvizも起動します．
 
 ```bash:
-sobit_education/sobit_education_bringup/src/joint_controller.py
+$ roslaunch sobit_edu_bringup minimal.launch
 ```
-
-###  Folder in joint parameters
-```bash:
-sobit_education/sobit_education_control/config
-```
-
-### smach sample code for moving, grasping
-
-https://gitlab.com/TeamSOBITS/sobit_education/wikis/smach_sample

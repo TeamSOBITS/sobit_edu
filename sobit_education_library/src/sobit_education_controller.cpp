@@ -1,6 +1,6 @@
 #include <sobit_education_library/sobit_education_controller.hpp>
 
-using namespace sobit;
+using namespace sobit_education;
 
 SobitEducationController::SobitEducationController( const std::string &name ) : SobitTurtlebotController( name ) {
     pub_arm_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>("/arm_trajectory_controller/command", 1);

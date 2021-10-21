@@ -3,7 +3,7 @@
 
 #include <sobit_education_library/sobit_turtlebot_controller.hpp>
 
-namespace sobit {
+namespace sobit_education {
     enum Joint { 
                     ARM_ROLL_JOINT = 0, 
                     ARM_FLEX_JOINT, 
