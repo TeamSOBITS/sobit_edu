@@ -2,10 +2,10 @@ education_pose:
     - { 
         pose_name: "initial_pose",
         arm_roll_joint: 0.00,
-        arm_flex_joint: -1.57, 
-        elbow_flex_joint: 1.39, 
-        wrist_flex_joint: 0.16, 
-        hand_motor_joint: 0.00, 
+        arm_flex_joint: 1.57, 
+        elbow_flex_joint: -1.40, 
+        wrist_flex_joint: -0.17, 
+        hand_motor_joint: -1.00, 
         xtion_tilt_joint: 0.00, 
         xtion_pan_joint: 0.00 
     }
