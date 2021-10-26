@@ -1,0 +1,46 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/sobits/catkin_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/sobits/catkin_ws/src/azure_kinect_ros/Azure_Kinect_ROS_Driver/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/cv_bridge/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/DynamixelSDK/ros/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry/eigen_conversions/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/image_geometry/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry/kdl_conversions/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/turtlebot2/kobuki_bumper2pc/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/turtlebot2/kobuki_keyop/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/turtlebot2/kobuki_node/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/turtlebot2/kobuki_safety_controller/include/**",
+        "/home/sobits/catkin_ws/src/roboticsgroup_gazebo_plugins/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/sobit_common_library/include/**",
+        "/home/sobits/catkin_ws/src/sobit_education/sobit_education_library/include/**",
+        "/home/sobits/catkin_ws/src/sobit_mini/sobit_mini_library/include/**",
+        "/home/sobits/catkin_ws/src/sobit_pro/sobit_pro_control/include/**",
+        "/home/sobits/catkin_ws/src/sobit_pro/sobit_pro_library/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry/tf/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry2/tf2/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry2/tf2_bullet/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry2/tf2_eigen/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry2/tf2_geometry_msgs/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry2/tf2_kdl/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry2/tf2_msgs/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry2/tf2_ros/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry2/tf2_sensor_msgs/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/geometry/tf_conversions/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/turtlebot2/turtlebot_apps/turtlebot_actions/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/turtlebot2/yocs_cmd_vel_mux/include/**",
+        "/home/sobits/catkin_ws/src/sobit_common/turtlebot2/yocs_controllers/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}
