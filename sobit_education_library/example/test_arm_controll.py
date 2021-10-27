@@ -11,12 +11,12 @@ def test():
     args = sys.argv
     edu_ctr = SobitEducationController(args[0]) # args[0] : C++上でros::init()を行うための引数
 
-    ###  arm controll  ###
-    ### arm1    =  1.0 ###
-    ### arm2    =  1.0 ###
-    ### arm3    =  1.0 ###
-    ### arm4    =  1.0 ###
-    ### gripper =  1.0 ###
+    ###    arm controll     ###
+    ### arm_roll   =   0.00 ###
+    ### arm_flex   =  -1.57 ###
+    ### elbow_flex =   1.57 ###
+    ### wrist_flex =   0.00 ###
+    ### hand_motor =   -1.0 ###
     edu_ctr.moveArm( 0.0, -1.57, 1.57, 0.0, -1.0 )
 
     rospy.sleep(2.0)
