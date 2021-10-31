@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   pybind11_catkin
+  tf
 )
 
 catkin_package(
@@ -31,3 +32,19 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 pybind_add_module(sobit_education_module MODULE src/sobit_turtlebot_controller.cpp
                                                 src/sobit_education_controller.cpp
                                                 src/sobit_education_pybind.cpp)
+
+install(
+  TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
+install(
+  DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+add_executable(test_grasp_edu example/test_grasp.cpp
+                        src/sobit_education_controller.cpp
+                        src/sobit_turtlebot_controller.cpp)
+target_link_libraries(test_grasp_edu ${catkin_LIBRARIES})

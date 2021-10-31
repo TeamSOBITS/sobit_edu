@@ -17,6 +17,6 @@ education_pose:
         elbow_flex_joint: 0.00, 
         wrist_flex_joint: 0.00, 
         hand_motor_joint: 0.00, 
-        xtion_tilt_joint: 0.53, 
-        xtion_pan_joint: 0.00 
+        xtion_tilt_joint: 0.00, 
+        xtion_pan_joint: -0.52 
     }

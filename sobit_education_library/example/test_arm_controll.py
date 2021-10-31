@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+#coding: utf-8
+
 import rospy
 from sobit_education_module import SobitEducationController
 from sobit_education_module import Joint
