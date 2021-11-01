@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     edu_arm_ctr.moveJoint( sobit_education::Joint::HAND_MOTOR_JOINT, 0.0, 2.0, true );
     ros::Duration(2.0).sleep();
 
-    // Move the arm to a high position and then to the initial pose
+    // Move the arm to the initial pose
     edu_arm_ctr.movePose( "initial_pose" );
 
     return 0;

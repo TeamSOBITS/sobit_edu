@@ -223,7 +223,7 @@ bool SobitEducationController::moveGripperToTarget( const std::string &target_na
     }
 
     // Target is below elbow_flex_join and above shoulder_flex_joint
-    else if (base_to_shoulder_flex_joint_z_cm < target_pos_z_cm && target_pos_z_cm < (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)){
+    else if (base_to_shoulder_flex_joint_z_cm <= target_pos_z_cm && target_pos_z_cm <= (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)){
         std::cout << "Target (z:" << target_pos_z_cm << ") is below elbow_flex_join and above shoulder_flex_joint" << std::endl;
         ROS_INFO("Target (z:%f) is below elbow_flex_join and above shoulder_flex_joint", target_pos_z_cm);
 
@@ -326,7 +326,7 @@ bool SobitEducationController::moveGripperToTargetXYZ( const double target_x, co
     }
 
     // Target is below elbow_flex_join and above shoulder_flex_joint
-    else if (base_to_shoulder_flex_joint_z_cm < target_pos_z_cm && target_pos_z_cm < (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)){
+    else if (base_to_shoulder_flex_joint_z_cm <= target_pos_z_cm && target_pos_z_cm <= (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)){
         std::cout << "Target (z:" << target_pos_z_cm << ") is below elbow_flex_join and above shoulder_flex_joint" << std::endl;
         ROS_INFO("Target (z:%f) is below elbow_flex_join and above shoulder_flex_joint", target_pos_z_cm);
 

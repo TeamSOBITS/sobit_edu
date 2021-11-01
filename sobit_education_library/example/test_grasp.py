@@ -36,7 +36,6 @@ def test(target_name):
     rospy.sleep(2.0)
 
     # 決められたポーズをする
-    # edu_arm_pantilt_ctr.movePose( "grasp_high_pose" )
     edu_arm_pantilt_ctr.movePose( "initial_pose" )
 
 if __name__ == '__main__':
