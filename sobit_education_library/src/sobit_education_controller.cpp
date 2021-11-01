@@ -178,17 +178,17 @@ bool SobitEducationController::moveGripperToTarget( const std::string &target_na
     // double base_to_target_x = transform_base_to_target.getOrigin().x() + diff_x;
     // double base_to_target_y = transform_base_to_target.getOrigin().y() + diff_y;
     // double base_to_target_z = transform_base_to_target.getOrigin().z() + diff_z;
-    double base_to_target_x = transform_base_to_target.getOrigin().x() + shift.x + diff_x;
-    double base_to_target_y = transform_base_to_target.getOrigin().y() + shift.y + diff_y;
-    double base_to_target_z = transform_base_to_target.getOrigin().z() + shift.z + diff_z;
+    const double base_to_target_x = transform_base_to_target.getOrigin().x() + shift.x + diff_x;
+    const double base_to_target_y = transform_base_to_target.getOrigin().y() + shift.y + diff_y;
+    const double base_to_target_z = transform_base_to_target.getOrigin().z() + shift.z + diff_z;
 
     // Calculate angle between footbase_pos and the sifted target_pos (XY平面)
     double tan_rad = std::atan2(base_to_target_y, base_to_target_x);
 
     // Change target_pos units (m->cm)
-    double target_pos_x_cm = base_to_target_x * 100.;
-    double target_pos_y_cm = base_to_target_y * 100.;
-    double target_pos_z_cm = base_to_target_z * 100.;
+    const double target_pos_x_cm = base_to_target_x * 100.;
+    const double target_pos_y_cm = base_to_target_y * 100.;
+    const double target_pos_z_cm = base_to_target_z * 100.;
 
     // Check if the object is graspable
     if (target_pos_z_cm > can_grasp_max_z_cm){
@@ -215,7 +215,7 @@ bool SobitEducationController::moveGripperToTarget( const std::string &target_na
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
         double elbow_flex_joint_sin = (target_pos_z_cm - (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)) / arm2_link_x_cm;
-        elbow_flex_joint_rad = -std::asin(elbow_flex_joint_sin);
+        elbow_flex_joint_rad = std::asin(elbow_flex_joint_sin);
         wrist_flex_joint_rad = -elbow_flex_joint_rad;
         shoulder_flex_joint_rad = 0.0;
 
@@ -229,7 +229,7 @@ bool SobitEducationController::moveGripperToTarget( const std::string &target_na
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
         double elbow_flex_joint_sin = (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm - target_pos_z_cm) / arm2_link_x_cm;
-        elbow_flex_joint_rad = std::asin(elbow_flex_joint_sin);
+        elbow_flex_joint_rad = -std::asin(elbow_flex_joint_sin);
         wrist_flex_joint_rad = -elbow_flex_joint_rad;
         shoulder_flex_joint_rad = 0.0;
 
@@ -243,23 +243,23 @@ bool SobitEducationController::moveGripperToTarget( const std::string &target_na
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
         double elbow_flex_joint_cos = (base_to_shoulder_flex_joint_z_cm - arm1_link_z_cm - target_pos_z_cm) / arm2_link_x_cm;
-        elbow_flex_joint_rad = -std::acos(elbow_flex_joint_cos);
-        wrist_flex_joint_rad = -std::asin(elbow_flex_joint_cos);
-        shoulder_flex_joint_rad = SobitTurtlebotController::deg2Rad(90.0);
+        elbow_flex_joint_rad = std::acos(elbow_flex_joint_cos);
+        wrist_flex_joint_rad = std::asin(elbow_flex_joint_cos);
+        shoulder_flex_joint_rad = -SobitTurtlebotController::deg2Rad(90.0);
 
         base_to_wrist_flex_joint_x_cm = base_to_shoulder_flex_joint_x_cm + arm1_link_z_cm + arm2_link_x_cm * std::cos(elbow_flex_joint_rad);
     }
 
     // Calculate wheel movement
     // - Rotate the robot
-    double rot_rad = std::atan2(target_pos_y_cm, target_pos_x_cm);
+    const double rot_rad = std::atan2(target_pos_y_cm, target_pos_x_cm);
     ROS_INFO("rot_rad = %f(deg:%f)", rot_rad, SobitTurtlebotController::rad2Deg(rot_rad));
     wheel_ctrl.controlWheelLinear(-0.1);
     wheel_ctrl.controlWheelRotateRad(rot_rad);
     ros::Duration(3.0).sleep();
 
     // - Move forward the robot
-    double linear_m = std::sqrt(std::pow(target_pos_x_cm, 2) + std::pow(target_pos_y_cm, 2)) / 100.0 - base_to_wrist_flex_joint_x_cm / 100.0;
+    const double linear_m = std::sqrt(std::pow(target_pos_x_cm, 2) + std::pow(target_pos_y_cm, 2)) / 100.0 - base_to_wrist_flex_joint_x_cm / 100.0;
     // double linear_m = std::sqrt(std::pow(transform_base_to_target.getOrigin().x(), 2) + std::pow(transform_base_to_target.getOrigin().y(), 2)) - base_to_wrist_flex_joint_x_cm / 100. + diff_x;
     ROS_INFO("linear_m = %f", linear_m);
     wheel_ctrl.controlWheelLinear(linear_m+0.1);
@@ -281,17 +281,17 @@ bool SobitEducationController::moveGripperToTargetXYZ( const double target_x, co
     sobit_education::SobitTurtlebotController wheel_ctrl;
 
     // // Calculate target_pos + difference(gap)
-    double base_to_target_x = target_x + diff_x;
-    double base_to_target_y = target_y + diff_y;
-    double base_to_target_z = target_z + diff_z;
+    const double base_to_target_x = target_x + diff_x;
+    const double base_to_target_y = target_y + diff_y;
+    const double base_to_target_z = target_z + diff_z;
 
     // Calculate angle between footbase_pos and the sifted target_pos (XY平面)
     double tan_rad = std::atan2(base_to_target_y, base_to_target_x);
 
     // Change target_pos units (m->cm)
-    double target_pos_x_cm = base_to_target_x * 100.;
-    double target_pos_y_cm = base_to_target_y * 100.;
-    double target_pos_z_cm = base_to_target_z * 100.;
+    const double target_pos_x_cm = base_to_target_x * 100.;
+    const double target_pos_y_cm = base_to_target_y * 100.;
+    const double target_pos_z_cm = base_to_target_z * 100.;
 
     // Check if the object is graspable
     if (target_pos_z_cm > can_grasp_max_z_cm){
@@ -318,7 +318,7 @@ bool SobitEducationController::moveGripperToTargetXYZ( const double target_x, co
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
         double elbow_flex_joint_sin = (target_pos_z_cm - (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)) / arm2_link_x_cm;
-        elbow_flex_joint_rad = -std::asin(elbow_flex_joint_sin);
+        elbow_flex_joint_rad = std::asin(elbow_flex_joint_sin);
         wrist_flex_joint_rad = -elbow_flex_joint_rad;
         shoulder_flex_joint_rad = 0.0;
 
@@ -332,7 +332,7 @@ bool SobitEducationController::moveGripperToTargetXYZ( const double target_x, co
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
         double elbow_flex_joint_sin = (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm - target_pos_z_cm) / arm2_link_x_cm;
-        elbow_flex_joint_rad = std::asin(elbow_flex_joint_sin);
+        elbow_flex_joint_rad = -std::asin(elbow_flex_joint_sin);
         wrist_flex_joint_rad = -elbow_flex_joint_rad;
         shoulder_flex_joint_rad = 0.0;
 
@@ -346,23 +346,23 @@ bool SobitEducationController::moveGripperToTargetXYZ( const double target_x, co
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
         double elbow_flex_joint_cos = (base_to_shoulder_flex_joint_z_cm - arm1_link_z_cm - target_pos_z_cm) / arm2_link_x_cm;
-        elbow_flex_joint_rad = -std::acos(elbow_flex_joint_cos);
-        wrist_flex_joint_rad = -std::asin(elbow_flex_joint_cos);
-        shoulder_flex_joint_rad = SobitTurtlebotController::deg2Rad(90.0);
+        elbow_flex_joint_rad = std::acos(elbow_flex_joint_cos);
+        wrist_flex_joint_rad = std::asin(elbow_flex_joint_cos);
+        shoulder_flex_joint_rad = -SobitTurtlebotController::deg2Rad(90.0);
 
         base_to_wrist_flex_joint_x_cm = base_to_shoulder_flex_joint_x_cm + arm1_link_z_cm + arm2_link_x_cm * std::cos(elbow_flex_joint_rad);
     }
 
     // Calculate wheel movement
     // - Rotate the robot
-    double rot_rad = std::atan2(target_pos_y_cm, target_pos_x_cm);
+    const double rot_rad = std::atan2(target_pos_y_cm, target_pos_x_cm);
     ROS_INFO("rot_rad = %f(deg:%f)", rot_rad, SobitTurtlebotController::rad2Deg(rot_rad));
     wheel_ctrl.controlWheelLinear(-0.1);
     wheel_ctrl.controlWheelRotateRad(rot_rad);
     ros::Duration(3.0).sleep();
 
     // - Move forward the robot
-    double linear_m = std::sqrt(std::pow(target_pos_x_cm, 2) + std::pow(target_pos_y_cm, 2)) / 100.0 - base_to_wrist_flex_joint_x_cm / 100.0;
+    const double linear_m = std::sqrt(std::pow(target_pos_x_cm, 2) + std::pow(target_pos_y_cm, 2)) / 100.0 - base_to_wrist_flex_joint_x_cm / 100.0;
     // double linear_m = std::sqrt(std::pow(transform_base_to_target.getOrigin().x(), 2) + std::pow(transform_base_to_target.getOrigin().y(), 2)) - base_to_wrist_flex_joint_x_cm / 100. + diff_x;
     ROS_INFO("linear_m = %f", linear_m);
     wheel_ctrl.controlWheelLinear(linear_m+0.1);

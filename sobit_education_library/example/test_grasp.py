@@ -27,9 +27,7 @@ def test(target_name):
     # 把持する対象の物体があった場合、
     # そこの位置までアームを移動させる
     # grasp_flag = edu_arm_pantilt_ctr.moveGripperToTarget(target_name, 0.0, 0.0, 0.0)
-    grasp_flag = edu_arm_pantilt_ctr.moveGripperToTargetXYZ(0.5, 0.5, 0.5, 0.0, 0.0, 0.0)
-    # grasp_flag = edu_arm_pantilt_ctr.moveGripperToTarget(target_name, 0.35, 0.0, 0.0)
-    # res = edu_arm_pantilt_ctr.moveGripperToTarget(1., .5, .5, 0.35, 0.0, 0.0)
+    grasp_flag = edu_arm_pantilt_ctr.moveGripperToTargetXYZ(0.5, 0.5, 0.75, 0.0, 0.0, 0.0)
     print("result : ", grasp_flag)
     rospy.sleep(2.0)
     
