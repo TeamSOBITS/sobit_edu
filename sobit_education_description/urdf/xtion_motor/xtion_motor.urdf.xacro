@@ -10,7 +10,7 @@
       <parent link="${parent}"/>
       <child link="${prefix}_pan_link"/>
       <origin rpy="${-M_PI/2.0} ${-M_PI/2.0} 0" xyz="0 0.396 0.191"/>
-      <axis xyz="0 0 1"/>
+      <axis xyz="0 0 -1"/>
       <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
     </joint>
 
@@ -32,7 +32,7 @@
       <parent link="${prefix}_pan_link"/>
       <child link="${prefix}_tilt_link"/>
       <origin rpy="${-M_PI/2.0} ${-M_PI/2.0} 0" xyz="0.0 0.0 0.0428"/>
-      <axis xyz="0 0 1"/>
+      <axis xyz="0 0 -1"/>
       <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
     </joint>
 
@@ -54,7 +54,7 @@
       <parent link="${prefix}_tilt_link"/>
       <child link="${prefix}_double_sided_tape_link"/>
       <origin rpy="0.05 0 -0.06" xyz="0.02050 0.0 0.0"/>
-      <axis xyz="0 0 1"/>
+      <axis xyz="0 0 -1"/>
       <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
     </joint>
 

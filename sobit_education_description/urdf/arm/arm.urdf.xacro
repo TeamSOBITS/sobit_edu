@@ -31,7 +31,7 @@
       <parent link="${prefix}_base_link"/>
       <child link="${prefix}_roll_link"/>
       <origin rpy="0 0 0" xyz="0.13577 0.0 0.04314"/>
-      <axis xyz="0 0 1"/>
+      <axis xyz="0 0 -1"/>
       <limit effort="30" lower="${-M_PI}" upper="${M_PI}" velocity="${M_PI/2.0}"/>
     </joint>
 
@@ -53,7 +53,7 @@
       <parent link="${prefix}_roll_link"/>
       <child link="${prefix}_flex_link"/>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0407"/>
-      <axis xyz="0 1 0"/>
+      <axis xyz="0 -1 0"/>
       <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
     </joint>
 
@@ -75,7 +75,7 @@
       <parent link="${prefix}_flex_link"/>
       <child link="elbow_flex_link"/>
       <origin rpy="0 0 0" xyz="0.0235 0.0 0.148"/>
-      <axis xyz="0 1 0"/>
+      <axis xyz="0 -1 0"/>
       <limit effort="30" lower="${-M_PI/2.0}" upper="1.4155" velocity="${M_PI/2.0}"/>
     </joint>
 
@@ -107,7 +107,7 @@
       <parent link="wrist_flex_dummy_link"/>
       <child link="wrist_flex_link"/>
       <origin rpy="0 0 0" xyz="0.152 0.0 0.0"/>
-      <axis xyz="0 1 0"/>
+      <axis xyz="0 -1 0"/>
       <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
     </joint>
 
