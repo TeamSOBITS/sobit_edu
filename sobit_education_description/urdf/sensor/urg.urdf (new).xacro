@@ -4,8 +4,7 @@
   <xacro:macro name="urg" params="parent">
 
     <joint name="base_laser_joint" type="fixed">
-      <!-- <origin xyz="0.18 0.0 0.38" rpy="0 0 0" /> -->
-      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+      <origin xyz="0.18 0.0 0.38" rpy="0 0 0" />
       <parent link="${parent}" />
       <child link="base_laser_link" />
       <origin rpy="0 0 0" xyz="0.13525 0.0 0.034"/>

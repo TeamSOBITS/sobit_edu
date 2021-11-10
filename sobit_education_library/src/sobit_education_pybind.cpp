@@ -28,5 +28,7 @@ PYBIND11_MODULE(sobit_education_module, m) {
         .def( "moveXtionPanTilt", &SobitEducationController::moveXtionPanTilt, "move Xtion PanTilt", 
             py::arg("pan_rad"), py::arg("tilt_rad"), py::arg("sec"), py::arg("is_sleep") = true )
         .def( "moveArm", &SobitEducationController::moveArm, "move Arm" )
-        .def( "movePose", &SobitEducationController::movePose, "move Pose" );     
+        .def( "movePose", &SobitEducationController::movePose, "move Pose" )
+        .def( "moveGripperToTarget", &SobitEducationController::moveGripperToTarget, "moveGripperToTarget" )
+        .def( "moveGripperToTargetXYZ", &SobitEducationController::moveGripperToTargetXYZ, "moveGripperToTargetXYZ" );     
 }

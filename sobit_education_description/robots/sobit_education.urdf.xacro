@@ -14,15 +14,17 @@
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/mic.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/matrix.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/urg.urdf.xacro" />
+  <xacro:include filename="$(find sobit_education_description)/urdf/urg_sup/urg_sup.urdf.xacro" />
   <xacro:base/>
   <stack_hexagons parent="base_link" />
   <xacro:arm prefix="arm" parent="plate_top_link"/>
   <xacro:hand prefix="hand_motor" parent="wrist_flex_link"/>
   <xacro:pole parent="plate_top_link"/>
+  <xacro:urg_sup parent="plate_bottom_link"/>
   <xacro:xtion_motor prefix="xtion" parent="base_pole_link"/>
   <xacro:sensor_asus_xtion_pro parent="xtion_double_sided_tape_link"/>
   <xacro:mic parent="base_pole_link"/>
   <xacro:matrix parent="base_pole_link"/>
-  <xacro:urg parent="base_link"/>
+  <xacro:urg parent="base_urg_sup_link"/>
   
 </robot>
