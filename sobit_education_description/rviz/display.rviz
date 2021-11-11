@@ -85,13 +85,18 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: false
+          Value: true
         base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
         base_pole_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_urg_sup_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -358,6 +363,8 @@ Visualization Manager:
           Value: false
         base_pole_link:
           Value: false
+        base_urg_sup_link:
+          Value: true
         camera_depth_optical_frame:
           Value: false
         camera_link:
@@ -467,6 +474,8 @@ Visualization Manager:
         base_footprint:
           base_link:
             base_laser_link:
+              {}
+            base_urg_sup_link:
               {}
             caster_back_link:
               {}
