@@ -4,7 +4,7 @@
   <xacro:macro name="urg_sup" params="parent">
 
     <joint name="base_urg_sup_joint" type="fixed">
-      <origin xyz="0.194084 0.0 0.00475" rpy="0 0 0" />
+      <origin xyz="0.194084 0.0 0.0085" rpy="0 0 0" />
       <parent link="${parent}" />
       <child link="base_urg_sup_link" />
       <axis xyz="0 0 1"/>
