@@ -8,7 +8,8 @@
 namespace sobit_education {
     enum Joint { 
                     ARM_ROLL_JOINT = 0, 
-                    ARM_FLEX_JOINT, 
+                    ARM_FLEX_JOINT_RGT, 
+                    ARM_FLEX_JOINT_LFT, 
                     ELBOW_FLEX_JOINT, 
                     WRIST_FLEX_JOINT, 
                     HAND_MOTOR_JOINT, 
@@ -29,7 +30,8 @@ namespace sobit_education {
             tf::TransformListener listener_;
 
             const std::vector<std::string> joint_names_ = { "arm_roll_joint", 
-                                                            "arm_flex_joint", 
+                                                            "arm_flex_joint_rgt", 
+                                                            "arm_flex_joint_lft", 
                                                             "elbow_flex_joint", 
                                                             "wrist_flex_joint", 
                                                             "hand_motor_joint", 
