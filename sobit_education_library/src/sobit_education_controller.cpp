@@ -30,10 +30,11 @@ void SobitEducationController::loadPose() {
     pose_list_.clear();
     for ( int i = 0; i < pose_num; i++ ) {
         Pose pose;
-        std::vector<double> joint_val(7, 0.0);
+        std::vector<double> joint_val(8, 0.0);
         pose.pose_name = static_cast<std::string>(pose_val[i]["pose_name"]); 
         joint_val[Joint::ARM_ROLL_JOINT] = static_cast<double>(pose_val[i]["arm_roll_joint"]); 
-        joint_val[Joint::ARM_FLEX_JOINT] = static_cast<double>(pose_val[i]["arm_flex_joint"]); 
+        joint_val[Joint::ARM_FLEX_JOINT_RGT] = static_cast<double>(pose_val[i]["arm_flex_joint_rgt"]); 
+        joint_val[Joint::ARM_FLEX_JOINT_LFT] = static_cast<double>(pose_val[i]["arm_flex_joint_lft"]); 
         joint_val[Joint::ELBOW_FLEX_JOINT] = static_cast<double>(pose_val[i]["elbow_flex_joint"]); 
         joint_val[Joint::WRIST_FLEX_JOINT] = static_cast<double>(pose_val[i]["wrist_flex_joint"]); 
         joint_val[Joint::HAND_MOTOR_JOINT] = static_cast<double>(pose_val[i]["hand_motor_joint"]); 
@@ -59,7 +60,8 @@ bool SobitEducationController::moveAllJoint(
         trajectory_msgs::JointTrajectory arm_joint_trajectory;
         trajectory_msgs::JointTrajectory xtion_joint_trajectory;
         setJointTrajectory( joint_names_[Joint::ARM_ROLL_JOINT], arm_roll, sec, &arm_joint_trajectory );
-        addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT], arm_flex, sec, &arm_joint_trajectory );
+        addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT_RGT], arm_flex, sec, &arm_joint_trajectory );
+        addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT_LFT], -arm_flex, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ELBOW_FLEX_JOINT], elbow_flex, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::WRIST_FLEX_JOINT], wrist_flex, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::HAND_MOTOR_JOINT], hand_motor, sec, &arm_joint_trajectory );
@@ -124,7 +126,7 @@ bool SobitEducationController::movePose( const std::string &pose_name ) {
         ROS_INFO("I found a '%s'", pose_name.c_str() );
         return moveAllJoint( 
                             joint_val[Joint::ARM_ROLL_JOINT], 
-                            joint_val[Joint::ARM_FLEX_JOINT], 
+                            joint_val[Joint::ARM_FLEX_JOINT_RGT], 
                             joint_val[Joint::ELBOW_FLEX_JOINT], 
                             joint_val[Joint::WRIST_FLEX_JOINT], 
                             joint_val[Joint::HAND_MOTOR_JOINT], 
@@ -141,7 +143,8 @@ bool SobitEducationController::moveArm ( const double arm_roll, const double arm
     try {
         trajectory_msgs::JointTrajectory arm_joint_trajectory;
         setJointTrajectory( joint_names_[Joint::ARM_ROLL_JOINT], arm_roll, 5.0, &arm_joint_trajectory );
-        addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT], arm_flex, 5.0, &arm_joint_trajectory );
+        addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT_RGT], arm_flex, 5.0, &arm_joint_trajectory );
+        addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT_LFT], -arm_flex, 5.0, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ELBOW_FLEX_JOINT], elbow_flex, 5.0, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::WRIST_FLEX_JOINT], wrist_flex, 5.0, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::HAND_MOTOR_JOINT], hand_motor, 5.0, &arm_joint_trajectory );
