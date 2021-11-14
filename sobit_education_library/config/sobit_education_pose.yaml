@@ -2,7 +2,8 @@ education_pose:
     - { 
         pose_name: "initial_pose",
         arm_roll_joint: 0.00,
-        arm_flex_joint: 1.57, 
+        arm_flex_joint_rgt: 1.57, 
+        arm_flex_joint_lft: -1.57, 
         elbow_flex_joint: -1.40, 
         wrist_flex_joint: -0.17, 
         hand_motor_joint: -1.00, 
@@ -13,7 +14,8 @@ education_pose:
     - { 
         pose_name: "detecting_pose",
         arm_roll_joint: 0.00,
-        arm_flex_joint: 0.00, 
+        arm_flex_joint_rgt: 0.00, 
+        arm_flex_joint_lft: 0.00, 
         elbow_flex_joint: 0.00, 
         wrist_flex_joint: 0.00, 
         hand_motor_joint: 0.00, 
