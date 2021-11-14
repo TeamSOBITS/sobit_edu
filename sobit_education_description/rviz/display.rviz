@@ -67,6 +67,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: false
+        arm__flex_link_rgt_lft:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         arm_flex_link:
           Alpha: 1
           Show Axes: false
