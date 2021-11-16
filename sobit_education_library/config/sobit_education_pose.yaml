@@ -4,7 +4,8 @@ education_pose:
         arm_roll_joint: 0.00,
         arm_flex_joint_rgt: 1.57, 
         arm_flex_joint_lft: -1.57, 
-        elbow_flex_joint: -1.40, 
+        elbow_flex_joint_rgt: -1.40, 
+        elbow_flex_joint_lft: 1.40, 
         wrist_flex_joint: -0.17, 
         hand_motor_joint: -1.00, 
         xtion_tilt_joint: 0.00, 
@@ -16,9 +17,10 @@ education_pose:
         arm_roll_joint: 0.00,
         arm_flex_joint_rgt: 0.00, 
         arm_flex_joint_lft: 0.00, 
-        elbow_flex_joint: 0.00, 
+        elbow_flex_joint_rgt: 0.00, 
+        elbow_flex_joint_lft: 0.00, 
         wrist_flex_joint: 0.00, 
         hand_motor_joint: 0.00, 
-        xtion_tilt_joint: 0.53, 
+        xtion_tilt_joint: -0.53, 
         xtion_pan_joint: 0.00 
     }
