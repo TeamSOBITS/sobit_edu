@@ -30,16 +30,17 @@ void SobitEducationController::loadPose() {
     pose_list_.clear();
     for ( int i = 0; i < pose_num; i++ ) {
         Pose pose;
-        std::vector<double> joint_val(8, 0.0);
+        std::vector<double> joint_val(9, 0.0);
         pose.pose_name = static_cast<std::string>(pose_val[i]["pose_name"]); 
-        joint_val[Joint::ARM_ROLL_JOINT] = static_cast<double>(pose_val[i]["arm_roll_joint"]); 
-        joint_val[Joint::ARM_FLEX_JOINT_RGT] = static_cast<double>(pose_val[i]["arm_flex_joint_rgt"]); 
-        joint_val[Joint::ARM_FLEX_JOINT_LFT] = static_cast<double>(pose_val[i]["arm_flex_joint_lft"]); 
-        joint_val[Joint::ELBOW_FLEX_JOINT] = static_cast<double>(pose_val[i]["elbow_flex_joint"]); 
-        joint_val[Joint::WRIST_FLEX_JOINT] = static_cast<double>(pose_val[i]["wrist_flex_joint"]); 
-        joint_val[Joint::HAND_MOTOR_JOINT] = static_cast<double>(pose_val[i]["hand_motor_joint"]); 
-        joint_val[Joint::XTION_PAN_JOINT] = static_cast<double>(pose_val[i]["xtion_tilt_joint"]); 
-        joint_val[Joint::XTION_TILT_JOINT] = static_cast<double>(pose_val[i]["xtion_pan_joint"]); 
+        joint_val[Joint::ARM_ROLL_JOINT] = static_cast<double>(pose_val[i][joint_names_[ARM_ROLL_JOINT]]); 
+        joint_val[Joint::ARM_FLEX_JOINT_RGT] = static_cast<double>(pose_val[i][joint_names_[ARM_FLEX_JOINT_RGT]]); 
+        joint_val[Joint::ARM_FLEX_JOINT_LFT] = static_cast<double>(pose_val[i][joint_names_[ARM_FLEX_JOINT_LFT]]); 
+        joint_val[Joint::ELBOW_FLEX_JOINT_RGT] = static_cast<double>(pose_val[i][joint_names_[ELBOW_FLEX_JOINT_RGT]]); 
+        joint_val[Joint::ELBOW_FLEX_JOINT_LFT] = static_cast<double>(pose_val[i][joint_names_[ELBOW_FLEX_JOINT_LFT]]); 
+        joint_val[Joint::WRIST_FLEX_JOINT] = static_cast<double>(pose_val[i][joint_names_[WRIST_FLEX_JOINT]]); 
+        joint_val[Joint::HAND_MOTOR_JOINT] = static_cast<double>(pose_val[i][joint_names_[HAND_MOTOR_JOINT]]); 
+        joint_val[Joint::XTION_PAN_JOINT] = static_cast<double>(pose_val[i][joint_names_[XTION_PAN_JOINT]]); 
+        joint_val[Joint::XTION_TILT_JOINT] = static_cast<double>(pose_val[i][joint_names_[XTION_TILT_JOINT]]); 
         pose.joint_val = joint_val;
         pose_list_.push_back( pose );
     }
@@ -62,7 +63,8 @@ bool SobitEducationController::moveAllJoint(
         setJointTrajectory( joint_names_[Joint::ARM_ROLL_JOINT], arm_roll, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT_RGT], arm_flex, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT_LFT], -arm_flex, sec, &arm_joint_trajectory );
-        addJointTrajectory( joint_names_[Joint::ELBOW_FLEX_JOINT], elbow_flex, sec, &arm_joint_trajectory );
+        addJointTrajectory( joint_names_[Joint::ELBOW_FLEX_JOINT_RGT], elbow_flex, sec, &arm_joint_trajectory );
+        addJointTrajectory( joint_names_[Joint::ELBOW_FLEX_JOINT_LFT], -elbow_flex, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::WRIST_FLEX_JOINT], wrist_flex, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::HAND_MOTOR_JOINT], hand_motor, sec, &arm_joint_trajectory );
         setJointTrajectory( joint_names_[Joint::XTION_PAN_JOINT], xtion_pan, sec, &xtion_joint_trajectory );
@@ -127,10 +129,10 @@ bool SobitEducationController::movePose( const std::string &pose_name ) {
         return moveAllJoint( 
                             joint_val[Joint::ARM_ROLL_JOINT], 
                             joint_val[Joint::ARM_FLEX_JOINT_RGT], 
-                            joint_val[Joint::ELBOW_FLEX_JOINT], 
+                            joint_val[Joint::ELBOW_FLEX_JOINT_RGT], 
                             joint_val[Joint::WRIST_FLEX_JOINT], 
                             joint_val[Joint::HAND_MOTOR_JOINT], 
-                            joint_val[Joint:: XTION_PAN_JOINT], 
+                            joint_val[Joint::XTION_PAN_JOINT], 
                             joint_val[Joint::XTION_TILT_JOINT],
                             5.0 );
     } else {
@@ -145,7 +147,8 @@ bool SobitEducationController::moveArm ( const double arm_roll, const double arm
         setJointTrajectory( joint_names_[Joint::ARM_ROLL_JOINT], arm_roll, 5.0, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT_RGT], arm_flex, 5.0, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_FLEX_JOINT_LFT], -arm_flex, 5.0, &arm_joint_trajectory );
-        addJointTrajectory( joint_names_[Joint::ELBOW_FLEX_JOINT], elbow_flex, 5.0, &arm_joint_trajectory );
+        addJointTrajectory( joint_names_[Joint::ELBOW_FLEX_JOINT_RGT], elbow_flex, 5.0, &arm_joint_trajectory );
+        addJointTrajectory( joint_names_[Joint::ELBOW_FLEX_JOINT_LFT], -elbow_flex, 5.0, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::WRIST_FLEX_JOINT], wrist_flex, 5.0, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::HAND_MOTOR_JOINT], hand_motor, 5.0, &arm_joint_trajectory );
         checkPublishersConnection ( pub_arm_control_ );
@@ -265,7 +268,7 @@ bool SobitEducationController::moveGripperToTargetXYZ( const double target_x, co
         base_to_wrist_flex_joint_x_cm = base_to_shoulder_flex_joint_x_cm + arm1_link_z_cm + arm2_link_x_cm * std::cos(elbow_flex_joint_rad);
     }
 
-    // Calculate wheel movement
+    // Calculate wheel movement (diagonal)
     // - Rotate the robot
     const double rot_rad = std::atan2(target_pos_y_cm, target_pos_x_cm);
     ROS_INFO("rot_rad = %f(deg:%f)", rot_rad, SobitTurtlebotController::rad2Deg(rot_rad));
@@ -278,6 +281,28 @@ bool SobitEducationController::moveGripperToTargetXYZ( const double target_x, co
     ROS_INFO("linear_m = %f", linear_m);
     wheel_ctrl.controlWheelLinear(linear_m);
     ros::Duration(3.0).sleep();
+
+    // // Calculate wheel movement (+-90->x_pos->-+90->y_pos) NEEDS CONFIRMATION
+    // // - Rotate the robot
+    // const double rot_deg = target_pos_x_cm > 0.0 ? 90.0:-90.0;
+    // ROS_INFO("rot_deg:%f)", rot_deg);
+    // wheel_ctrl.controlWheelRotateDeg(rot_deg);
+    // ros::Duration(3.0).sleep();
+
+    // // - Move forward the robot
+    // ROS_INFO("linear_m = %f", target_pos_x_cm/100.0);
+    // wheel_ctrl.controlWheelLinear(target_pos_x_cm/100.0);
+    // ros::Duration(3.0).sleep();
+
+    // // - Rotate the robot
+    // ROS_INFO("rot_deg:%f)", -rot_deg);
+    // wheel_ctrl.controlWheelRotateDeg(-rot_deg);
+    // ros::Duration(3.0).sleep();
+
+    // // - Move forward the robot
+    // ROS_INFO("linear_m = %f", target_pos_y_cm/100.0);
+    // wheel_ctrl.controlWheelLinear(target_pos_y_cm/100.0);
+    // ros::Duration(3.0).sleep();
 
     // - Move arm (OPEN)
     hand_rad = SobitTurtlebotController::deg2Rad(90.0);
