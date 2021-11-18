@@ -15,9 +15,6 @@ node [shape=box];
 "arm_roll_link" [label="arm_roll_link"];
 "arm_flex_dummy_link" [label="arm_flex_dummy_link"];
 "arm_flex_link" [label="arm_flex_link"];
-"arm_flex_link_rgt_lft" [label="arm_flex_link_rgt_lft"];
-"elbow_flex_link" [label="elbow_flex_link"];
-"elbow_flex_link_rgt_lft" [label="elbow_flex_link_rgt_lft"];
 "elbow_flex_dummy_link" [label="elbow_flex_dummy_link"];
 "wrist_flex_link" [label="wrist_flex_link"];
 "hand_dummy_link" [label="hand_dummy_link"];
@@ -69,12 +66,12 @@ node [shape=ellipse, color=blue, fontcolor=blue];
 "arm_base_fixed_joint" -> "arm_base_link"
 "arm_base_link" -> "arm_roll_joint" [label="xyz: 0.13525 0 0.034 \nrpy: 0 -0 0"]
 "arm_roll_joint" -> "arm_roll_link"
-"arm_roll_link" -> "arm_flex_joint_rgt" [label="xyz: 0 0 0.0421 \nrpy: 0 -0 0"]
-"arm_flex_joint_rgt" -> "arm_flex_link"
-"arm_flex_link" -> "elbow_flex_joint_rgt" [label="xyz: 0.024 0 0.148 \nrpy: 0 1.5708 -0"]
-"arm_flex_joint_lft" -> "arm_flex_link_rgt_lft"
-"elbow_flex_joint_rgt" -> "elbow_flex_dummy_link"
-"elbow_flex_joint_lft" -> "elbow_flex_link_rgt_lft"
+"arm_roll_link" -> "arm_flex_joint" [label="xyz: 0 0 0.0421 \nrpy: 0 -0 0"]
+"arm_flex_joint" -> "arm_flex_dummy_link"
+"arm_flex_dummy_link" -> "arm_flex_dummy_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"arm_flex_dummy_joint" -> "arm_flex_link"
+"arm_flex_link" -> "elbow_flex_joint" [label="xyz: 0.024 0 0.148 \nrpy: 0 1.5708 -0"]
+"elbow_flex_joint" -> "elbow_flex_dummy_link"
 "elbow_flex_dummy_link" -> "elbow_flex_dummy_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
 "elbow_flex_dummy_joint" -> "wrist_flex_link"
 "wrist_flex_link" -> "hand_dummy_joint" [label="xyz: 0 0 0.15 \nrpy: 0 -0 0"]

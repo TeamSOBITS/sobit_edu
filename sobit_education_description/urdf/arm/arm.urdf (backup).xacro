@@ -49,7 +49,7 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}_flex_joint_rgt" type="revolute">
+    <joint name="${prefix}_flex_joint" type="revolute">
       <parent link="${prefix}_roll_link"/>
       <child link="${prefix}_flex_link"/>
       <origin rpy="0 0 0" xyz="0.0 0.0 0.0407"/>
@@ -71,19 +71,7 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}_flex_joint_lft" type="revolute">
-      <parent link="${prefix}_roll_link"/>
-      <child link="${prefix}_flex_link_rgt_lft"/>
-      <origin rpy="0 0 ${M_PI}" xyz="0.0 0.0 0.0"/>
-      <axis xyz="0 -1 0"/>
-      <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
-    </joint>
-
-    <link name="${prefix}_flex_link_rgt_lft">
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-    </link>
-
-    <joint name="elbow_flex_joint_rgt" type="revolute">
+    <joint name="elbow_flex_joint" type="revolute">
       <parent link="${prefix}_flex_link"/>
       <child link="elbow_flex_link"/>
       <origin rpy="0 0 0" xyz="0.0235 0.0 0.148"/>
@@ -92,18 +80,6 @@
     </joint>
 
     <link name="elbow_flex_link"/>
-
-    <joint name="elbow_flex_joint_lft" type="revolute">
-      <parent link="${prefix}_flex_link"/>
-      <child link="elbow_flex_link_rgt_lft"/>
-      <origin rpy="0 0 ${M_PI}" xyz="0.0 0.0 0.0"/>
-      <axis xyz="0 -1 0"/>
-      <limit effort="30" lower="${-M_PI/2.0}" upper="1.4155" velocity="${M_PI/2.0}"/>
-    </joint>
-
-    <link name="elbow_flex_link_rgt_lft">
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-    </link>
 
     <joint name="wrist_flex_dummy_joint" type="fixed">
       <parent link="elbow_flex_link"/>

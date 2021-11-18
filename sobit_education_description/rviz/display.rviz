@@ -72,6 +72,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        arm_flex_link_rgt_lft:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         arm_roll_link:
           Alpha: 1
           Show Axes: false
@@ -141,6 +146,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
         elbow_flex_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        elbow_flex_link_rgt_lft:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -353,6 +362,8 @@ Visualization Manager:
           Value: false
         arm_flex_link:
           Value: false
+        arm_flex_link_rgt_lft:
+          Value: false
         arm_roll_link:
           Value: false
         base_footprint:
@@ -364,7 +375,7 @@ Visualization Manager:
         base_pole_link:
           Value: false
         base_urg_sup_link:
-          Value: true
+          Value: false
         camera_depth_optical_frame:
           Value: false
         camera_link:
@@ -384,6 +395,8 @@ Visualization Manager:
         depth_link:
           Value: false
         elbow_flex_link:
+          Value: false
+        elbow_flex_link_rgt_lft:
           Value: false
         gyro_link:
           Value: false
@@ -473,10 +486,9 @@ Visualization Manager:
       Tree:
         base_footprint:
           base_link:
-            base_laser_link:
-              {}
             base_urg_sup_link:
-              {}
+              base_laser_link:
+                {}
             caster_back_link:
               {}
             caster_front_link:

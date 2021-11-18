@@ -15,27 +15,34 @@ def test(target_name):
 
     grasp_flag = False
 
-    # 決められたポーズをする
-    print("starting")
+    # ”detecting_pose”など決められたポーズをする
     edu_arm_pantilt_ctr.movePose( "detecting_pose" )
-    rospy.sleep(5.0)
+    rospy.sleep(3.0)
 
-    # ハンドを動かす
+    # ハンドを開く
     edu_arm_pantilt_ctr.moveJoint( Joint.HAND_MOTOR_JOINT, 1.57, 2.0, True )
     rospy.sleep(2.0)
 
-    # 把持する対象の物体があった場合、
-    # そこの位置までアームを移動させる
-    # grasp_flag = edu_arm_pantilt_ctr.moveGripperToTarget(target_name, 0.0, 0.0, 0.0)
-    grasp_flag = edu_arm_pantilt_ctr.moveGripperToTargetXYZ(0.5, 0.5, 0.75, 0.0, 0.0, 0.0)
-    print("result : ", grasp_flag)
+    # 把持する対象の物体があった場合、そこの位置までアームを移動させる
+    # 注意：x_shift=-0.3しておくと、衝突を避けられる対策である
+    # grasp_flag = edu_arm_pantilt_ctr.moveGripperToTarget(target_name, -0.3, 0.0, 0.0)
+    grasp_flag = edu_arm_pantilt_ctr.moveGripperToTargetXYZ(0.2, 0.2, 0.75, -0.3, 0.0, 0.0)
+    print("Was it grasped? ", grasp_flag)
+    rospy.sleep(2.0)
+
+    # ロボット全体を0.3m直進させる
+    edu_wheel_ctr.controlWheelLinear(0.3)
     rospy.sleep(2.0)
     
     # ハンドを動かす
     edu_arm_pantilt_ctr.moveJoint( Joint.HAND_MOTOR_JOINT, 0.0, 2.0, True )
     rospy.sleep(2.0)
 
-    # 決められたポーズをする
+    # ロボット全体を0.3m戻ってくる
+    edu_wheel_ctr.controlWheelLinear(-0.3)
+    rospy.sleep(2.0)
+
+    # "initail_pose"など決められたポーズをする
     edu_arm_pantilt_ctr.movePose( "initial_pose" )
 
 if __name__ == '__main__':

@@ -6,8 +6,10 @@ namespace py = pybind11;
 PYBIND11_MODULE(sobit_education_module, m) {
     py::enum_<Joint>( m, "Joint" )
         .value( "ARM_ROLL_JOINT", Joint::ARM_ROLL_JOINT )
-        .value( "ARM_FLEX_JOINT", Joint::ARM_FLEX_JOINT )
-        .value( "ELBOW_FLEX_JOINT", Joint::ELBOW_FLEX_JOINT )
+        .value( "ARM_FLEX_JOINT_RGT", Joint::ARM_FLEX_JOINT_RGT )
+        .value( "ARM_FLEX_JOINT_LFT", Joint::ARM_FLEX_JOINT_LFT )
+        .value( "ELBOW_FLEX_JOINT_RGT", Joint::ELBOW_FLEX_JOINT_RGT )
+        .value( "ELBOW_FLEX_JOINT_LFT", Joint::ELBOW_FLEX_JOINT_LFT )
         .value( "WRIST_FLEX_JOINT", Joint::WRIST_FLEX_JOINT )
         .value( "HAND_MOTOR_JOINT", Joint::HAND_MOTOR_JOINT )
         .value( "XTION_PAN_JOINT", Joint:: XTION_PAN_JOINT )
