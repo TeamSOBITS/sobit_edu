@@ -185,7 +185,7 @@ bool SobitEducationController::moveGripperToTarget( const std::string &target_na
     const double target_y = transform_base_to_target.getOrigin().y();
     const double target_z = transform_base_to_target.getOrigin().z();
 
-    bool grasp_flag = moveGripperToTargetXYZ(target_x, target_y, target_x, diff_x, diff_y, diff_z);
+    bool grasp_flag = moveGripperToTargetXYZ(target_x, target_y, target_z, diff_x, diff_y, diff_z);
 
     return grasp_flag;
 
