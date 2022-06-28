@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 import rospy
 import tf
@@ -92,7 +92,7 @@ class Joy_control:
             self.move_joint("xtion_joint3", -1.57)
 
         #elif self.left_joystick_lr == 0 and self.left_joystick_ud == 0 and self.right_joystick_lr == 0 and self.right_joystick_ud == 0:
-            #print "not publish"
+            #print("not publish")
             #pass
         #足を動かすモード
         else:
@@ -105,14 +105,14 @@ class Joy_control:
 
 
     def move_joint(self, joint_name, value):
-		point = JointTrajectoryPoint()
-		point.positions.append(value)
+        point = JointTrajectoryPoint()
+        point.positions.append(value)
 
-		send_data = JointTrajectory()
-		send_data.joint_names.append(joint_name)
-		send_data.points.append(point)
-		#send_dataを送信
-		self.pub_joint_trajectory.publish(send_data)
+        send_data = JointTrajectory()
+        send_data.joint_names.append(joint_name)
+        send_data.points.append(point)
+        #send_dataを送信
+        self.pub_joint_trajectory.publish(send_data)
 
 
 

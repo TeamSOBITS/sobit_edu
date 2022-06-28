@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 import rospy
 import tf
@@ -83,14 +83,14 @@ class Joy_control:
             rospy.Rate(10).sleep()
 
     def move_joint(self, joint_name, value):
-		point = JointTrajectoryPoint()
-		point.positions.append(value)
+        point = JointTrajectoryPoint()
+        point.positions.append(value)
 
-		send_data = JointTrajectory()
-		send_data.joint_names.append(joint_name)
-		send_data.points.append(point)
-		#send_dataを送信
-		self.pub_joint_trajectory.publish(send_data)
+        send_data = JointTrajectory()
+        send_data.joint_names.append(joint_name)
+        send_data.points.append(point)
+        #send_dataを送信
+        self.pub_joint_trajectory.publish(send_data)
 
 
 
