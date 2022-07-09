@@ -16,6 +16,13 @@ bool SobitTurtlebotController::controlWheelLinear( const double distance ) {
     try {
         double start_time = ros::Time::now().toSec();
         geometry_msgs::Twist output_vel;
+        while ( curt_odom_.pose.pose.orientation.x == 0 &
+                curt_odom_.pose.pose.orientation.y == 0 &
+                curt_odom_.pose.pose.orientation.z == 0 &
+                curt_odom_.pose.pose.orientation.w == 0 ) {
+
+            ros::spinOnce();
+        }
         nav_msgs::Odometry init_odom = curt_odom_;
         double moving_distance = 0.0;
         double target_distance = std::fabs( distance );
@@ -41,7 +48,8 @@ bool SobitTurtlebotController::controlWheelLinear( const double distance ) {
             double x_diif = curt_odom_.pose.pose.position.x - init_odom.pose.pose.position.x;
             double y_diif = curt_odom_.pose.pose.position.y - init_odom.pose.pose.position.y;
             moving_distance = std::hypotf( x_diif, y_diif );
-            ROS_INFO("target_distance = %f\tmoving_distance = %f", target_distance, moving_distance );
+            // ROS_INFO("target_distance = %f\tmoving_distance = %f", target_distance, moving_distance );
+            ROS_INFO("x_diif = %f\tx2_diif = %f\ty_diif = %f\ty2_diif = %f", init_odom.pose.pose.position.x, curt_odom_.pose.pose.position.x, init_odom.pose.pose.position.y, curt_odom_.pose.pose.position.y );
             loop_rate.sleep();
         }
         return true;
