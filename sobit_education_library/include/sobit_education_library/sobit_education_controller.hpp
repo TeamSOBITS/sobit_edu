@@ -6,18 +6,16 @@
 #include <geometry_msgs/Point.h>
 
 namespace sobit_education {
-    enum Joint { 
-                    ARM_ROLL_JOINT = 0, 
-                    ARM_FLEX_JOINT_RGT, 
-                    ARM_FLEX_JOINT_LFT, 
-                    ELBOW_FLEX_JOINT_RGT, 
-                    ELBOW_FLEX_JOINT_LFT, 
-                    WRIST_FLEX_JOINT, 
-                    HAND_MOTOR_JOINT, 
-                    XTION_PAN_JOINT, 
-                    XTION_TILT_JOINT, 
-                    JOINT_NUM 
-                };
+    enum Joint { ARM_ROLL_JOINT = 0, 
+                 ARM_FLEX_JOINT_RGT, 
+                 ARM_FLEX_JOINT_LFT, 
+                 ELBOW_FLEX_JOINT_RGT, 
+                 ELBOW_FLEX_JOINT_LFT, 
+                 WRIST_FLEX_JOINT, 
+                 HAND_MOTOR_JOINT, 
+                 XTION_PAN_JOINT, 
+                 XTION_TILT_JOINT, 
+                 JOINT_NUM };
 
     typedef struct {         
         std::string pose_name;
@@ -49,7 +47,7 @@ namespace sobit_education {
             static const double grasp_min_z_cm;
             static const double grasp_max_z_cm;
 
-            void loadPose();
+            void loadPose( );
             bool moveAllJoint( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor, const double xtion_pan, const double xtion_tilt, const double sec, bool is_sleep = true );
 
         public:

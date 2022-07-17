@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
     // Pose: detecting_pose
     std::cout << "starting" << std:: endl;
-    edu_arm_ctr.movePose("detecting_pose");
+    edu_arm_ctr.moveToPose("detecting_pose");
     ros::Duration(3.0).sleep();
 
     // Open the hand
@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
     // Move the hand towards the target "target_name"
     // grasp_flag = edu_arm_ctr.moveGripperToTarget(target_name, 0.0, 0.0, 0.0)
     // Caution: We shift the x axis target posiition -0.3 to avoid collision
-    grasp_flag = edu_arm_ctr.moveGripperToTarget(target_name, -0.3, 0.0, 0.0);
-    grasp_flag = edu_arm_ctr.moveGripperToTargetXYZ(0.5, 0.5, 0.5, -0.3, 0.0, 0.0);
+    grasp_flag = edu_arm_ctr.moveGripperToTargetTF(target_name, -0.3, 0.0, 0.0);
+    grasp_flag = edu_arm_ctr.moveGripperToTargetCoord(0.5, 0.5, 0.5, -0.3, 0.0, 0.0);
     std::cout << "Is grasped? " << (grasp_flag? "True":"False") << std::endl;
     ros::Duration(2.0).sleep();
 
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     ros::Duration(2.0).sleep();
 
     // Pose: "initial pose"
-    edu_arm_ctr.movePose( "initial_pose" );
+    edu_arm_ctr.moveToPose( "initial_pose" );
 
     return 0;
 }

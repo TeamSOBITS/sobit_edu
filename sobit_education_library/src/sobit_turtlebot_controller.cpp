@@ -71,10 +71,10 @@ bool SobitTurtlebotController::controlWheelRotateRad( const double angle_rad ) {
 
             ros::spinOnce();
         }
-        double init_yaw = geometryQuat2Yaw ( curt_odom_.pose.pose.orientation );
+        double init_yaw = geometryQuat2Yaw( curt_odom_.pose.pose.orientation );
         double moving_angle_rad = 0.0;
         double abs_angle_rad =  std::fabs( angle_rad );
-        double abs_angle_deg = rad2Deg ( abs_angle_rad );
+        double abs_angle_deg = rad2Deg( abs_angle_rad );
         double Kp = 0.1;
         double Ki = 0.4;
         double Kd = 0.8;
@@ -98,10 +98,10 @@ bool SobitTurtlebotController::controlWheelRotateRad( const double angle_rad ) {
             output_vel.angular.z = ( angle_rad > 0 ) ? vel_angular : - vel_angular;
             velocity_differential = vel_angular;
             pub_cmd_vel_.publish( output_vel );
-            double curt_yaw = geometryQuat2Yaw ( curt_odom_.pose.pose.orientation );
+            double curt_yaw = geometryQuat2Yaw( curt_odom_.pose.pose.orientation );
             double pre_move_ang_rad = moving_angle_rad;
-            if(-0.00314 < curt_yaw - init_yaw && curt_yaw - init_yaw < 0 && 0 < angle_rad) continue;
-            else if(0 < curt_yaw - init_yaw && curt_yaw - init_yaw < 0.00314 && angle_rad < 0) continue;
+            if ( -0.00314 < curt_yaw - init_yaw && curt_yaw - init_yaw < 0 && 0 < angle_rad ) continue;
+            else if ( 0 < curt_yaw - init_yaw && curt_yaw - init_yaw < 0.00314 && angle_rad < 0 ) continue;
 
             if ( curt_yaw - init_yaw < 0 && 0 < angle_rad ) moving_angle_rad = abs(curt_yaw - init_yaw + deg2Rad(360 * loop_cnt));
             else if ( 0 < curt_yaw - init_yaw && angle_rad < 0 ) moving_angle_rad = abs(curt_yaw - init_yaw - deg2Rad(360 * loop_cnt));
@@ -114,13 +114,13 @@ bool SobitTurtlebotController::controlWheelRotateRad( const double angle_rad ) {
                 else moving_angle_rad = abs(curt_yaw - init_yaw - deg2Rad(360 * (loop_cnt-1)));
             }
             
-            ROS_INFO("target_angle = %f\tmoving_angle = %f", abs_angle_rad, moving_angle_rad );
+            ROS_INFO( "target_angle = %f\tmoving_angle = %f", abs_angle_rad, moving_angle_rad );
             
             loop_rate.sleep();
         }
         return true;
     } catch ( const std::exception& ex ) {
-        ROS_ERROR("%s", ex.what());
+        ROS_ERROR( "%s", ex.what() );
         return false;
     }
 }
