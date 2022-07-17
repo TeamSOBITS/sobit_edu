@@ -34,9 +34,9 @@ namespace sobit_education {
             ros::Subscriber sub_odom_;
             nav_msgs::Odometry curt_odom_;
             
-            void setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
-            void addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
-            void checkPublishersConnection( const ros::Publisher& pub );
+            // void setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
+            // void addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
+            // void checkPublishersConnection( const ros::Publisher& pub );
             void callbackOdometry( const nav_msgs::OdometryConstPtr &odom_msg );
             double geometryQuat2Yaw( const geometry_msgs::Quaternion& geometry_quat );
             double rad2Deg( const double rad );
@@ -50,40 +50,40 @@ namespace sobit_education {
     };
 }
 
-inline void sobit_education::SobitTurtlebotController::setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
-    trajectory_msgs::JointTrajectory joint_trajectory;
-    trajectory_msgs::JointTrajectoryPoint joint_trajectory_point; 
-    joint_trajectory.joint_names.push_back( joint_name ); 
-    joint_trajectory_point.positions.push_back( rad );
-    joint_trajectory_point.velocities.push_back( 0.0 );
-    joint_trajectory_point.accelerations.push_back( 0.0 );
-    joint_trajectory_point.effort.push_back( 0.0 );
-    joint_trajectory_point.time_from_start = ros::Duration( sec );
-    joint_trajectory.points.push_back( joint_trajectory_point );
-    *jt = joint_trajectory;
-    return;
-}
+// inline void sobit_education::SobitTurtlebotController::setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
+//     trajectory_msgs::JointTrajectory joint_trajectory;
+//     trajectory_msgs::JointTrajectoryPoint joint_trajectory_point; 
+//     joint_trajectory.joint_names.push_back( joint_name ); 
+//     joint_trajectory_point.positions.push_back( rad );
+//     joint_trajectory_point.velocities.push_back( 0.0 );
+//     joint_trajectory_point.accelerations.push_back( 0.0 );
+//     joint_trajectory_point.effort.push_back( 0.0 );
+//     joint_trajectory_point.time_from_start = ros::Duration( sec );
+//     joint_trajectory.points.push_back( joint_trajectory_point );
+//     *jt = joint_trajectory;
+//     return;
+// }
 
-inline void sobit_education::SobitTurtlebotController::addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
-    trajectory_msgs::JointTrajectory joint_trajectory = *jt;
-    joint_trajectory.joint_names.push_back( joint_name ); 
-    joint_trajectory.points[0].positions.push_back( rad );
-    joint_trajectory.points[0].velocities.push_back( 0.0 );
-    joint_trajectory.points[0].accelerations.push_back( 0.0 );
-    joint_trajectory.points[0].effort.push_back( 0.0 );
-    joint_trajectory.points[0].time_from_start = ros::Duration( sec );
-    *jt = joint_trajectory;
-    return;
-}
+// inline void sobit_education::SobitTurtlebotController::addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
+//     trajectory_msgs::JointTrajectory joint_trajectory = *jt;
+//     joint_trajectory.joint_names.push_back( joint_name ); 
+//     joint_trajectory.points[0].positions.push_back( rad );
+//     joint_trajectory.points[0].velocities.push_back( 0.0 );
+//     joint_trajectory.points[0].accelerations.push_back( 0.0 );
+//     joint_trajectory.points[0].effort.push_back( 0.0 );
+//     joint_trajectory.points[0].time_from_start = ros::Duration( sec );
+//     *jt = joint_trajectory;
+//     return;
+// }
 
-inline void sobit_education::SobitTurtlebotController::checkPublishersConnection ( const ros::Publisher& pub ) {
-    ros::Rate loop_rate( 10 );
-    while ( pub.getNumSubscribers()	== 0 && ros::ok() ) {
-        try { loop_rate.sleep();
-        } catch ( const std::exception& ex ) { break; }
-    }
-    return; 
-}
+// inline void sobit_education::SobitTurtlebotController::checkPublishersConnection ( const ros::Publisher& pub ) {
+//     ros::Rate loop_rate( 10 );
+//     while ( pub.getNumSubscribers()	== 0 && ros::ok() ) {
+//         try { loop_rate.sleep();
+//         } catch ( const std::exception& ex ) { break; }
+//     }
+//     return; 
+// }
 
 inline void sobit_education::SobitTurtlebotController::callbackOdometry ( const nav_msgs::OdometryConstPtr &odom_msg ) { curt_odom_ = *odom_msg; }
 

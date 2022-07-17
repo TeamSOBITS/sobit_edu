@@ -1,9 +1,15 @@
 #ifndef SOBIT_EDUCATION_CONTROLLER
 #define SOBIT_EDUCATION_CONTROLLER
 
+#include <geometry_msgs/Point.h>
+#include <ros/ros.h>
+
 #include <sobit_education_library/sobit_turtlebot_controller.hpp>
 #include <tf/transform_listener.h>
-#include <geometry_msgs/Point.h>
+#include <trajectory_msgs/JointTrajectory.h>
+
+#include <sobit_common_msg/current_state.h>
+#include <sobit_common_msg/current_state_array.h>
 
 namespace sobit_education {
     enum Joint { ARM_ROLL_JOINT = 0, 
@@ -47,8 +53,24 @@ namespace sobit_education {
             static const double grasp_min_z_cm;
             static const double grasp_max_z_cm;
 
+            void setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
+            void addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
+            void checkPublishersConnection( const ros::Publisher& pub );
             void loadPose( );
-            bool moveAllJoint( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor, const double xtion_pan, const double xtion_tilt, const double sec, bool is_sleep = true );
+            bool moveAllJoint( const double arm_roll,
+                               const double arm_flex,
+                               const double elbow_flex,
+                               const double wrist_flex,
+                               const double hand_motor,
+                               const double xtion_pan,
+                               const double xtion_tilt,
+                               const double sec,
+                               bool         is_sleep = true );
+
+        double wrist_flex_current_ = 0.;
+        double hand_motor_current_ = 0.;
+        void callbackCurrentStateArray( const sobit_common_msg::current_state_array );
+        ros::Subscriber sub_current_state_array = nh_.subscribe( "/current_state_array", 1, &SobitEducationController::callbackCurrentStateArray, this );
 
         public:
             SobitEducationController( const std::string &name );
@@ -60,7 +82,44 @@ namespace sobit_education {
             bool moveArm( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor, const double sec = 5.0, bool is_sleep = true );
             bool moveGripperToTargetCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z );
             bool moveGripperToTargetTF( const std::string &target_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z );
+            bool graspDecision( );
     };
-} //namespace sobit_education
+} // namespace sobit_education
+
+inline void sobit_education::SobitEducationController::setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
+    trajectory_msgs::JointTrajectory joint_trajectory;
+    trajectory_msgs::JointTrajectoryPoint joint_trajectory_point; 
+    joint_trajectory.joint_names.push_back( joint_name ); 
+    joint_trajectory_point.positions.push_back( rad );
+    joint_trajectory_point.velocities.push_back( 0.0 );
+    joint_trajectory_point.accelerations.push_back( 0.0 );
+    joint_trajectory_point.effort.push_back( 0.0 );
+    joint_trajectory_point.time_from_start = ros::Duration( sec );
+    joint_trajectory.points.push_back( joint_trajectory_point );
+    *jt = joint_trajectory;
+    return;
+}
+
+inline void sobit_education::SobitEducationController::addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
+    trajectory_msgs::JointTrajectory joint_trajectory = *jt;
+    joint_trajectory.joint_names.push_back( joint_name ); 
+    joint_trajectory.points[0].positions.push_back( rad );
+    joint_trajectory.points[0].velocities.push_back( 0.0 );
+    joint_trajectory.points[0].accelerations.push_back( 0.0 );
+    joint_trajectory.points[0].effort.push_back( 0.0 );
+    joint_trajectory.points[0].time_from_start = ros::Duration( sec );
+    *jt = joint_trajectory;
+    return;
+}
+
+inline void sobit_education::SobitEducationController::checkPublishersConnection ( const ros::Publisher& pub ) {
+    ros::Rate loop_rate( 10 );
+    while ( pub.getNumSubscribers()	== 0 && ros::ok() ) {
+        try { loop_rate.sleep();
+        } catch ( const std::exception& ex ) { break; }
+    }
+    return; 
+}
+
 
 #endif /* SOBIT_EDUCATION_CONTROLLER */

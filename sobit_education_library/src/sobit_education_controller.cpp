@@ -324,3 +324,34 @@ bool SobitEducationController::moveGripperToTargetTF( const std::string &goal_po
 
     return is_reached;
 }
+
+bool SobitEducationController::graspDecision() {
+    while ( hand_motor_current_ == 0. ) {
+        ros::spinOnce();
+    }
+    ros::spinOnce();
+    std::cout << "hand_motor_current_ :" << hand_motor_current_ << std::endl;
+    if ( 500 <= hand_motor_current_ && hand_motor_current_ <= 1000 ) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void SobitEducationController::callbackCurrentStateArray( const sobit_common_msg::current_state_array msg ) {
+    ros::spinOnce();
+
+    for ( const auto current_state : msg.current_state_array ) {
+        if ( current_state.joint_name == "WRIST_FLEX_JOINT" ) {
+            //std::cout << "\njoint_name:" << current_state.joint_name << std::endl;
+            //std::cout << "\njoint_current:" << current_state.current_ma << std::endl;
+            wrist_flex_current_ = current_state.current_ma;
+        }
+
+        if ( current_state.joint_name == "HAND_MOTOR_JOINT" ) {
+            //std::cout << "\njoint_name:" << current_state.joint_name << std::endl;
+            //std::cout << "\njoint_current:" << current_state.current_ma << std::endl;
+            hand_motor_current_ = current_state.current_ma;
+        }
+    }
+}

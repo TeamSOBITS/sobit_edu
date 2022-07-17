@@ -17,12 +17,6 @@ PYBIND11_MODULE( sobit_education_module, m ) {
         .value( "JOINT_NUM", Joint::JOINT_NUM )
         .export_values( );
     
-    py::class_<SobitTurtlebotController>( m, "SobitTurtlebotController" )
-        .def( py::init< const std::string& >() )
-        .def( "controlWheelLinear", &SobitTurtlebotController::controlWheelLinear, "control Wheel Linear" )
-        .def( "controlWheelRotateRad", &SobitTurtlebotController::controlWheelRotateRad, "control Wheel Rotate Rad" )
-        .def( "controlWheelRotateDeg", &SobitTurtlebotController::controlWheelRotateDeg, "control Wheel Rotate Deg" );
-    
     py::class_<SobitEducationController, SobitTurtlebotController>( m, "SobitEducationController" )
         .def( py::init< const std::string& >() )
         .def( "moveToPose", &SobitEducationController::moveToPose, "move Pose",
@@ -57,5 +51,15 @@ PYBIND11_MODULE( sobit_education_module, m ) {
             py::arg( "target_name" ),
             py::arg( "diff_goal_position_x" ),
             py::arg( "diff_goal_position_y" ),
-            py::arg( "diff_goal_position_z" ) );
+            py::arg( "diff_goal_position_z" ) )
+        .def( "graspDecision", &SobitEducationController::graspDecision, "grasp Decision" );
+
+    py::class_<SobitTurtlebotController>( m, "SobitTurtlebotController" )
+        .def( py::init< const std::string& >() )
+        .def( "controlWheelLinear", &SobitTurtlebotController::controlWheelLinear, "control Wheel Linear", 
+            py::arg( "distance" ) )
+        .def( "controlWheelRotateRad", &SobitTurtlebotController::controlWheelRotateRad, "control Wheel Rotate Rad", 
+            py::arg( "angle_rad" ) )
+        .def( "controlWheelRotateDeg", &SobitTurtlebotController::controlWheelRotateDeg, "control Wheel Rotate Deg",
+            py::arg( "angle_deg" ) );
 }
