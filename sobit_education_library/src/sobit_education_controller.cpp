@@ -113,17 +113,17 @@ bool SobitEducationController::moveJoint( const Joint joint_num, const double ra
         // ARM_FLEX_JOINT_RGT   : joint_num = 2
         // ELBOW_FLEX_JOINT_RGT : joint_num = 3
         // ELBOW_FLEX_JOINT_RGT : joint_num = 4
-        if ( joint_num == 1 || joint_num = 3 ){
+        if ( joint_num == 1 || joint_num == 3 ) {
             setJointTrajectory( joint_names_[joint_num], rad, sec, &joint_trajectory );
             addJointTrajectory(joint_names_[joint_num + 1], -rad, sec, &joint_trajectory);
-        } else if ( joint_num == 2 || joint_num = 4 ){
+        } else if ( joint_num == 2 || joint_num == 4 ) {
             setJointTrajectory( joint_names_[joint_num], rad, sec, &joint_trajectory );
             addJointTrajectory(joint_names_[joint_num - 1], -rad, sec, &joint_trajectory);
-        } else{
+        } else {
             setJointTrajectory( joint_names_[joint_num], rad, sec, &joint_trajectory );
         }
         
-        if( joint_num < Joint::XTION_PAN_JOINT ) {
+        if ( joint_num < Joint::XTION_PAN_JOINT ) {
             checkPublishersConnection ( pub_arm_control_ );
             pub_arm_control_.publish( joint_trajectory );
         } else {
@@ -175,31 +175,30 @@ bool SobitEducationController::moveArm ( const double arm_roll, const double arm
 
 // TODO: Forward Kinematics Method (check result)
 
-bool SobitEducationController::moveGripperToTargetCoord( const double target_x, const double target_y, const double target_z, const double diff_x, const double diff_y, const double diff_z ){
+bool SobitEducationController::moveGripperToTargetCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ){
     sobit_education::SobitTurtlebotController wheel_ctrl;
     geometry_msgs::Point shift;
 
-    // // Calculate target_pos + difference(gap)
-    const double base_to_target_x = target_x + shift.x + diff_x;
-    const double base_to_target_y = target_y + shift.y + diff_y;
-    const double base_to_target_z = target_z + shift.z + diff_z;
+    // // Calculate goal_position_pos + difference(gap)
+    const double base_to_goal_position_x = goal_position_x + shift.x + diff_goal_position_x;
+    const double base_to_goal_position_y = goal_position_y + shift.y + diff_goal_position_y;
+    const double base_to_goal_position_z = goal_position_z + shift.z + diff_goal_position_z;
 
-    // Calculate angle between footbase_pos and the sifted target_pos (XY平面)
-    double tan_rad = std::atan2(base_to_target_y, base_to_target_x);
+    // Calculate angle between footbase_pos and the sifted goal_position_pos (XY平面)
+    double tan_rad = std::atan2(base_to_goal_position_y, base_to_goal_position_x);
 
-    // Change target_pos units (m->cm)
-    const double target_pos_x_cm = base_to_target_x * 100.;
-    const double target_pos_y_cm = base_to_target_y * 100.;
-    const double target_pos_z_cm = base_to_target_z * 100.;
+    // Change goal_position_pos units (m->cm)
+    const double goal_position_pos_x_cm = base_to_goal_position_x * 100.;
+    const double goal_position_pos_y_cm = base_to_goal_position_y * 100.;
+    const double goal_position_pos_z_cm = base_to_goal_position_z * 100.;
 
     // Check if the object is graspable
-    if ( target_pos_z_cm > grasp_max_z_cm ) {
-        std::cout << "The target is located too tall ("  << target_pos_z_cm << ">80.0)" << std::endl;
+    if ( goal_position_pos_z_cm > grasp_max_z_cm ) {
+        std::cout << "The target is located too tall ("  << goal_position_pos_z_cm << ">80.0)" << std::endl;
         return false;
 
-    }
-    else if ( target_pos_z_cm < grasp_min_z_cm ) {
-        std::cout << "The target is located too low (" << target_pos_z_cm << "<35.0) " << std::endl;
+    } else if ( goal_position_pos_z_cm < grasp_min_z_cm ) {
+        std::cout << "The target is located too low (" << goal_position_pos_z_cm << "<35.0) " << std::endl;
         return false;
     }
 
@@ -211,12 +210,12 @@ bool SobitEducationController::moveGripperToTargetCoord( const double target_x, 
     double base_to_wrist_flex_joint_x_cm = 0.0;
 
     // Target is above elbow_flex_join
-    if ( (base_to_shoulder_flex_joint_z_cm + arm1_link_z_cm) < target_pos_z_cm ) {
-        std::cout << "Target (z:" << target_pos_z_cm << ") is above elbow_flex_join" << std::endl;
-        ROS_INFO("Target (z:%f) is above elbow_flex_join", target_pos_z_cm);
+    if ( (base_to_shoulder_flex_joint_z_cm + arm1_link_z_cm) < goal_position_pos_z_cm ) {
+        std::cout << "Target (z:" << goal_position_pos_z_cm << ") is above elbow_flex_join" << std::endl;
+        ROS_INFO("Target (z:%f) is above elbow_flex_join", goal_position_pos_z_cm);
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
-        double elbow_flex_joint_sin = (target_pos_z_cm - (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)) / arm2_link_x_cm;
+        double elbow_flex_joint_sin = (goal_position_pos_z_cm - (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)) / arm2_link_x_cm;
         elbow_flex_joint_rad = std::asin(elbow_flex_joint_sin);
         wrist_flex_joint_rad = -elbow_flex_joint_rad;
         shoulder_flex_joint_rad = 0.0;
@@ -225,12 +224,12 @@ bool SobitEducationController::moveGripperToTargetCoord( const double target_x, 
     }
 
     // Target is below elbow_flex_join and above shoulder_flex_joint
-    else if (base_to_shoulder_flex_joint_z_cm <= target_pos_z_cm && target_pos_z_cm <= (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm)){
-        std::cout << "Target (z:" << target_pos_z_cm << ") is below elbow_flex_join and above shoulder_flex_joint" << std::endl;
-        ROS_INFO("Target (z:%f) is below elbow_flex_join and above shoulder_flex_joint", target_pos_z_cm);
+    else if ( base_to_shoulder_flex_joint_z_cm <= goal_position_pos_z_cm && goal_position_pos_z_cm <= (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm) ) {
+        std::cout << "Target (z:" << goal_position_pos_z_cm << ") is below elbow_flex_join and above shoulder_flex_joint" << std::endl;
+        ROS_INFO("Target (z:%f) is below elbow_flex_join and above shoulder_flex_joint", goal_position_pos_z_cm);
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
-        double elbow_flex_joint_sin = (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm - target_pos_z_cm) / arm2_link_x_cm;
+        double elbow_flex_joint_sin = (base_to_shoulder_flex_joint_z_cm + arm1_link_x_cm - goal_position_pos_z_cm) / arm2_link_x_cm;
         elbow_flex_joint_rad = -std::asin(elbow_flex_joint_sin);
         wrist_flex_joint_rad = -elbow_flex_joint_rad;
         shoulder_flex_joint_rad = 0.0;
@@ -239,12 +238,12 @@ bool SobitEducationController::moveGripperToTargetCoord( const double target_x, 
     }
 
     // Target is below shoulder_flex_joint
-    else if (target_pos_z_cm < base_to_shoulder_flex_joint_z_cm){
-        std::cout << "Target (z:" << target_pos_z_cm << ") is below shoulder_flex_joint" << std::endl;
-        ROS_INFO("Target (z:%f) is below shoulder_flex_joint", target_pos_z_cm);
+    else if ( goal_position_pos_z_cm < base_to_shoulder_flex_joint_z_cm ) {
+        std::cout << "Target (z:" << goal_position_pos_z_cm << ") is below shoulder_flex_joint" << std::endl;
+        ROS_INFO("Target (z:%f) is below shoulder_flex_joint", goal_position_pos_z_cm);
 
         // Caution: Calculating until wrist_flex_joint_x_cm (not target)
-        double elbow_flex_joint_cos = (base_to_shoulder_flex_joint_z_cm - arm1_link_z_cm - target_pos_z_cm) / arm2_link_x_cm;
+        double elbow_flex_joint_cos = (base_to_shoulder_flex_joint_z_cm - arm1_link_z_cm - goal_position_pos_z_cm) / arm2_link_x_cm;
         elbow_flex_joint_rad = std::acos(elbow_flex_joint_cos);
         wrist_flex_joint_rad = std::asin(elbow_flex_joint_cos);
         shoulder_flex_joint_rad = -SobitTurtlebotController::deg2Rad(90.0);
@@ -254,28 +253,28 @@ bool SobitEducationController::moveGripperToTargetCoord( const double target_x, 
 
     // Calculate wheel movement (diagonal)
     // - Rotate the robot
-    const double rot_rad = std::atan2(target_pos_y_cm, target_pos_x_cm);
+    const double rot_rad = std::atan2(goal_position_pos_y_cm, goal_position_pos_x_cm);
     ROS_INFO("rot_rad = %f(deg:%f)", rot_rad, SobitTurtlebotController::rad2Deg(rot_rad));
     wheel_ctrl.controlWheelRotateRad(rot_rad);
     ros::Duration(3.0).sleep();
 
     // - Move forward the robot
-    const double linear_m = std::sqrt(std::pow(target_pos_x_cm, 2) + std::pow(target_pos_y_cm, 2)) / 100.0 - base_to_wrist_flex_joint_x_cm / 100.0;
-    // double linear_m = std::sqrt(std::pow(transform_base_to_target.getOrigin().x(), 2) + std::pow(transform_base_to_target.getOrigin().y(), 2)) - base_to_wrist_flex_joint_x_cm / 100. + diff_x;
+    const double linear_m = std::sqrt(std::pow(goal_position_pos_x_cm, 2) + std::pow(goal_position_pos_y_cm, 2)) / 100.0 - base_to_wrist_flex_joint_x_cm / 100.0;
+    // double linear_m = std::sqrt(std::pow(transform_base_to_target.getOrigin().x(), 2) + std::pow(transform_base_to_target.getOrigin().y(), 2)) - base_to_wrist_flex_joint_x_cm / 100. + diff_goal_position_x;
     ROS_INFO("linear_m = %f", linear_m);
     wheel_ctrl.controlWheelLinear(linear_m);
     ros::Duration(3.0).sleep();
 
     // // Calculate wheel movement (+-90->x_pos->-+90->y_pos) NEEDS CONFIRMATION
     // // - Rotate the robot
-    // const double rot_deg = target_pos_x_cm > 0.0 ? 90.0:-90.0;
+    // const double rot_deg = goal_position_pos_x_cm > 0.0 ? 90.0:-90.0;
     // ROS_INFO("rot_deg:%f)", rot_deg);
     // wheel_ctrl.controlWheelRotateDeg(rot_deg);
     // ros::Duration(3.0).sleep();
 
     // // - Move forward the robot
-    // ROS_INFO("linear_m = %f", target_pos_x_cm/100.0);
-    // wheel_ctrl.controlWheelLinear(target_pos_x_cm/100.0);
+    // ROS_INFO("linear_m = %f", goal_position_pos_x_cm/100.0);
+    // wheel_ctrl.controlWheelLinear(goal_position_pos_x_cm/100.0);
     // ros::Duration(3.0).sleep();
 
     // // - Rotate the robot
@@ -284,8 +283,8 @@ bool SobitEducationController::moveGripperToTargetCoord( const double target_x, 
     // ros::Duration(3.0).sleep();
 
     // // - Move forward the robot
-    // ROS_INFO("linear_m = %f", target_pos_y_cm/100.0);
-    // wheel_ctrl.controlWheelLinear(target_pos_y_cm/100.0);
+    // ROS_INFO("linear_m = %f", goal_position_pos_y_cm/100.0);
+    // wheel_ctrl.controlWheelLinear(goal_position_pos_y_cm/100.0);
     // ros::Duration(3.0).sleep();
 
     // - Move arm (OPEN)
@@ -293,14 +292,14 @@ bool SobitEducationController::moveGripperToTargetCoord( const double target_x, 
     bool is_reached = moveArm(shoulder_roll_joint_rad, shoulder_flex_joint_rad, elbow_flex_joint_rad, wrist_flex_joint_rad, hand_rad);
     printf("ARM RAD: %f\t%f\t%f\t%f\t%f\n", shoulder_roll_joint_rad, shoulder_flex_joint_rad, elbow_flex_joint_rad, wrist_flex_joint_rad, hand_rad);
     printf("ARM DEG: %f\t%f\t%f\t%f\t%f\n", rad2Deg (shoulder_roll_joint_rad), rad2Deg (shoulder_flex_joint_rad), rad2Deg (elbow_flex_joint_rad), rad2Deg (wrist_flex_joint_rad), rad2Deg (hand_rad));
-    ROS_INFO("target_pos = (%f, %f, %f)", target_pos_x_cm, target_pos_y_cm, target_pos_z_cm);
+    ROS_INFO("goal_position_pos = (%f, %f, %f)", goal_position_pos_x_cm, goal_position_pos_y_cm, goal_position_pos_z_cm);
     // ROS_INFO("result_pos = (%f, %f, %f)", for_kinematics_x, for_kinematics_z, for_kinematics_z);
     ros::Duration(2.0).sleep();
 
     return is_reached;
 }
 
-bool SobitEducationController::moveGripperToTargetTF( const std::string &target_name, const double diff_x, const double diff_y, const double diff_z ) {
+bool SobitEducationController::moveGripperToTargetTF( const std::string &goal_position_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
     sobit_education::SobitTurtlebotController wheel_ctrl;
     tf::StampedTransform transform_base_to_target;
     geometry_msgs::Point shift;
@@ -308,20 +307,20 @@ bool SobitEducationController::moveGripperToTargetTF( const std::string &target_
     bool tf_flag = false;
 
     try {
-        listener_.waitForTransform("base_footprint", target_name, ros::Time(0), ros::Duration(2.0));
-        listener_.lookupTransform("base_footprint", target_name, ros::Time(0), transform_base_to_target);
+        listener_.waitForTransform("base_footprint", goal_position_name, ros::Time(0), ros::Duration(2.0));
+        listener_.lookupTransform("base_footprint", goal_position_name, ros::Time(0), transform_base_to_target);
         tf_flag = true;
     } catch ( tf::TransformException ex ) {
         ROS_ERROR("ERROR: %s", ex.what());
         return false;
     }
 
-    // // Send target_pos
-    const double target_x = transform_base_to_target.getOrigin().x();
-    const double target_y = transform_base_to_target.getOrigin().y();
-    const double target_z = transform_base_to_target.getOrigin().z();
+    // // Send goal_position_pos
+    const double goal_position_x = transform_base_to_target.getOrigin().x();
+    const double goal_position_y = transform_base_to_target.getOrigin().y();
+    const double goal_position_z = transform_base_to_target.getOrigin().z();
 
-    bool is_reached = moveGripperToTargetCoord(target_x, target_y, target_z, diff_x, diff_y, diff_z);
+    bool is_reached = moveGripperToTargetCoord(goal_position_x, goal_position_y, goal_position_z, diff_goal_position_x, diff_goal_position_y, diff_goal_position_z);
 
     return is_reached;
 }

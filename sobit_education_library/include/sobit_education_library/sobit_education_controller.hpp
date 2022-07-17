@@ -57,11 +57,11 @@ namespace sobit_education {
             SobitEducationController( );
             
             bool moveToPose( const std::string &pose_name, const double sec = 5.0 );
-            bool moveJoint ( const Joint joint_num, const double rad, const double sec = 5.0, bool is_sleep = true );
-            bool moveHeadPanTilt ( const double pan_rad, const double tilt_rad, const double sec = 5.0, bool is_sleep = true );  
-            bool moveArm ( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor, const double sec = 5.0, bool is_sleep = true );
-            bool moveGripperToTargetCoord( const double target_x, const double target_y, const double target_z, const double diff_x, const double diff_y, const double diff_z );
-            bool moveGripperToTargetTF( const std::string &target_name, const double diff_x, const double diff_y, const double diff_z );
+            bool moveJoint( const Joint joint_num, const double rad, const double sec = 5.0, bool is_sleep = true );
+            bool moveHeadPanTilt( const double pan_rad, const double tilt_rad, const double sec = 5.0, bool is_sleep = true );  
+            bool moveArm( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor, const double sec = 5.0, bool is_sleep = true );
+            bool moveGripperToTargetCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z );
+            bool moveGripperToTargetTF( const std::string &target_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z );
     };
 } //namespace sobit_education
 
