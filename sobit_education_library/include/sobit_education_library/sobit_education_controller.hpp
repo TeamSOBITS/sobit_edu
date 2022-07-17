@@ -38,8 +38,7 @@ namespace sobit_education {
                                                             "wrist_flex_joint", 
                                                             "hand_motor_joint", 
                                                             "xtion_pan_joint", 
-                                                            "xtion_tilt_joint"
-                                                        };
+                                                            "xtion_tilt_joint" };
             std::vector<Pose> pose_list_;
 
             static const double base_to_shoulder_flex_joint_z_cm;
@@ -47,21 +46,23 @@ namespace sobit_education {
             static const double arm1_link_x_cm;
             static const double arm1_link_z_cm;
             static const double arm2_link_x_cm;
-            static const double can_grasp_min_z_cm;
-            static const double can_grasp_max_z_cm;
+            static const double grasp_min_z_cm;
+            static const double grasp_max_z_cm;
 
             void loadPose();
             bool moveAllJoint( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor, const double xtion_pan, const double xtion_tilt, const double sec, bool is_sleep = true );
-            
+
         public:
             SobitEducationController( const std::string &name );
             SobitEducationController( );
-            bool moveJoint ( const Joint joint_num, const double rad, const double sec, bool is_sleep = true );
-            bool moveXtionPanTilt ( const double pan_rad, const double tilt_rad, const double sec, bool is_sleep = true );  
-            bool moveArm ( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor );
-            bool movePose( const std::string &pose_name );
-            bool moveGripperToTarget( const std::string &target_name, const double diff_x, const double diff_y, const double diff_z );
-            bool moveGripperToTargetXYZ( const double target_x, const double target_y, const double target_z, const double diff_x, const double diff_y, const double diff_z );
+            
+            bool moveToPose( const std::string &pose_name, const double sec = 5.0 );
+            bool moveJoint ( const Joint joint_num, const double rad, const double sec = 5.0, bool is_sleep = true );
+            bool moveHeadPanTilt ( const double pan_rad, const double tilt_rad, const double sec = 5.0, bool is_sleep = true );  
+            bool moveArm ( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor, const double sec = 5.0, bool is_sleep = true );
+            bool moveGripperToTargetCoord( const double target_x, const double target_y, const double target_z, const double diff_x, const double diff_y, const double diff_z );
+            bool moveGripperToTargetTF( const std::string &target_name, const double diff_x, const double diff_y, const double diff_z );
     };
-}
-#endif
+} //namespace sobit_education
+
+#endif /* SOBIT_EDUCATION_CONTROLLER */
