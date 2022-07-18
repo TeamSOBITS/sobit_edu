@@ -52,6 +52,18 @@ PYBIND11_MODULE( sobit_education_module, m ) {
             py::arg( "diff_goal_position_x" ),
             py::arg( "diff_goal_position_y" ),
             py::arg( "diff_goal_position_z" ) )
+        .def( "moveGripperToPlaceCoord", &SobitEducationController::moveGripperToPlaceCoord, "move Gripper To Placeable Position Coordinate",
+            py::arg( "goal_position_x" ),
+            py::arg( "goal_position_y" ),
+            py::arg( "goal_position_z" ),
+            py::arg( "diff_goal_position_x" ),
+            py::arg( "diff_goal_position_y" ),
+            py::arg( "diff_goal_position_z" ) )
+        .def( "moveGripperToPlaceTF", &SobitEducationController::moveGripperToPlaceTF, "move Gripper To Placeable Position TF",
+            py::arg( "target_name" ),
+            py::arg( "diff_goal_position_x" ),
+            py::arg( "diff_goal_position_y" ),
+            py::arg( "diff_goal_position_z" ) )
         .def( "graspDecision", &SobitEducationController::graspDecision, "grasp Decision" );
 
     py::class_<SobitTurtlebotController>( m, "SobitTurtlebotController" )

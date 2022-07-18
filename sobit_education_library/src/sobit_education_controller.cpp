@@ -325,6 +325,47 @@ bool SobitEducationController::moveGripperToTargetTF( const std::string &goal_po
     return is_reached;
 }
 
+bool SobitEducationController::moveGripperToPlaceCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
+    geometry_msgs::Point shift;
+
+    // 作成中
+    double target_z         = 0.;
+
+    /** 目標値から0.1[m]程下げた位置までアームを移動 **/
+    /**  ハンドに負荷がかかった場合はそこで停止する  **/
+    while( -target_z < diff_goal_position_z ) {
+        moveGripperToTargetCoord( goal_position_x, goal_position_y, goal_position_z, 
+                                  diff_goal_position_x, diff_goal_position_y, diff_goal_position_z );
+        
+        // ハンドのジョイントに負荷がかかった場合、そこで停止する
+        if ( 500 < wrist_flex_current_ && wrist_flex_current_ < 1000 ) {
+            break;
+        }
+
+        // 目標値からの差分を追加
+        target_z -= 0.05;
+    }
+
+    return true;
+}
+
+bool SobitEducationController::moveGripperToPlaceTF( const std::string& target_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
+    geometry_msgs::Point shift;
+
+    tf::StampedTransform transform_base_to_target;
+    try {
+        listener_.waitForTransform("base_footprint", target_name, ros::Time(0), ros::Duration(2.0));
+        listener_.lookupTransform("base_footprint", target_name, ros::Time(0), transform_base_to_target);
+    } catch ( tf::TransformException ex ) {
+        ROS_ERROR("%s", ex.what());
+        return false;
+    }
+
+    moveGripperToPlaceCoord( transform_base_to_target.getOrigin().x(), transform_base_to_target.getOrigin().y(), transform_base_to_target.getOrigin().z(),
+                                        diff_goal_position_x, diff_goal_position_y, diff_goal_position_z );
+    return true;
+}
+
 bool SobitEducationController::graspDecision() {
     while ( hand_motor_current_ == 0. ) {
         ros::spinOnce();
