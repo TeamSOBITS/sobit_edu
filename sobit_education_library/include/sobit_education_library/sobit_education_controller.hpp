@@ -123,5 +123,4 @@ inline void sobit_education::SobitEducationController::checkPublishersConnection
     return; 
 }
 
-
 #endif /* SOBIT_EDUCATION_CONTROLLER */
