@@ -14,11 +14,11 @@ def test():
     edu_ctr = SobitEducationController(args[0]) # args[0] : C++上でros::init()を行うための引数
 
     # 決められたポーズをする
-    edu_ctr.movePose( "pan_pose" )
+    edu_ctr.moveToPose( "pan_pose" )
     rospy.sleep(5)
 
     # 決められたポーズをする
-    edu_ctr.movePose( "initial_pose" )
+    edu_ctr.moveToPose( "initial_pose" )
 
 if __name__ == '__main__':
     try:

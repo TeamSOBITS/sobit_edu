@@ -24,7 +24,7 @@ def test():
     rospy.sleep(2.0)
 
     # 決められたポーズをする
-    edu_ctr.movePose( "initial_pose" )
+    edu_ctr.moveToPose( "initial_pose" )
 
 if __name__ == '__main__':
     try:
