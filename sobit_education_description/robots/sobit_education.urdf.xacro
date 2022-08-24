@@ -22,7 +22,8 @@
   <xacro:base/>
   <xacro:stack_hexagons parent="base_link" />
   <xacro:arm prefix="arm" parent="plate_top_link"/>
-  <xacro:hand prefix="hand_motor" parent="wrist_flex_link"/>
+  <xacro:hand prefix="hand" parent="wrist_flex_link"/>
+  <!-- <xacro:hand prefix_hand="hand" prefix_finger="finger" parent="wrist_flex_link" /> -->
   <xacro:pole parent="plate_top_link"/>
   <xacro:urg_sup parent="plate_bottom_link"/>
   <xacro:xtion_motor prefix="xtion" parent="base_pole_link"/>
