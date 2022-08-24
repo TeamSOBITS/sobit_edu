@@ -1,9 +1,11 @@
 <?xml version="1.0" ?>
+
 <robot name="sobit_education" xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <!-- common xacro -->
+  <!-- Add Common Xacro: transmissions, colors -->
   <xacro:include filename="$(find sobit_education_description)/urdf/common.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/materials.urdf.xacro" />
-  <!-- links and joints -->
+
+  <!-- Add URDF: links, joints -->
   <xacro:include filename="$(find sobit_education_description)/urdf/base/base.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/stacks/stacks.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/arm/arm.urdf.xacro" />
@@ -15,6 +17,8 @@
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/matrix.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/urg.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/urg_sup/urg_sup.urdf.xacro" />
+
+  <!-- Connect the previous Links and Joints -->
   <xacro:base/>
   <xacro:stack_hexagons parent="base_link" />
   <xacro:arm prefix="arm" parent="plate_top_link"/>
@@ -26,5 +30,4 @@
   <xacro:mic parent="base_pole_link"/>
   <xacro:matrix parent="base_pole_link"/>
   <xacro:urg parent="base_urg_sup_link"/>
-  
 </robot>
