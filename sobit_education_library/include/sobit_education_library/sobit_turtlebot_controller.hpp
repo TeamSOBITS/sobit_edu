@@ -41,6 +41,7 @@ namespace sobit_education {
         public :
             SobitTurtlebotController( const std::string &name );
             SobitTurtlebotController( );
+            bool controlWheelLinearFixed( const double distance );
             bool controlWheelLinear( const double distance );
             bool controlWheelRotateRad( const double angle_rad );
             bool controlWheelRotateDeg( const double angle_deg );
