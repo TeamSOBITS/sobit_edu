@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<robot name="urg"
+  xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="urg" params="parent">
+
+    <joint name="base_laser_joint" type="fixed">
+      <!-- <origin xyz="0.18 0.0 0.38" rpy="0 0 0" /> -->
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+      <parent link="${parent}" />
+      <child link="base_laser_link" />
+      <origin rpy="0 0 0" xyz="0.13525 0.0 0.034"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="30" lower="-3.14" upper="3.14" velocity="1.571"/>
+    </joint>
+
+    <link name="base_laser_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://sobit_education_description/meshes/UST-20LX.dae"/>
+        </geometry>
+      </visual>
+      <inertial>
+        <mass value="0.000001" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
+      </inertial>
+    </link>
+
+  </xacro:macro>
+</robot>
