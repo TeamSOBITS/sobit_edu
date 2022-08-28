@@ -8,12 +8,12 @@
 
   <!-- Add URDF: links, joints -->
   <xacro:include filename="$(find sobit_education_description)/urdf/base/base.urdf.xacro" />
-  <xacro:include filename="$(find sobit_education_description)/urdf/stacks/stacks.urdf.xacro" />
+  <xacro:include filename="$(find sobit_education_description)/urdf/body/stacks.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/body/cover.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/arm/arm.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/hand/hand.urdf.xacro" />
-  <xacro:include filename="$(find sobit_education_description)/urdf/pole/pole.urdf.xacro" />
-  <xacro:include filename="$(find sobit_education_description)/urdf/xtion_motor/xtion_motor.urdf.xacro" />
+  <xacro:include filename="$(find sobit_education_description)/urdf/back/back.urdf.xacro" />
+  <xacro:include filename="$(find sobit_education_description)/urdf/head/head.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/xtion.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/mic.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/matrix.urdf.xacro" />
@@ -27,7 +27,6 @@
   <xacro:cover prefix="cover" parent="plate_top_link" />
   <xacro:arm prefix="arm" parent="plate_top_link" />
   <xacro:hand prefix_hand="hand" prefix_finger="finger" parent="arm_wrist_tilt_link" />
-  <!-- <xacro:hand prefix="hand" parent="arm_wrist_tilt_link" /> -->
   <xacro:back prefix="back" parent="plate_top_link" />
   <xacro:head prefix="head" parent="back_base_link" />
   <xacro:xtion_pro prefix="camera" parent="head_double_sided_tape_link" />
