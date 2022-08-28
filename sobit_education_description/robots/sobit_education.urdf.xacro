@@ -4,10 +4,13 @@
   <!-- Add Common Xacro: transmissions, colors -->
   <xacro:include filename="$(find sobit_education_description)/urdf/common.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/materials.urdf.xacro" />
+  <xacro:include filename="$(find urg_node)/urdf/hokuyo_ust10.urdf.xacro" />
+
 
   <!-- Add URDF: links, joints -->
   <xacro:include filename="$(find sobit_education_description)/urdf/base/base.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/stacks/stacks.urdf.xacro" />
+  <xacro:include filename="$(find sobit_education_description)/urdf/body/cover.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/arm/arm.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/hand/hand.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/pole/pole.urdf.xacro" />
@@ -16,18 +19,19 @@
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/mic.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/matrix.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/urg.urdf.xacro" />
-  <xacro:include filename="$(find sobit_education_description)/urdf/urg_sup/urg_sup.urdf.xacro" />
+
 
   <!-- Connect the previous Links and Joints -->
   <xacro:base/>
   <xacro:stack_hexagons parent="base_link" />
-  <xacro:arm prefix="arm" parent="plate_top_link"/>
+  <xacro:cover prefix="cover" parent="plate_top_link" />
+  <xacro:arm prefix="arm" parent="plate_top_link" />
   <xacro:hand prefix_hand="hand" prefix_finger="finger" parent="arm_wrist_tilt_link" />
-  <xacro:pole parent="plate_top_link"/>
-  <xacro:urg_sup parent="plate_bottom_link"/>
-  <xacro:xtion_motor prefix="xtion" parent="base_pole_link"/>
-  <xacro:sensor_asus_xtion_pro parent="xtion_double_sided_tape_link"/>
-  <xacro:mic parent="base_pole_link"/>
-  <xacro:matrix parent="base_pole_link"/>
-  <xacro:urg parent="base_urg_sup_link"/>
+  <!-- <xacro:hand prefix="hand" parent="arm_wrist_tilt_link" /> -->
+  <xacro:back prefix="back" parent="plate_top_link" />
+  <xacro:head prefix="head" parent="back_base_link" />
+  <xacro:xtion_pro prefix="camera" parent="head_double_sided_tape_link" />
+  <xacro:mic prefix="mic" parent="back_base_link" />
+  <xacro:matrix prefix="matrix" parent="back_base_link" />
+  <xacro:urg prefix="urg" parent="plate_bottom_link" />
 </robot>
