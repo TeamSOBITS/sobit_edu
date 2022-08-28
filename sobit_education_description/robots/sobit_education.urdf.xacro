@@ -4,7 +4,6 @@
   <!-- Add Common Xacro: transmissions, colors -->
   <xacro:include filename="$(find sobit_education_description)/urdf/common.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/materials.urdf.xacro" />
-  <xacro:include filename="$(find urg_node)/urdf/hokuyo_ust10.urdf.xacro" />
 
 
   <!-- Add URDF: links, joints -->
@@ -19,6 +18,7 @@
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/mic.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/matrix.urdf.xacro" />
   <xacro:include filename="$(find sobit_education_description)/urdf/sensor/urg.urdf.xacro" />
+  <xacro:include filename="$(find urg_node)/urdf/hokuyo_ust.urdf.xacro" />
 
 
   <!-- Connect the previous Links and Joints -->
