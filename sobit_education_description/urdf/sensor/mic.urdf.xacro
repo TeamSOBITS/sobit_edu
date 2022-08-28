@@ -1,61 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <robot name="mic" 
   xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="mic" params="parent">
+  <xacro:macro name="mic" params="prefix parent">
 
-    <joint name="mic_stand_joint" type="fixed">
-      <parent link="${parent}"/>
-      <child link="mic_stand_link"/>
-      <origin rpy="${-M_PI/2.0} 0 0" xyz="0.0 0.62 0.17"/>
-      <axis xyz="0 1 0"/>
+    <joint name="${prefix}_base_joint" type="fixed">
+      <parent link="${parent}" />
+      <child link="${prefix}_base_link" />
+      <origin xyz="0.190 0.0 0.610" rpy="0.0 0.0 0.0" />
+      <axis xyz="0 1 0" />
     </joint>
 
-    <link name="mic_stand_link">
-      <collision>
-        <origin rpy="0 0 0" xyz="0 0 0.025"/>
-        <geometry>
-          <cylinder radius="0.015" length="0.05"/>
-        </geometry>
-      </collision>
+    <link name="${prefix}_base_link">
       <visual>
-        <origin rpy="0 0 0" xyz="0 0 0.025"/>
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2} 0 ${M_PI/2}" />
         <geometry>
-          <cylinder radius="0.015" length="0.05"/>
+          <mesh filename="package://sobit_education_description/meshes/sensor/mic_base.stl" scale="0.001 0.001 0.001" />
         </geometry>
-        <material name="black"/>
+        <material name="black" />
       </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2} 0 ${M_PI/2}" />
+        <geometry>
+          <mesh filename="package://sobit_education_description/meshes/sensor/mic_base.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="black" />
+      </collision>
       <inertial>
-        <origin rpy="0 0 0" xyz="0 0 0.025"/>
-        <mass value="1"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+        <mass value="1" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 iyy="1.0" iyz="0.0"
+                 izz="1.0" />
       </inertial>
     </link>
 
-    <joint name="mic_joint" type="fixed">
-      <parent link="mic_stand_link"/>
-      <child link="mic"/>
-      <origin rpy="0.78 0 0" xyz="0.0 0.0 0.05"/>
-      <axis xyz="0 1 0"/>
+    <joint name="${prefix}_joint" type="fixed">
+      <parent link="${prefix}_base_link" />
+      <child link="mic" />
+      <origin xyz="-0.017007 0.0 0.020" rpy="0.0 0.0 0.0" />
+      <axis xyz="0 1 0" />
     </joint>
 
     <link name="mic">
-      <collision>
-        <origin rpy="0 0 0" xyz="0 0 0.05"/>
-        <geometry>
-          <cylinder radius="0.01" length="0.18"/>
-        </geometry>
-      </collision>
       <visual>
-        <origin rpy="0 0 0" xyz="0 0 0.05"/>
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI} 0.0 ${M_PI/2}" />
         <geometry>
-          <cylinder radius="0.01" length="0.18"/>
+          <mesh filename="package://sobit_education_description/meshes/sensor/mic.stl" scale="0.001 0.001 0.001" />
         </geometry>
-        <material name="black"/>
+        <material name="black" />
       </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI} 0.0 ${M_PI/2}" />
+        <geometry>
+          <mesh filename="package://sobit_education_description/meshes/sensor/mic.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="black" />
+      </collision>
       <inertial>
-        <origin rpy="0 0 0" xyz="0 0 0.05"/>
-        <mass value="1"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+        <mass value="1" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 iyy="1.0" iyz="0.0"
+                 izz="1.0" />
       </inertial>
     </link>
 
