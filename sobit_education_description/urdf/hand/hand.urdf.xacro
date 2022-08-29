@@ -5,9 +5,9 @@
   <xacro:include filename="$(find sobit_education_description)/urdf/hand/hand.transmission.xacro" />
   
   <xacro:macro name="hand" params="prefix_hand prefix_finger parent">
-    <xacro:hand_transmission prefix="${prefix_hand}" />
+    <xacro:hand_transmission prefix_hand="${prefix_hand}" prefix_finger="${prefix_finger}" />
 
-    <joint name="${prefix_hand}_base_joint" type="revolute">
+    <joint name="${prefix_hand}_base_joint" type="fixed">
       <parent link="${parent}" />
       <child link="${prefix_hand}_base_link" />
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
@@ -43,7 +43,7 @@
       <parent link="${prefix_hand}_base_link" />
       <child link="${prefix_hand}_inner_l_link" />
       <origin xyz="-0.028 0.0150335 0.077436" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 -1" />
+      <axis xyz="1 0 0" />
       <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="-1.0" offset="0" /> -->
     </joint>
@@ -76,7 +76,8 @@
       <parent link="${parent}" />
       <child link="${prefix_hand}_inner_r_link" />
       <origin xyz="-0.028 -0.0150335 0.077436" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 -1" />
+      <axis xyz="-1 0 0" />
+      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1" offset="0" />
       <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="1.0" offset="0" /> -->
     </joint>
@@ -109,7 +110,8 @@
       <parent link="${parent}" />
       <child link="${prefix_hand}_outer_l_link" />
       <origin xyz="-0.028 0.04 0.059065" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 1" />
+      <axis xyz="1 0 0" />
+      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1" offset="0" />
       <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="-1.12" offset="0" /> -->
     </joint>
@@ -142,7 +144,8 @@
       <parent link="${parent}" />
       <child link="${prefix_hand}_outer_r_link" />
       <origin xyz="-0.028 -0.04 0.059065" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 1" />
+      <axis xyz="-1 0 0" />
+      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1" offset="0" />
       <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="1.12" offset="0" /> -->
     </joint>
@@ -175,7 +178,8 @@
       <parent link="${prefix_hand}_outer_l_link" />
       <child link="${prefix_hand}_${prefix_finger}_l_link" />
       <origin xyz="0.019 0.0 0.070114" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 1" />
+      <axis xyz="1 0 0" />
+      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="-1" offset="0" />
       <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="0.84" offset="0" /> -->
     </joint>
@@ -208,7 +212,8 @@
       <parent link="${prefix_hand}_outer_r_link" />
       <child link="${prefix_hand}_${prefix_finger}_r_link" />
       <origin xyz="0.019 0.0 0.070114" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 1" />
+      <axis xyz="-1 0 0" />
+      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="-1" offset="0" />
       <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="-0.84" offset="0" /> -->
     </joint>
