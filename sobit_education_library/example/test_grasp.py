@@ -20,7 +20,7 @@ def test(target_name):
     rospy.sleep(3.0)
 
     # ハンドを開く
-    edu_arm_pantilt_ctr.moveJoint( Joint.HAND_MOTOR_JOINT, 1.57, 2.0, True )
+    edu_arm_pantilt_ctr.moveJoint( Joint.HAND_JOINT, 1.5708, 2.0, True )
     rospy.sleep(2.0)
 
     # 把持する対象の物体があった場合、そこの位置までアームを移動させる
@@ -35,7 +35,7 @@ def test(target_name):
     rospy.sleep(2.0)
     
     # ハンドを動かす
-    edu_arm_pantilt_ctr.moveJoint( Joint.HAND_MOTOR_JOINT, 0.0, 2.0, True )
+    edu_arm_pantilt_ctr.moveJoint( Joint.HAND_JOINT, 0.0, 2.0, True )
     rospy.sleep(2.0)
 
     # ロボット全体を0.3m戻ってくる

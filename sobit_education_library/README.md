@@ -94,7 +94,7 @@ sobit educationを動かすクラス
         - { 
             pose_name: "initial_pose",
             arm_roll_joint: 0.00,
-            arm_flex_joint: -1.57, 
+            arm_flex_joint: -1.5708, 
             elbow_flex_joint: 1.39, 
             wrist_flex_joint: 0.16, 
             hand_motor_joint: 0.00, 

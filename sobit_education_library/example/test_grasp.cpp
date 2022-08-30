@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     ros::Duration(3.0).sleep();
 
     // Open the hand
-    edu_arm_ctr.moveJoint( sobit_education::Joint::HAND_MOTOR_JOINT, 1.57, 2.0, true );
+    edu_arm_ctr.moveJoint( sobit_education::Joint::HAND_JOINT, 1.5708, 2.0, true );
     ros::Duration(2.0).sleep();
 
     // Move the hand towards the target "target_name"
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     ros::Duration(2.0).sleep();
 
     // Close hand
-    edu_arm_ctr.moveJoint( sobit_education::Joint::HAND_MOTOR_JOINT, 0.0, 2.0, true );
+    edu_arm_ctr.moveJoint( sobit_education::Joint::HAND_JOINT, 0.0, 2.0, true );
     ros::Duration(2.0).sleep();
 
     // Move back the robot (-0.3m)
