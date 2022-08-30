@@ -73,20 +73,20 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         arm_elbow_2_tilt_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         arm_shoulder_1_tilt_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         arm_shoulder_2_tilt_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         arm_shoulder_pan_link:
           Alpha: 1
           Show Axes: false
@@ -187,6 +187,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        hand_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         hand_outer_l_link:
           Alpha: 1
           Show Axes: false
@@ -442,6 +446,8 @@ Visualization Manager:
           Value: true
         hand_inner_r_link:
           Value: true
+        hand_link:
+          Value: true
         hand_outer_l_link:
           Value: true
         hand_outer_r_link:
@@ -554,14 +560,12 @@ Visualization Manager:
               arm_base_link:
                 arm_shoulder_pan_link:
                   arm_shoulder_1_tilt_link:
-                    {}
-                  arm_shoulder_2_tilt_link:
                     arm_elbow_1_tilt_link:
-                      {}
-                    arm_elbow_2_tilt_link:
                       arm_wrist_tilt_link:
                         hand_base_link:
                           hand_inner_l_link:
+                            {}
+                          hand_link:
                             {}
                         hand_inner_r_link:
                           {}
@@ -571,6 +575,10 @@ Visualization Manager:
                         hand_outer_r_link:
                           hand_finger_r_link:
                             {}
+                    arm_elbow_2_tilt_link:
+                      {}
+                  arm_shoulder_2_tilt_link:
+                    {}
               back_base_link:
                 head_camera_base_link:
                   head_camera_pan_link:
@@ -669,7 +677,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.1567115783691406
+      Distance: 1.526810646057129
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -677,17 +685,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.24219244718551636
-        Y: -0.2619989514350891
-        Z: 0.35651686787605286
+        X: 0.11139142513275146
+        Y: 0.11893119663000107
+        Z: 0.6216991543769836
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7853981852531433
+      Pitch: 0.650398313999176
       Target Frame: <Fixed Frame>
-      Yaw: 0.7853981852531433
+      Yaw: 4.993575096130371
     Saved: ~
 Window Geometry:
   Displays:
