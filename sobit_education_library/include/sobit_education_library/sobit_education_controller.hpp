@@ -12,16 +12,16 @@
 #include <sobit_common_msg/current_state_array.h>
 
 namespace sobit_education {
-    enum Joint { ARM_ROLL_JOINT = 0, 
-                ARM_FLEX_JOINT_RGT, 
-                ARM_FLEX_JOINT_LFT, 
-                ELBOW_FLEX_JOINT_RGT, 
-                ELBOW_FLEX_JOINT_LFT, 
-                WRIST_FLEX_JOINT, 
-                HAND_MOTOR_JOINT, 
-                XTION_PAN_JOINT, 
-                XTION_TILT_JOINT, 
-                JOINT_NUM };
+    enum Joint { ARM_SHOULDER_PAN_JOINT = 0, 
+                 ARM_SHOULDER_1_TILT_JOINT, 
+                 ARM_SHOULDER_2_TILT_JOINT, 
+                 ARM_ELBOW_1_TILT_JOINT, 
+                 ARM_ELBOW_2_TILT_JOINT, 
+                 ARM_WRIST_TILT_JOINT, 
+                 HAND_JOINT, 
+                 HEAD_CAMERA_PAN_JOINT, 
+                 HEAD_CAMERA_TILT_JOINT, 
+                 JOINT_NUM };
 
     typedef struct {         
         std::string pose_name;
@@ -31,25 +31,25 @@ namespace sobit_education {
     class SobitEducationController : public SobitTurtlebotController {
         private:
             ros::Publisher pub_arm_control_;
-            ros::Publisher pub_xtion_control_;  
+            ros::Publisher pub_head_camera_control_;  
             tf::TransformListener listener_;
 
-            const std::vector<std::string> joint_names_ = { "arm_roll_joint", 
-                                                            "arm_flex_joint_rgt", 
-                                                            "arm_flex_joint_lft", 
-                                                            "elbow_flex_joint_rgt", 
-                                                            "elbow_flex_joint_lft", 
-                                                            "wrist_flex_joint", 
-                                                            "hand_motor_joint", 
-                                                            "xtion_pan_joint", 
-                                                            "xtion_tilt_joint" };
+            const std::vector<std::string> joint_names_ = { "arm_shoulder_pan_joint", 
+                                                            "arm_shoulder_1_tilt_joint", 
+                                                            "arm_shoulder_2_tilt_joint", 
+                                                            "arm_elbow_1_tilt_joint", 
+                                                            "arm_elbow_2_tilt_joint", 
+                                                            "arm_wrist_tilt_joint", 
+                                                            "hand_joint", 
+                                                            "head_camera_pan_joint", 
+                                                            "head_camera_tilt_joint" };
             std::vector<Pose> pose_list_;
 
             static const double base_to_shoulder_flex_joint_z_cm;
             static const double base_to_shoulder_flex_joint_x_cm;
-            static const double arm1_link_x_cm;
-            static const double arm1_link_z_cm;
-            static const double arm2_link_x_cm;
+            static const double arm_upper_link_x_cm;
+            static const double arm_upper_link_z_cm;
+            static const double arm_outer_link_x_cm;
             static const double grasp_min_z_cm;
             static const double grasp_max_z_cm;
 
@@ -57,20 +57,20 @@ namespace sobit_education {
             void addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
             void checkPublishersConnection( const ros::Publisher& pub );
             void loadPose( );
-            bool moveAllJoint( const double arm_roll,
-                                const double arm_flex,
-                                const double elbow_flex,
-                                const double wrist_flex,
-                                const double hand_motor,
-                                const double xtion_pan,
-                                const double xtion_tilt,
-                                const double sec,
-                                bool         is_sleep = true );
+            bool moveAllJoint( const double arm_shoulder_pan,
+                               const double arm_shoulder_tilt,
+                               const double arm_elbow_tilt,
+                               const double arm_wrist_tilt,
+                               const double hand,
+                               const double head_camera_pan,
+                               const double head_camera_tilt,
+                               const double sec,
+                               bool         is_sleep = true );
 
-        double wrist_flex_current_ = 0.;
-        double hand_motor_current_ = 0.;
-        void callbackCurrentStateArray( const sobit_common_msg::current_state_array );
-        ros::Subscriber sub_current_state_array = nh_.subscribe( "/current_state_array", 1, &SobitEducationController::callbackCurrentStateArray, this );
+            double arm_wrist_tilt_current_ = 0.;
+            double hand_current_ = 0.;
+            void callbackCurrentStateArray( const sobit_common_msg::current_state_array );
+            ros::Subscriber sub_current_state_array = nh_.subscribe( "/current_state_array", 1, &SobitEducationController::callbackCurrentStateArray, this );
 
         public:
             SobitEducationController( const std::string &name );
@@ -79,7 +79,7 @@ namespace sobit_education {
             bool moveToPose( const std::string &pose_name, const double sec = 5.0 );
             bool moveJoint( const Joint joint_num, const double rad, const double sec = 5.0, bool is_sleep = true );
             bool moveHeadPanTilt( const double pan_rad, const double tilt_rad, const double sec = 5.0, bool is_sleep = true );  
-            bool moveArm( const double arm_roll, const double arm_flex, const double elbow_flex, const double wrist_flex, const double hand_motor, const double sec = 5.0, bool is_sleep = true );
+            bool moveArm( const double arm_shoulder_pan, const double arm_shoulder_tilt, const double arm_elbow_tilt, const double arm_wrist_tilt, const double hand, const double sec = 5.0, bool is_sleep = true );
             bool moveGripperToTargetCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z );
             bool moveGripperToTargetTF( const std::string &target_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z );
             bool moveGripperToPlaceCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z );

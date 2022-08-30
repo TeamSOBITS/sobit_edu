@@ -5,15 +5,15 @@ namespace py = pybind11;
 
 PYBIND11_MODULE( sobit_education_module, m ) {
     py::enum_<Joint>( m, "Joint" )
-        .value( "ARM_ROLL_JOINT", Joint::ARM_ROLL_JOINT )
-        .value( "ARM_FLEX_JOINT_RGT", Joint::ARM_FLEX_JOINT_RGT )
-        .value( "ARM_FLEX_JOINT_LFT", Joint::ARM_FLEX_JOINT_LFT )
-        .value( "ELBOW_FLEX_JOINT_RGT", Joint::ELBOW_FLEX_JOINT_RGT )
-        .value( "ELBOW_FLEX_JOINT_LFT", Joint::ELBOW_FLEX_JOINT_LFT )
-        .value( "WRIST_FLEX_JOINT", Joint::WRIST_FLEX_JOINT )
-        .value( "HAND_MOTOR_JOINT", Joint::HAND_MOTOR_JOINT )
-        .value( "XTION_PAN_JOINT", Joint:: XTION_PAN_JOINT )
-        .value( "XTION_TILT_JOINT", Joint::XTION_TILT_JOINT )
+        .value( "ARM_SHOULDER_PAN_JOINT", Joint::ARM_SHOULDER_PAN_JOINT )
+        .value( "ARM_SHOULDER_1_TILT_JOINT", Joint::ARM_SHOULDER_1_TILT_JOINT )
+        .value( "ARM_SHOULDER_2_TILT_JOINT", Joint::ARM_SHOULDER_2_TILT_JOINT )
+        .value( "ARM_ELBOW_1_TILT_JOINT", Joint::ARM_ELBOW_1_TILT_JOINT )
+        .value( "ARM_ELBOW_2_TILT_JOINT", Joint::ARM_ELBOW_2_TILT_JOINT )
+        .value( "ARM_WRIST_TILT_JOINT", Joint::ARM_WRIST_TILT_JOINT )
+        .value( "HAND_JOINT", Joint::HAND_JOINT )
+        .value( "HEAD_CAMERA_PAN_JOINT", Joint:: HEAD_CAMERA_PAN_JOINT )
+        .value( "HEAD_CAMERA_TILT_JOINT", Joint::HEAD_CAMERA_TILT_JOINT )
         .value( "JOINT_NUM", Joint::JOINT_NUM )
         .export_values( );
     
@@ -44,11 +44,11 @@ PYBIND11_MODULE( sobit_education_module, m ) {
             py::arg( "sec" ) = 5.0,
             py::arg( "is_sleep" ) = true )
         .def( "moveArm", &SobitEducationController::moveArm, "move Arm",
-            py::arg( "arm_roll" ),
-            py::arg( "arm_flex" ),
-            py::arg( "elbow_flex" ),
-            py::arg( "wrist_flex" ),
-            py::arg( "hand_motor" ),
+            py::arg( "arm_shoulder_pan" ),
+            py::arg( "arm_shoulder_tilt" ),
+            py::arg( "arm_elbow_tilt" ),
+            py::arg( "arm_wrist_tilt" ),
+            py::arg( "hand" ),
             py::arg( "sec" ) = 5.0,
             py::arg( "is_sleep" ) = true )
         .def( "moveGripperToTargetCoord", &SobitEducationController::moveGripperToTargetCoord, "moveGripperToTargetCoord",
