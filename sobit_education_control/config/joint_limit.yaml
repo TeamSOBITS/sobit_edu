@@ -1,5 +1,5 @@
 joint_limits:
-  arm_roll_joint:
+  arm_shoulder_pan_joint:
     has_position_limits: true
     min_position: -3.14
     max_position: 3.14
@@ -7,66 +7,66 @@ joint_limits:
     max_velocity: 5.969211435
     has_acceleration_limits: true
     max_acceleration: 4.0
-  arm_flex_joint_rgt:
+  arm_shoulder_1_tilt_joint:
     has_position_limits: true
-    min_position: -1.57
-    max_position: 1.57
+    min_position: -1.5708
+    max_position: 1.5708
     has_velocity_limits: true
     max_velocity: 5.969211435
     has_acceleration_limits: true
     max_acceleration: 4.0
-  arm_flex_joint_lft:
+  arm_shoulder_2_tilt_joint:
     has_position_limits: true
-    min_position: -1.57
-    max_position: 1.57
+    min_position: -1.5708
+    max_position: 1.5708
     has_velocity_limits: true
     max_velocity: 5.969211435
     has_acceleration_limits: true
     max_acceleration: 4.0
-  elbow_flex_joint_rgt:
+  arm_elbow_1_tilt_joint:
     has_position_limits: true
-    min_position: -1.57
-    max_position: 1.42
+    min_position: -1.5708
+    max_position: 1.5708
     has_velocity_limits: true
     max_velocity: 5.969211435
     has_acceleration_limits: true
     max_acceleration: 4.0
-  elbow_flex_joint_lft:
+  arm_elbow_2_tilt_joint:
     has_position_limits: true
-    min_position: -1.57
-    max_position: 1.42
+    min_position: -1.5708
+    max_position: 1.5708
     has_velocity_limits: true
     max_velocity: 5.969211435
     has_acceleration_limits: true
     max_acceleration: 4.0
-  wrist_flex_joint:
+  arm_wrist_tilt_joint:
     has_position_limits: true
-    min_position: -1.57
-    max_position: 1.57
+    min_position: -1.5708
+    max_position: 1.5708
     has_velocity_limits: true
     max_velocity: 5.969211435
     has_acceleration_limits: true
     max_acceleration: 4.0
-  hand_motor_joint:
+  hand_joint:
     has_position_limits: true
-    min_position: 0
-    max_position: 1.57
+    min_position: -1.5708
+    max_position: 0
     has_velocity_limits: true
     max_velocity: 5.969211435
     has_acceleration_limits: true
     max_acceleration: 4.0
-  xtion_tilt_joint:
+  head_camera_pan_joint:
     has_position_limits: true
-    min_position: -1.57
-    max_position: 1.57
+    min_position: -1.5708
+    max_position: 1.5708
     has_velocity_limits: true
     max_velocity: 5.969211435
     has_acceleration_limits: true
     max_acceleration: 4.0
-  xtion_pan_joint:
+  head_camera_tilt_joint:
     has_position_limits: true
-    min_position: -1.57
-    max_position: 1.57
+    min_position: -1.5708
+    max_position: 1.5708
     has_velocity_limits: true
     max_velocity: 5.969211435
     has_acceleration_limits: true
