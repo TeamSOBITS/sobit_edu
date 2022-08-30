@@ -69,7 +69,7 @@ class Joy_control:
                 self.move_joint("joint4", 1.31)
                 self.move_joint("joint6", 0)
                 self.move_joint("hand_motor_joint", 0)
-                self.move_joint("xtion_joint3", -1.57)
+                self.move_joint("xtion_joint3", -1.5708)
 
             elif self.left_joystick_lr == 0 and self.left_joystick_ud == 0 and self.right_joystick_lr == 0 and self.right_joystick_ud == 0:
                 pass
