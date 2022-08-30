@@ -6,8 +6,6 @@
       <parent link="${parent}" />
       <child link="${prefix}_camera_base_link" />
       <origin xyz="0.150 0.0 0.370" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 -1" />
-      <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}" />
     </joint>
 
     <link name="${prefix}_camera_base_link">
@@ -102,8 +100,6 @@
       <parent link="${prefix}_camera_tilt_link" />
       <child link="${prefix}_double_sided_tape_link" />
       <origin xyz="0.0 0.0 0.029" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 -1" />
-      <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}" />
     </joint>
     
     <link name="${prefix}_double_sided_tape_link" />

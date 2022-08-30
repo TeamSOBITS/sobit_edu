@@ -11,7 +11,6 @@
       <parent link="${parent}" />
       <child link="${prefix}_base_link" />
       <origin xyz="0.0 0.0 0.620" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 1 0" />
     </joint>
 
     <link name="${prefix}_base_link">
@@ -42,7 +41,6 @@
       <parent link="${prefix}_base_link" />
       <child link="${prefix}_board_link" />
       <origin xyz="0.0 0.0 0.0295" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 1 0" />
     </joint>
     <link name="${prefix}_board_link">
       <visual>

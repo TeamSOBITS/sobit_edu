@@ -7,7 +7,6 @@
       <parent link="${parent}" />
       <child link="${prefix}_base_link" />
       <origin xyz="0.190 0.0 0.610" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 1 0" />
     </joint>
 
     <link name="${prefix}_base_link">
@@ -38,7 +37,6 @@
       <parent link="${prefix}_base_link" />
       <child link="mic" />
       <origin xyz="-0.017007 0.0 0.020" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 1 0" />
     </joint>
 
     <link name="mic">

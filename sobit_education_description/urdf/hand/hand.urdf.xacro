@@ -11,8 +11,6 @@
       <parent link="${parent}" />
       <child link="${prefix_hand}_base_link" />
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 0 1" />
-      <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
     </joint>
 
     <link name="${prefix_hand}_base_link">
@@ -39,13 +37,24 @@
     </link>
 
 
+    <joint name="${prefix_hand}_joint" type="revolute">
+      <parent link="${prefix_hand}_base_link" />
+      <child link="${prefix_hand}_link" />
+      <origin xyz="-0.028 -0.0150335 0.077436" rpy="0.0 0.0 0.0" />
+      <axis xyz="-1 0 0" />
+      <limit lower="${-M_PI/2.0}" upper="0" effort="1" velocity="1" />
+    </joint>
+
+    <link name="${prefix_hand}_link" />
+
+
     <joint name="${prefix_hand}_inner_l_joint" type="revolute">
       <parent link="${prefix_hand}_base_link" />
       <child link="${prefix_hand}_inner_l_link" />
       <origin xyz="-0.028 0.0150335 0.077436" rpy="0.0 0.0 0.0" />
       <axis xyz="1 0 0" />
-      <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
-      <!-- <mimic joint="${prefix_hand}_joint" multiplier="-1.0" offset="0" /> -->
+      <mimic joint="${prefix_hand}_joint" multiplier="1.0" offset="0" />
+      <limit lower="${-M_PI/2.0}" upper="0" effort="1" velocity="1" />
     </joint>
 
     <link name="${prefix_hand}_inner_l_link">
@@ -78,8 +87,7 @@
       <origin xyz="-0.028 -0.0150335 0.077436" rpy="0.0 0.0 0.0" />
       <axis xyz="-1 0 0" />
       <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1" offset="0" />
-      <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
-      <!-- <mimic joint="${prefix_hand}_joint" multiplier="1.0" offset="0" /> -->
+      <limit lower="${-M_PI/2.0}" upper="0" effort="1" velocity="1" />
     </joint>
 
     <link name="${prefix_hand}_inner_r_link">
@@ -112,7 +120,7 @@
       <origin xyz="-0.028 0.04 0.059065" rpy="0.0 0.0 0.0" />
       <axis xyz="1 0 0" />
       <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1" offset="0" />
-      <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
+      <limit lower="${-M_PI/2.0}" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="-1.12" offset="0" /> -->
     </joint>
 
@@ -146,7 +154,7 @@
       <origin xyz="-0.028 -0.04 0.059065" rpy="0.0 0.0 0.0" />
       <axis xyz="-1 0 0" />
       <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1" offset="0" />
-      <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
+      <limit lower="${-M_PI/2.0}" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="1.12" offset="0" /> -->
     </joint>
 
@@ -178,9 +186,9 @@
       <parent link="${prefix_hand}_outer_l_link" />
       <child link="${prefix_hand}_${prefix_finger}_l_link" />
       <origin xyz="0.019 0.0 0.070114" rpy="0.0 0.0 0.0" />
-      <axis xyz="1 0 0" />
-      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="-1" offset="0" />
-      <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
+      <axis xyz="-1 0 0" />
+      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1" offset="0" />
+      <limit lower="${-M_PI/2.0}" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="0.84" offset="0" /> -->
     </joint>
 
@@ -212,9 +220,9 @@
       <parent link="${prefix_hand}_outer_r_link" />
       <child link="${prefix_hand}_${prefix_finger}_r_link" />
       <origin xyz="0.019 0.0 0.070114" rpy="0.0 0.0 0.0" />
-      <axis xyz="-1 0 0" />
-      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="-1" offset="0" />
-      <limit lower="-1.570796327" upper="0" effort="1" velocity="1" />
+      <axis xyz="1 0 0" />
+      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1" offset="0" />
+      <limit lower="${-M_PI/2.0}" upper="0" effort="1" velocity="1" />
       <!-- <mimic joint="${prefix_hand}_joint" multiplier="-0.84" offset="0" /> -->
     </joint>
 
