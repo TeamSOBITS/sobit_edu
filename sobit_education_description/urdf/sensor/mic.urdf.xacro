@@ -35,11 +35,11 @@
 
     <joint name="${prefix}_joint" type="fixed">
       <parent link="${prefix}_base_link" />
-      <child link="mic" />
+      <child link="${prefix}_link" />
       <origin xyz="-0.017007 0.0 0.020" rpy="0.0 0.0 0.0" />
     </joint>
 
-    <link name="mic">
+    <link name="${prefix}_link">
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI} 0.0 ${M_PI/2}" />
         <geometry>
