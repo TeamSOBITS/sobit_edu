@@ -30,8 +30,8 @@ add_library(${PROJECT_NAME} src/sobit_turtlebot_controller.cpp
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 pybind_add_module(sobit_edu_module MODULE src/sobit_turtlebot_controller.cpp
-                                                src/sobit_edu_controller.cpp
-                                                src/sobit_edu_pybind.cpp)
+                                          src/sobit_edu_controller.cpp
+                                          src/sobit_edu_pybind.cpp)
 
 install(
   TARGETS ${PROJECT_NAME}
@@ -44,7 +44,7 @@ install(
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-add_executable(test_grasp_edu example/test_grasp.cpp
+add_executable(test_grasp example/test_grasp.cpp
                         src/sobit_edu_controller.cpp
                         src/sobit_turtlebot_controller.cpp)
-target_link_libraries(test_grasp_edu ${catkin_LIBRARIES})
+target_link_libraries(test_grasp ${catkin_LIBRARIES})

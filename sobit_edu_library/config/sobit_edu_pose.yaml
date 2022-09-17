@@ -1,4 +1,4 @@
-education_pose:
+sobit_edu_pose:
     - { 
         pose_name: "initial_pose",
         arm_shoulder_pan_joint: 0.00,

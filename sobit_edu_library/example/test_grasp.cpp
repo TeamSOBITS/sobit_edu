@@ -5,8 +5,8 @@
 int main(int argc, char *argv[]) {
     ros::init(argc, argv, "sobit_edu_grasp");
 
-    sobit_edu::SobitEducationController edu_arm_ctr;
-    sobit_edu::SobitEducationController edu_wheel_ctr;
+    sobit_edu::SobitEduController edu_arm_ctr;
+    sobit_edu::SobitEduController edu_wheel_ctr;
 
     double grasp_flag = false;
     std::string target_name = "pringle";

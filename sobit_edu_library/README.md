@@ -13,7 +13,7 @@ $ cm
 
 ---
 
-## SobitEducationController
+## SobitEduController
 sobit educationを動かすクラス
 ### Joint
 * sobit educationのジョイント名とその定数名(Enum : Joint)
@@ -51,7 +51,7 @@ sobit educationを動かすクラス
 #### JointController
 1.  moveJoint() :   1つのジョイントを動かす関数（ジョイントの指定は定数名(Enum)）
     ```bash
-    bool sobit::SobitEducationController::moveJoint (
+    bool sobit::SobitEduController::moveJoint (
         const Joint joint_num,          :   ジョイント番号
         const double rad,               :   移動角度
         const double sec,               :   移動時間
@@ -60,7 +60,7 @@ sobit educationを動かすクラス
     ```  
 2.  moveXtionPanTilt()   :   xtionのパンチルトを任意の角度に動かす
     ```bash
-    bool sobit::SobitEducationController::moveXtionPanTilt (
+    bool sobit::SobitEduController::moveXtionPanTilt (
         const double pan_rad,           :   パン角度
         const double tilt_rad,          :   チルト角度
         const double sec,               :   移動時間
@@ -69,7 +69,7 @@ sobit educationを動かすクラス
     ```  
 3.  moveArm()   :   アームを任意の角度に動かす
     ```bash
-    bool sobit::SobitEducationController::moveArm ( 
+    bool sobit::SobitEduController::moveArm ( 
         const double shoulder_roll,
         const double shoulder_flex,
         const double elbow_roll,
@@ -78,7 +78,7 @@ sobit educationを動かすクラス
     ```  
 4.  movePose()   :   予め設定したポーズに動かす
     ```bash
-    bool sobit::SobitEducationController::movePose( 
+    bool sobit::SobitEduController::movePose( 
         const std::string &pose_name 
     )
     ```  
@@ -90,7 +90,7 @@ sobit educationを動かすクラス
     
     * ポーズの設定方法：sobit_edu_library/config/sobit_edu_pose.yamlでポーズを設定する
     ```bash
-    education_pose:
+    sobit_edu_pose:
         - { 
             pose_name: "initial_pose",
             arm_roll_joint: 0.00,
@@ -123,7 +123,7 @@ sobit educationを動かすクラス
 #include <sobit_edu_library/sobit_edu_controller.hpp>
 int main(int argc, char *argv[]) {
     ros::init(argc, argv, "sobit_turtlebot_controller_test");
-    sobit::SobitEducationController sobit_edu_ctr;
+    sobit::SobitEduController sobit_edu_ctr;
     ros::Rate loop_rate(1.0);
     double pan_ang = 0.8;
     while ( ros::ok() ) {
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 ```bash:
 #!/usr/bin/env python
 import rospy
-from sobit_edu_module import SobitEducationController
+from sobit_edu_module import SobitEduController
 from sobit_edu_module import Joint
 import sys
 
@@ -149,7 +149,7 @@ def test():
     r = rospy.Rate(1) # 10hz
     ang = 0.8
     args = sys.argv
-    edu_ctr = SobitEducationController(args[0]) # args[0] : C++上でros::init()を行うための引数
+    edu_ctr = SobitEduController(args[0]) # args[0] : C++上でros::init()を行うための引数
     while not rospy.is_shutdown():
         ang = -1.0 * ang
         edu_ctr.moveJoint( Joint.XTION_PAN_JOINT, ang, 0.8, false )

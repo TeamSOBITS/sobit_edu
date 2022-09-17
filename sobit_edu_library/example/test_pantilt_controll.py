@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import rospy
-from sobit_edu_module import SobitEducationController
+from sobit_edu_module import SobitEduController
 from sobit_edu_module import Joint
 import sys
 
@@ -9,7 +9,7 @@ def test():
     r = rospy.Rate(1) # 10hz
     ang = 0.8
     args = sys.argv
-    edu_pantilt_ctr = SobitEducationController(args[0]) # args[0] : C++上でros::init()を行うための引数
+    edu_pantilt_ctr = SobitEduController(args[0]) # args[0] : C++上でros::init()を行うための引数
 
     while not rospy.is_shutdown():
         ang = -1.0 * ang

@@ -28,7 +28,7 @@ namespace sobit_edu {
         std::vector<double> joint_val;
     } Pose;
 
-    class SobitEducationController : public SobitTurtlebotController {
+    class SobitEduController : public SobitTurtlebotController {
         private:
             ros::Publisher pub_arm_control_;
             ros::Publisher pub_head_camera_control_;  
@@ -70,11 +70,11 @@ namespace sobit_edu {
             double arm_wrist_tilt_current_ = 0.;
             double hand_current_ = 0.;
             void callbackCurrentStateArray( const sobit_common_msg::current_state_array );
-            ros::Subscriber sub_current_state_array = nh_.subscribe( "/current_state_array", 1, &SobitEducationController::callbackCurrentStateArray, this );
+            ros::Subscriber sub_current_state_array = nh_.subscribe( "/current_state_array", 1, &SobitEduController::callbackCurrentStateArray, this );
 
         public:
-            SobitEducationController( const std::string &name );
-            SobitEducationController( );
+            SobitEduController( const std::string &name );
+            SobitEduController( );
             
             bool moveToPose( const std::string &pose_name, const double sec = 5.0 );
             bool moveJoint( const Joint joint_num, const double rad, const double sec = 5.0, bool is_sleep = true );
@@ -88,7 +88,7 @@ namespace sobit_edu {
     };
 } // namespace sobit_edu
 
-inline void sobit_edu::SobitEducationController::setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
+inline void sobit_edu::SobitEduController::setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
     trajectory_msgs::JointTrajectory joint_trajectory;
     trajectory_msgs::JointTrajectoryPoint joint_trajectory_point; 
     joint_trajectory.joint_names.push_back( joint_name ); 
@@ -102,7 +102,7 @@ inline void sobit_edu::SobitEducationController::setJointTrajectory( const std::
     return;
 }
 
-inline void sobit_edu::SobitEducationController::addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
+inline void sobit_edu::SobitEduController::addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt ) {
     trajectory_msgs::JointTrajectory joint_trajectory = *jt;
     joint_trajectory.joint_names.push_back( joint_name ); 
     joint_trajectory.points[0].positions.push_back( rad );
@@ -114,7 +114,7 @@ inline void sobit_edu::SobitEducationController::addJointTrajectory( const std::
     return;
 }
 
-inline void sobit_edu::SobitEducationController::checkPublishersConnection ( const ros::Publisher& pub ) {
+inline void sobit_edu::SobitEduController::checkPublishersConnection ( const ros::Publisher& pub ) {
     ros::Rate loop_rate( 10 );
     while ( pub.getNumSubscribers()	== 0 && ros::ok() ) {
         try { loop_rate.sleep();

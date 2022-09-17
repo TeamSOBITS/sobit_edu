@@ -2,30 +2,30 @@
 
 using namespace sobit_edu;
 
-const double sobit_edu::SobitEducationController::base_to_shoulder_flex_joint_z_cm = 52.2;
-const double sobit_edu::SobitEducationController::base_to_shoulder_flex_joint_x_cm = 12.2;
-const double sobit_edu::SobitEducationController::arm_upper_link_x_cm = 14.8;
-const double sobit_edu::SobitEducationController::arm_upper_link_z_cm = 2.4;
-const double sobit_edu::SobitEducationController::arm_outer_link_x_cm = 15.0;
-const double sobit_edu::SobitEducationController::grasp_min_z_cm = 35.0;
-const double sobit_edu::SobitEducationController::grasp_max_z_cm = 80.0;
+const double sobit_edu::SobitEduController::base_to_shoulder_flex_joint_z_cm = 52.2;
+const double sobit_edu::SobitEduController::base_to_shoulder_flex_joint_x_cm = 12.2;
+const double sobit_edu::SobitEduController::arm_upper_link_x_cm = 14.8;
+const double sobit_edu::SobitEduController::arm_upper_link_z_cm = 2.4;
+const double sobit_edu::SobitEduController::arm_outer_link_x_cm = 15.0;
+const double sobit_edu::SobitEduController::grasp_min_z_cm = 35.0;
+const double sobit_edu::SobitEduController::grasp_max_z_cm = 80.0;
 
-SobitEducationController::SobitEducationController( const std::string &name ) : SobitTurtlebotController( name ) {
+SobitEduController::SobitEduController( const std::string &name ) : SobitTurtlebotController( name ) {
     pub_arm_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/arm_trajectory_controller/command", 1) ;
     pub_head_camera_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/head_camera_trajectory_controller/command", 1 );
     loadPose();
 }
 
-SobitEducationController::SobitEducationController( ) : SobitTurtlebotController( ) {
+SobitEduController::SobitEduController( ) : SobitTurtlebotController( ) {
     pub_arm_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/arm_trajectory_controller/command", 1 );
     pub_head_camera_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/head_camera_trajectory_controller/command", 1 );    
     loadPose();
 }
 
-void SobitEducationController::loadPose( ) {
+void SobitEduController::loadPose( ) {
     XmlRpc::XmlRpcValue pose_val;
-    if ( !nh_.hasParam("/education_pose") ) return; 
-    nh_.getParam( "/education_pose", pose_val );
+    if ( !nh_.hasParam("/sobit_edu_pose") ) return; 
+    nh_.getParam( "/sobit_edu_pose", pose_val );
     int pose_num = pose_val.size();
     pose_list_.clear();
     for ( int i = 0; i < pose_num; i++ ) {
@@ -47,7 +47,7 @@ void SobitEducationController::loadPose( ) {
     return;
 }
 
-bool SobitEducationController::moveToPose( const std::string &pose_name, const double sec ) {
+bool SobitEduController::moveToPose( const std::string &pose_name, const double sec ) {
     bool                is_find = false;
     std::vector<double> joint_val;
     for ( auto& pose : pose_list_ ) {
@@ -72,7 +72,7 @@ bool SobitEducationController::moveToPose( const std::string &pose_name, const d
     } 
 }
 
-bool SobitEducationController::moveAllJoint( const double arm_shoulder_pan, 
+bool SobitEduController::moveAllJoint( const double arm_shoulder_pan, 
                                              const double arm_shoulder_tilt, 
                                              const double arm_elbow_tilt, 
                                              const double arm_wrist_tilt, 
@@ -105,7 +105,7 @@ bool SobitEducationController::moveAllJoint( const double arm_shoulder_pan,
     }
 }
 
-bool SobitEducationController::moveJoint( const Joint joint_num, const double rad, const double sec, bool is_sleep ) {
+bool SobitEduController::moveJoint( const Joint joint_num, const double rad, const double sec, bool is_sleep ) {
     try {
         trajectory_msgs::JointTrajectory joint_trajectory;
 
@@ -140,7 +140,7 @@ bool SobitEducationController::moveJoint( const Joint joint_num, const double ra
     }
 }
 
-bool SobitEducationController::moveHeadPanTilt( const double pan_rad, const double tilt_rad, const double sec, bool is_sleep ) {
+bool SobitEduController::moveHeadPanTilt( const double pan_rad, const double tilt_rad, const double sec, bool is_sleep ) {
     try {
         trajectory_msgs::JointTrajectory joint_trajectory;
         setJointTrajectory( joint_names_[Joint::HEAD_CAMERA_PAN_JOINT], pan_rad, sec, &joint_trajectory );
@@ -155,7 +155,7 @@ bool SobitEducationController::moveHeadPanTilt( const double pan_rad, const doub
     }
 }
 
-bool SobitEducationController::moveArm ( const double arm_shoulder_pan, const double arm_shoulder_tilt, const double arm_elbow_tilt, const double arm_wrist_tilt, const double hand, const double sec, bool is_sleep ) {
+bool SobitEduController::moveArm ( const double arm_shoulder_pan, const double arm_shoulder_tilt, const double arm_elbow_tilt, const double arm_wrist_tilt, const double hand, const double sec, bool is_sleep ) {
     try {
         trajectory_msgs::JointTrajectory arm_joint_trajectory;
         setJointTrajectory( joint_names_[Joint::ARM_SHOULDER_PAN_JOINT], arm_shoulder_pan, sec, &arm_joint_trajectory );
@@ -177,7 +177,7 @@ bool SobitEducationController::moveArm ( const double arm_shoulder_pan, const do
 
 // TODO: Forward Kinematics Method (check result)
 
-bool SobitEducationController::moveGripperToTargetCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ){
+bool SobitEduController::moveGripperToTargetCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ){
     sobit_edu::SobitTurtlebotController wheel_ctrl;
     geometry_msgs::Point shift;
 
@@ -301,7 +301,7 @@ bool SobitEducationController::moveGripperToTargetCoord( const double goal_posit
     return is_reached;
 }
 
-bool SobitEducationController::moveGripperToTargetTF( const std::string &goal_position_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
+bool SobitEduController::moveGripperToTargetTF( const std::string &goal_position_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
     sobit_edu::SobitTurtlebotController wheel_ctrl;
     tf::StampedTransform transform_base_to_target;
     geometry_msgs::Point shift;
@@ -327,7 +327,7 @@ bool SobitEducationController::moveGripperToTargetTF( const std::string &goal_po
     return is_reached;
 }
 
-bool SobitEducationController::moveGripperToPlaceCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
+bool SobitEduController::moveGripperToPlaceCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
     geometry_msgs::Point shift;
 
     // 作成中
@@ -351,7 +351,7 @@ bool SobitEducationController::moveGripperToPlaceCoord( const double goal_positi
     return true;
 }
 
-bool SobitEducationController::moveGripperToPlaceTF( const std::string& target_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
+bool SobitEduController::moveGripperToPlaceTF( const std::string& target_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
     geometry_msgs::Point shift;
 
     tf::StampedTransform transform_base_to_target;
@@ -368,7 +368,7 @@ bool SobitEducationController::moveGripperToPlaceTF( const std::string& target_n
     return true;
 }
 
-bool SobitEducationController::graspDecision() {
+bool SobitEduController::graspDecision() {
     while ( hand_current_ == 0. ) {
         ros::spinOnce();
     }
@@ -381,7 +381,7 @@ bool SobitEducationController::graspDecision() {
     }
 }
 
-void SobitEducationController::callbackCurrentStateArray( const sobit_common_msg::current_state_array msg ) {
+void SobitEduController::callbackCurrentStateArray( const sobit_common_msg::current_state_array msg ) {
     ros::spinOnce();
 
     for ( const auto current_state : msg.current_state_array ) {

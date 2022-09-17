@@ -28,22 +28,22 @@ PYBIND11_MODULE( sobit_edu_module, m ) {
         .def( "controlWheelRotateDeg", &SobitTurtlebotController::controlWheelRotateDeg, "control Wheel Rotate Deg",
             py::arg( "angle_deg" ) );
 
-    py::class_<SobitEducationController, SobitTurtlebotController>( m, "SobitEducationController" )
+    py::class_<SobitEduController, SobitTurtlebotController>( m, "SobitEduController" )
         .def( py::init< const std::string& >() )
-        .def( "moveToPose", &SobitEducationController::moveToPose, "move Pose",
+        .def( "moveToPose", &SobitEduController::moveToPose, "move Pose",
             py::arg( "pose_name" ),
             py::arg( "sec" ) = 5.0 )
-        .def( "moveJoint", &SobitEducationController::moveJoint, "moveJoint", 
+        .def( "moveJoint", &SobitEduController::moveJoint, "moveJoint", 
             py::arg( "joint_num" ),
             py::arg( "rad" ),
             py::arg( "sec" ) = 5.0,
             py::arg( "is_sleep" ) = true )
-        .def( "moveHeadPanTilt", &SobitEducationController::moveHeadPanTilt, "move Head PanTilt", 
+        .def( "moveHeadPanTilt", &SobitEduController::moveHeadPanTilt, "move Head PanTilt", 
             py::arg( "pan_rad" ),
             py::arg( "tilt_rad" ),
             py::arg( "sec" ) = 5.0,
             py::arg( "is_sleep" ) = true )
-        .def( "moveArm", &SobitEducationController::moveArm, "move Arm",
+        .def( "moveArm", &SobitEduController::moveArm, "move Arm",
             py::arg( "arm_shoulder_pan" ),
             py::arg( "arm_shoulder_tilt" ),
             py::arg( "arm_elbow_tilt" ),
@@ -51,29 +51,29 @@ PYBIND11_MODULE( sobit_edu_module, m ) {
             py::arg( "hand" ),
             py::arg( "sec" ) = 5.0,
             py::arg( "is_sleep" ) = true )
-        .def( "moveGripperToTargetCoord", &SobitEducationController::moveGripperToTargetCoord, "moveGripperToTargetCoord",
+        .def( "moveGripperToTargetCoord", &SobitEduController::moveGripperToTargetCoord, "moveGripperToTargetCoord",
             py::arg( "goal_position_x" ),
             py::arg( "goal_position_y" ),
             py::arg( "goal_position_z" ),
             py::arg( "diff_goal_position_x" ),
             py::arg( "diff_goal_position_y" ),
             py::arg( "diff_goal_position_z" ) )
-        .def( "moveGripperToTargetTF", &SobitEducationController::moveGripperToTargetTF, "moveGripperToTargetTF",
+        .def( "moveGripperToTargetTF", &SobitEduController::moveGripperToTargetTF, "moveGripperToTargetTF",
             py::arg( "target_name" ),
             py::arg( "diff_goal_position_x" ),
             py::arg( "diff_goal_position_y" ),
             py::arg( "diff_goal_position_z" ) )
-        .def( "moveGripperToPlaceCoord", &SobitEducationController::moveGripperToPlaceCoord, "move Gripper To Placeable Position Coordinate",
+        .def( "moveGripperToPlaceCoord", &SobitEduController::moveGripperToPlaceCoord, "move Gripper To Placeable Position Coordinate",
             py::arg( "goal_position_x" ),
             py::arg( "goal_position_y" ),
             py::arg( "goal_position_z" ),
             py::arg( "diff_goal_position_x" ),
             py::arg( "diff_goal_position_y" ),
             py::arg( "diff_goal_position_z" ) )
-        .def( "moveGripperToPlaceTF", &SobitEducationController::moveGripperToPlaceTF, "move Gripper To Placeable Position TF",
+        .def( "moveGripperToPlaceTF", &SobitEduController::moveGripperToPlaceTF, "move Gripper To Placeable Position TF",
             py::arg( "target_name" ),
             py::arg( "diff_goal_position_x" ),
             py::arg( "diff_goal_position_y" ),
             py::arg( "diff_goal_position_z" ) )
-        .def( "graspDecision", &SobitEducationController::graspDecision, "grasp Decision" );
+        .def( "graspDecision", &SobitEduController::graspDecision, "grasp Decision" );
 }

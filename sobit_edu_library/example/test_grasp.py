@@ -2,7 +2,7 @@
 #coding: utf-8
 
 import rospy
-from sobit_edu_module import SobitEducationController
+from sobit_edu_module import SobitEduController
 from sobit_edu_module import SobitTurtlebotController
 from sobit_edu_module import Joint
 import sys
@@ -10,7 +10,7 @@ import sys
 def test(target_name):
     rospy.init_node('test')
     args = sys.argv
-    edu_arm_pantilt_ctr = SobitEducationController(args[0]) # args[0] : C++上でros::init()を行うための引数
+    edu_arm_pantilt_ctr = SobitEduController(args[0]) # args[0] : C++上でros::init()を行うための引数
     edu_wheel_ctr = SobitTurtlebotController(args[0])       # args[0] : C++上でros::init()を行うための引数
 
     grasp_flag = False
