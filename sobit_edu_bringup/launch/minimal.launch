@@ -1,0 +1,23 @@
+<launch>
+    <!-- Turtlebot -->
+   <arg name="base"              default="$(env TURTLEBOT_BASE)"         doc="mobile base type [create, roomba]"/>
+   <arg name="stacks"            default="$(env TURTLEBOT_STACKS)"       doc="stack type displayed in visualisation/simulation [circles, hexagons]"/>
+   <arg name="3d_sensor"         default="$(env TURTLEBOT_3D_SENSOR)"    doc="3d sensor types [kinect, asux_xtion_pro]"/>
+   <arg name="simulation"        default="$(env TURTLEBOT_SIMULATION)"   doc="set flags to indicate this turtle is run in simulation mode."/>
+   <arg name="serialport"        default="/dev/input/kobuki"             doc="used by create to configure the port it is connected on [/dev/input/kobuki]"/>
+
+   <param name="/use_sim_time" value="$(arg simulation)"/>
+
+   <param name="/proportional_control" type="double" value="0.10"/>
+   <param name="/derivation_control"   type="double" value="0.40"/>
+   <param name="/integral_control"     type="double" value="0.80"/>
+
+   <include file="$(find turtlebot_bringup)/launch/includes/mobile_base.launch.xml">
+     <arg name="base"       value="$(arg base)" />
+     <arg name="serialport" value="$(arg serialport)" />
+   </include>
+
+  <include file="$(find sobit_edu_control)/launch/sobit_edu_control.launch"/>
+  <include file="$(find sobit_edu_library)/launch/load_sobit_edu_pose.launch"/>
+
+</launch>
