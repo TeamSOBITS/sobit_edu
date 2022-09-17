@@ -21,7 +21,7 @@ sobit_edu_pose:
         arm_wrist_tilt_joint: -0.17,
         hand_joint: -1.00,
         head_camera_pan_joint: -0.00,
-        head_camera_tilt_joint: 1.00
+        head_camera_tilt_joint: -1.00
     }
     - { 
         pose_name: "detecting_pose",

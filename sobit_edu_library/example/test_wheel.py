@@ -11,8 +11,8 @@ def test():
     # タイヤ車輪をを動かす
     edu_wheel_ctr.controlWheelLinearFixed(1.5)
     rospy.sleep(5)
-#    edu_wheel_ctr.controlWheelRotateRad(1.5708)
-#    edu_wheel_ctr.controlWheelRotateDeg(-90)
+    edu_wheel_ctr.controlWheelRotateRad(1.5708)
+    edu_wheel_ctr.controlWheelRotateDeg(-90)
 
     edu_wheel_ctr.controlWheelLinearFixed(-1.5)
 
