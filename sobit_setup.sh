@@ -7,13 +7,16 @@ cd $(pwd)/..
 ros_packages=(
     "sobit_common" \
     "text_to_speech" \
-    "web_speech_recognition"
+    "web_speech_recognition" \
+    "azure_kinect_ros_driver" \
+    "realsense_ros" \
+    "urg_node"
 )
 
 for ((i = 0; i < ${#ros_packages[@]}; i++)) {
     # echo "array[$i] = ${array[i]}"
     echo "${ros_packages[i]}"
-    git clone https://gitlab.com/TeamSOBITS/${ros_packages[i]}.git
+    git clone https://github.com/TeamSOBITS/${ros_packages[i]}.git
 }
 
 # オープンソースのROSパッケージのgit clone
