@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<robot name="head" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find sobit_edu_description)/urdf/head/head.transmission.xacro" />
+
+  <xacro:macro name="head" params="prefix parent">
+
+    <joint name="${prefix}_camera_base_joint" type="fixed">
+      <parent link="${parent}" />
+      <child link="${prefix}_camera_base_link" />
+      <origin xyz="0.150 0.0 0.370" rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <link name="${prefix}_camera_base_link">
+      <visual>
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <geometry>
+          <mesh filename="package://sobit_edu_description/meshes/head/head_camera_base.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="black" />
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <geometry>
+          <mesh filename="package://sobit_edu_description/meshes/head/head_camera_base.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+      </collision>
+      <inertial>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
+        <mass value="0.08" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 iyy="1.0" iyz="0.0"
+                 izz="1.0" />
+      </inertial>
+    </link>
+
+
+    <joint name="${prefix}_camera_pan_joint" type="revolute">
+      <parent link="${prefix}_camera_base_link" />
+      <child link="${prefix}_camera_pan_link" />
+      <origin xyz="0.04125 0.0 0.0255" rpy="0.0 0.0 0.0" />
+      <axis xyz="0 0 1" />
+      <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}" />
+    </joint>
+
+    <link name="${prefix}_camera_pan_link">
+      <visual>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-M_PI/2.0}" />
+        <geometry>
+          <mesh filename="package://sobit_edu_description/meshes/head/head_camera_pan.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="black" />
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-M_PI/2.0}" />
+        <geometry>
+          <mesh filename="package://sobit_edu_description/meshes/head/head_camera_pan.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+      </collision>
+      <inertial>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
+        <mass value="0.08" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 iyy="1.0" iyz="0.0"
+                 izz="1.0" />
+      </inertial>
+    </link>
+
+
+    <joint name="${prefix}_camera_tilt_joint" type="revolute">
+      <parent link="${prefix}_camera_pan_link" />
+      <child link="${prefix}_camera_tilt_link" />
+      <origin xyz="0.0 0.0 0.0435" rpy="0.0 0.0 0.0" />
+      <axis xyz="0 1 0" />
+      <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}" />
+    </joint>
+
+    <link name="${prefix}_camera_tilt_link">
+      <visual>
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 0.0" />
+        <geometry>
+          <mesh filename="package://sobit_edu_description/meshes/head/head_camera_tilt.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+        <material name="black" />
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 0.0" />
+        <geometry>
+          <mesh filename="package://sobit_edu_description/meshes/head/head_camera_tilt.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+      </collision>
+      <inertial>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
+        <mass value="0.08" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                 iyy="1.0" iyz="0.0"
+                 izz="1.0" />
+      </inertial>
+    </link>
+
+
+    <joint name="${prefix}_double_sided_tape_joint" type="fixed">
+      <parent link="${prefix}_camera_tilt_link" />
+      <child link="${prefix}_double_sided_tape_link" />
+      <origin xyz="0.0 0.0 0.029" rpy="0.0 0.0 0.0" />
+    </joint>
+    
+    <link name="${prefix}_double_sided_tape_link" />
+
+    <xacro:head_transmission prefix="${prefix}" />
+
+  </xacro:macro>
+</robot>

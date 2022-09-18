@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<robot name="xtion_motor" 
+  xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find sobit_edu_description)/urdf/xtion_motor/xtion_motor.transmission.xacro" />
+
+  <xacro:macro name="xtion_motor" params="prefix parent">
+
+    <joint name="${prefix}_pan_joint" type="revolute">
+      <parent link="${parent}"/>
+      <child link="${prefix}_pan_link"/>
+      <origin rpy="${-M_PI/2.0} ${-M_PI/2.0} 0" xyz="0 0.396 0.191"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
+    </joint>
+
+    <link name="${prefix}_pan_link">
+      <visual>
+        <origin rpy="0 0 ${M_PI/2.0}" xyz="0.0138 -0.02159 -0.0005"/>
+        <geometry>
+          <mesh filename="package://sobit_edu_description/meshes/sobit_edu_pan.dae"/>
+        </geometry>
+      </visual>
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="0.08"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${prefix}_tilt_joint" type="revolute">
+      <parent link="${prefix}_pan_link"/>
+      <child link="${prefix}_tilt_link"/>
+      <origin rpy="${-M_PI/2.0} ${-M_PI/2.0} 0" xyz="0.0 0.0 0.0428"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
+    </joint>
+
+    <link name="${prefix}_tilt_link">
+      <visual>
+        <origin rpy="0 ${M_PI/2.0} ${-M_PI/2.0}" xyz="0.00 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://sobit_edu_description/meshes/sobit_edu_tilt.dae"/>
+        </geometry>
+      </visual>
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="0.08"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${prefix}_double_sided_tape_joint" type="fixed">
+      <parent link="${prefix}_tilt_link"/>
+      <child link="${prefix}_double_sided_tape_link"/>
+      <origin rpy="0.05 0 -0.06" xyz="0.02050 0.0 0.0"/>
+      <axis xyz="0 0 -1"/>
+      <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}"/>
+    </joint>
+
+    <link name="${prefix}_double_sided_tape_link"/>
+
+    <xacro:xtion_motor_transmission prefix="${prefix}"/>
+
+  </xacro:macro>
+</robot>

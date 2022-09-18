@@ -1,0 +1,49 @@
+sobit_edu_pose:
+    - { 
+        pose_name: "initial_pose",
+        arm_shoulder_pan_joint: 0.00,
+        arm_shoulder_1_tilt_joint: 1.5708,
+        arm_shoulder_2_tilt_joint: -1.5708,
+        arm_elbow_1_tilt_joint: -1.40,
+        arm_elbow_2_tilt_joint: 1.40,
+        arm_wrist_tilt_joint: -0.17,
+        hand_joint: -1.00,
+        head_camera_pan_joint: 0.00,
+        head_camera_tilt_joint: 0.00
+    }
+    - { 
+        pose_name: "pan_pose",
+        arm_shoulder_pan_joint: 0.00,
+        arm_shoulder_1_tilt_joint: 1.5708,
+        arm_shoulder_2_tilt_joint: -1.5708,
+        arm_elbow_1_tilt_joint: -1.40,
+        arm_elbow_2_tilt_joint: 1.40,
+        arm_wrist_tilt_joint: -0.17,
+        hand_joint: -1.00,
+        head_camera_pan_joint: -0.00,
+        head_camera_tilt_joint: -1.00
+    }
+    - { 
+        pose_name: "detecting_pose",
+        arm_shoulder_pan_joint: 0.00,
+        arm_shoulder_1_tilt_joint: 0.00,
+        arm_shoulder_2_tilt_joint: -0.00,
+        arm_elbow_1_tilt_joint: -0.00,
+        arm_elbow_2_tilt_joint: 0.00,
+        arm_wrist_tilt_joint: 0.00,
+        hand_joint: 0.00,
+        head_camera_pan_joint: 0.00,
+        head_camera_tilt_joint: -0.53
+    }
+    - { 
+        pose_name: "following_pose",
+        arm_shoulder_pan_joint: -1.5708,
+        arm_shoulder_1_tilt_joint: 1.5708,
+        arm_shoulder_2_tilt_joint: -1.5708,
+        arm_elbow_1_tilt_joint: -1.40,
+        arm_elbow_2_tilt_joint: 1.40,
+        arm_wrist_tilt_joint: -0.17,
+        hand_joint: -1.00,
+        head_camera_pan_joint: 0.00,
+        head_camera_tilt_joint: 0.00
+    }
