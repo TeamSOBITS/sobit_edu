@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   pybind11_catkin
   tf
+  sobit_common_msg
 )
 
 catkin_package(
