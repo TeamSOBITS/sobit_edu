@@ -4,20 +4,36 @@ project(sobit_edu_library)
 set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS}")
 
 find_package(catkin REQUIRED COMPONENTS
+  controller_manager
+  dynamixel_sdk
+  hardware_interface
   roscpp
   rospy
   std_msgs
+  sobit_common_msg
   trajectory_msgs
   geometry_msgs
   nav_msgs
-  pybind11_catkin
   tf
+  pybind11_catkin
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS pybind11_catkin
+  CATKIN_DEPENDS
+  controller_manager
+  dynamixel_sdk
+  hardware_interface
+  roscpp
+  rospy
+  std_msgs
+  sobit_common_msg
+  trajectory_msgs
+  geometry_msgs
+  nav_msgs
+  tf
+  pybind11_catkin
 )
 
 include_directories(
@@ -48,3 +64,5 @@ add_executable(test_grasp example/test_grasp.cpp
                         src/sobit_edu_controller.cpp
                         src/sobit_turtlebot_controller.cpp)
 target_link_libraries(test_grasp ${catkin_LIBRARIES})
+
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
