@@ -25,7 +25,7 @@
         </geometry>
       </collision>
       <inertial>
-        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
+        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <mass value="0.08" />
         <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                  iyy="1.0" iyz="0.0"
@@ -57,7 +57,7 @@
         </geometry>
       </collision>
       <inertial>
-        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-M_PI/2.0}" />
         <mass value="0.08" />
         <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                  iyy="1.0" iyz="0.0"
@@ -70,26 +70,26 @@
       <parent link="${prefix}_camera_pan_link" />
       <child link="${prefix}_camera_tilt_link" />
       <origin xyz="0.0 0.0 0.0435" rpy="0.0 0.0 0.0" />
-      <axis xyz="0 1 0" />
+      <axis xyz="0 -1 0" />
       <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}" />
     </joint>
 
     <link name="${prefix}_camera_tilt_link">
       <visual>
-        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 0.0" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI/2.0}" />
         <geometry>
           <mesh filename="package://sobit_edu_description/meshes/head/head_camera_tilt.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 0.0" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI/2.0}" />
         <geometry>
           <mesh filename="package://sobit_edu_description/meshes/head/head_camera_tilt.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI/2.0}" />
         <mass value="0.08" />
         <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                  iyy="1.0" iyz="0.0"
@@ -97,14 +97,6 @@
       </inertial>
     </link>
 
-
-    <joint name="${prefix}_double_sided_tape_joint" type="fixed">
-      <parent link="${prefix}_camera_tilt_link" />
-      <child link="${prefix}_double_sided_tape_link" />
-      <origin xyz="0.0 0.0 0.029" rpy="0.0 0.0 0.0" />
-    </joint>
-    
-    <link name="${prefix}_double_sided_tape_link" />
 
     <xacro:head_transmission prefix="${prefix}" />
 
