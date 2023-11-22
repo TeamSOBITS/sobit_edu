@@ -18,7 +18,7 @@
       <a href="#概要">概要</a>
     </li>
     <li>
-      <a href="#環境構築">環境構築</a>
+      <a href="#セットアップ">セットアップ</a>
       <ul>
         <li><a href="#環境条件">環境条件</a></li>
         <li><a href="#インストール方法">インストール方法</a></li>
@@ -27,7 +27,6 @@
     <li>
     　<a href="#実行・操作方法">実行・操作方法</a>
       <ul>
-        <li><a href="#移動機構のみを使用する場合">移動機構のみを使用する場合</a></li>
         <li><a href="#Rviz上の可視化">Rviz上の可視化</a></li>
       </ul>
     </li>
@@ -35,7 +34,7 @@
     　<a href="#ソフトウェア">ソフトウェア</a>
       <ul>
         <li><a href="#ジョイントコントローラ">ジョイントコントローラ</a></li>
-        <li><a href="#ホイルコントローラ">ホイルコントローラ</a></li>
+        <li><a href="#ホイールコントローラ">ホイールコントローラ</a></li>
       </ul>
     </li>
     <li>
@@ -60,7 +59,7 @@
 <!-- レポジトリの概要 -->
 ## 概要
 
-![SOBIT EDU](sobit_pro/docs/img/sobit_edu.png)
+![SOBIT EDU](sobit_edu/docs/img/sobit_edu.png)
 
 TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレータ（SOBIT EDU）を動かすためのライブラリです．
 
@@ -198,10 +197,25 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
     ```
 > [!NOTE]
 > `ジョイント名`は[ジョイント名](#ジョイント名)をご確認ください．
+
+1.  `moveHeadPanTilt()` : パンチルト機構を任意の角度に動かす
+    ```cpp
+    bool sobit::SobitProJointController::moveHeadPanTilt(
+        const double pan_rad,           # パンの回転角度 (rad)
+        const double tilt_rad,          # チルトの回転角度 (rad)
+        const double sec = 5.0,         # 移動時間 (s)
+        bool is_sleep = true            # 回転後に待機するかどうか
+    );
+    ```
  
 1.  `moveArm()` : アームの関節を任意の角度に動かします．
     ```cpp
     bool sobit::SobitProJointController::moveArm(
+        const double arm_shoulder_pan, 
+        const double arm_shoulder_tilt, 
+        const double arm_elbow_tilt, 
+        const double arm_wrist_tilt, 
+        const double hand, const double sec = 5.0, bool is_sleep = true
         const double arm1,              # ARM_SHOULDER_TILT_JOINTの回転角度 (rad)
         const double arm2,              # ARM_ELBOW_UPPER_TILT_JOINTの回転角度 (rad)
         const double arm3,              # ARM_ELBOW_LOWER_TILT_JOINTの回転角度 (rad)
@@ -212,15 +226,6 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
     );
     ```
 
-1.  `moveHeadPanTilt()` : パンチルト機構を任意の角度に動かす
-    ```cpp
-    bool sobit::SobitProJointController::moveHeadPanTilt(
-        const double head_camera_pan,   # パンの回転角度 (rad)
-        const double head_camera_tilt,  # チルトの回転角度 (rad)
-        const double sec = 5.0,         # 移動時間 (s)
-        bool is_sleep = true            # 回転後に待機するかどうか
-    );
-    ```
 
 1.  `moveGripperToTargetCoord()` : ハンドをxyz座標に動かします（把持モード）．
     ```cpp
@@ -280,16 +285,16 @@ SOBIT PROのジョイント名とその定数名を以下の通りです．
 
 | ジョイント番号 | ジョイント名 | ジョイント定数名 |
 | :---: | --- | --- |
+| 0 | arm_shoulder_pan_joint | ARM_SHOULDER_PAN_JOINT |
 | 1 | arm_shoulder_1_tilt_joint | ARM_SHOULDER_1_TILT_JOINT |
 | 2 | arm_shoulder_2_tilt_joint | ARM_SHOULDER_2_TILT_JOINT |
-| 3 | arm_elbow_upper_1_tilt_joint | ARM_ELBOW_UPPER_1_TILT_JOINT |
-| 4 | arm_elbow_upper_2_tilt_joint | ARM_ELBOW_UPPER_2_TILT_JOINT |
-| 5 | arm_elbow_lower_tilt_joint | ARM_ELBOW_LOWER_TILT_JOINT |
-| 6 | arm_elbow_lower_pan_joint | ARM_ELBOW_LOWER_PAN_JOINT |
-| 7 | arm_wrist_tilt_joint | ARM_WRIST_TILT_JOINT |
-| 8 | hand_joint | HAND_JOINT |
-| 9 | head_camera_pan_joint | HEAD_CAMERA_PAN_JOINT |
-| 10 | head_camera_tilt_joint | HEAD_CAMERA_TILT_JOINT |
+| 3 | arm_elbow_1_tilt_joint | ARM_ELBOW_1_TILT_JOINT |
+| 4 | arm_elbow_2_tilt_joint | ARM_ELBOW_2_TILT_JOINT |
+| 5 | arm_wrist_tilt_joint | ARM_WRIST_TILT_JOINT |
+| 6 | hand_joint | HAND_JOINT |
+| 7 | head_camera_pan_joint | HEAD_CAMERA_PAN_JOINT |
+| 8 | head_camera_tilt_joint | HEAD_CAMERA_TILT_JOINT |
+
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
@@ -298,22 +303,23 @@ SOBIT PROのジョイント名とその定数名を以下の通りです．
 [sobit_edu_pose.yaml](sobit_edu_library/config/sobit_edu_pose.yaml)というファイルでポーズの追加・編集ができます．以下のようなフォーマットになります．
 
 ```yaml
-sobit_pro_pose:
-        - { 
+sobit_edu_pose:
+    - { 
         pose_name: "pose_name",
-        arm_shoulder_1_tilt_joint: 1.57,
-        arm_elbow_upper_1_tilt_joint: 1.57,
-        arm_elbow_lower_tilt_joint: 0.0,
-        arm_elbow_lower_pan_joint: -1.57,
-        arm_wrist_tilt_joint: -1.57,
-        hand_joint: 0.0,
-        head_camera_pan_joint: 0.0,
-        head_camera_tilt_joint: 0.0
+        arm_shoulder_pan_joint: 0.00,
+        arm_shoulder_1_tilt_joint: 1.5708,
+        arm_shoulder_2_tilt_joint: -1.5708,
+        arm_elbow_1_tilt_joint: -1.40,
+        arm_elbow_2_tilt_joint: 1.40,
+        arm_wrist_tilt_joint: -0.17,
+        hand_joint: -1.00,
+        head_camera_pan_joint: 0.00,
+        head_camera_tilt_joint: 0.00
     }
     ...
 ```  
 
-### ホイルコントローラ
+### ホイールコントローラ
 SOBIT PROの移動機構を動かすための情報まとめです．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
@@ -346,9 +352,9 @@ SOBIT PROの移動機構を動かすための情報まとめです．
 
 
 ## ハードウェア
-SOBIT EDUはオープンソースハードウェアとして[OnShape](https://cad.onshape.com/documents/4acbecde07fba120a62ec033/w/c6217b66947274dee4e8f911/e/c2e5c16292d7dfc11ee3cc01?renderMode=0&uiState=654a13b8711fc82bedc118e2)にて公開しております．
+SOBIT EDUはオープンソースハードウェアとして[OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e?renderMode=0&uiState=654e03c33dd8e732221dd868)にて公開しております．
 
-![SOBIT PRO in OnShape](sobit_pro/docs/img/sobit_pro_onshape.png)
+![SOBIT EDU in OnShape](sobit_edu/docs/img/sobit_edu_onshape.png)
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
@@ -381,18 +387,18 @@ TBD
 | 項目 | 詳細 |
 | --- | --- |
 | 最大直進速度 | 0.7[m/s] |
-| 最大回転速度 | 0.229[rad/s] |
+| 最大回転速度 | 3.1415[rad/s] |
 | 最大ペイロード | 0.35[kg] |
-| サイズ (長さx幅x高さ) | 450x450x1250[mm] |
-| 重量 | 16[kg] |
+| サイズ (長さx幅x高さ) | 640x400x1150[mm] |
+| 重量 | 10.5[kg] |
 | リモートコントローラ | PS3/PS4 |
 | LiDAR | UST-20LX |
-| RGB-D | Azure Kinect DK (頭部)，RealSense D405 (アーム) |
+| RGB-D | Azure Kinect DK|
 | IMU | LSM6DSMUS |
 | スピーカー | モノラルスピーカー |
-| マイク | コンデンサーマイク |
-| アクチュエータ (アーム) | 2 x XM540-W150, 6 x XM430-W320 |
-| アクチュエータ (移動機構) | 4 x XM430-W320, 4 x XM430-W210 |
+| マイク | モノラルガンマイクロホン |
+| アクチュエータ (アーム) |7 x XM430-W320 |
+| 移動機構 | TurtleBot2 |
 | 電源 | 2 x Makita 6.0Ah 18V |
 | PC接続 | USB |
 
@@ -425,7 +431,6 @@ TBD
 <!-- マイルストーン -->
 ## マイルストーン
 
-- [x] パラメタによるSOBIT EDUと移動機構のみの切り替え
 - [ ] exampleファイルの修正
 - [ ] OSS
     - [ ] ドキュメンテーションの充実
@@ -439,7 +444,7 @@ TBD
 <!-- 変更履歴 -->
 ## 変更履歴
 
-- 1.0: SOBIT PROと移動機構の設定パラメタ化 (2023-11-07)
+- 1.0: SOBIT EDUのソフトウェア改良 (2023-11-21)
   - 詳細 1
   - 詳細 2
   - 詳細 3
@@ -665,5 +670,7 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException: pass
     
 ```
-
+・ソフトウェア関係
+・Rvizの可視化
+・
 --- -->
