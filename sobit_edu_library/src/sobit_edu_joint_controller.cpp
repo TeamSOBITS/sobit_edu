@@ -1,4 +1,4 @@
-#include "sobit_edu_library/sobit_edu_controller.hpp"
+#include "sobit_edu_library/sobit_edu_joint_controller.hpp"
 
 using namespace sobit_edu;
 

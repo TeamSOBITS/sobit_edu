@@ -6,7 +6,7 @@
 #include <tf/transform_listener.h>
 #include <trajectory_msgs/JointTrajectory.h>
 
-#include "sobit_edu_library/sobit_turtlebot_controller.hpp"
+#include "sobit_edu_library/sobit_edu_wheel_controller.hpp"
 #include "sobits_msgs/current_state.h"
 #include "sobits_msgs/current_state_array.h"
 

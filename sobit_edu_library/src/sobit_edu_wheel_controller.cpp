@@ -1,4 +1,4 @@
-#include "sobit_edu_library/sobit_turtlebot_controller.hpp"
+#include "sobit_edu_library/sobit_edu_wheel_controller.hpp"
 
 using namespace sobit_edu;
 
