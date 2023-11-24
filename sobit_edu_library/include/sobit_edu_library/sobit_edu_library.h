@@ -2,7 +2,6 @@
 #define _SOBIT_PRO_LIBRARY_SOBIT_PRO_LIBRARY_H_
 
 #include <pybind11/pybind11.h>
-
 #include <ros/ros.h>
 
 class ROSCommonNode {

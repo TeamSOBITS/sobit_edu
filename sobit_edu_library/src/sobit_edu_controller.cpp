@@ -1,4 +1,4 @@
-#include <sobit_edu_library/sobit_edu_controller.hpp>
+#include "sobit_edu_library/sobit_edu_controller.hpp"
 
 using namespace sobit_edu;
 
@@ -381,7 +381,7 @@ bool SobitEduController::graspDecision() {
     }
 }
 
-void SobitEduController::callbackCurrentStateArray( const sobit_common_msg::current_state_array msg ) {
+void SobitEduController::callbackCurrentStateArray( const sobits_msgs::current_state_array msg ) {
     ros::spinOnce();
 
     for ( const auto current_state : msg.current_state_array ) {

@@ -1,15 +1,14 @@
 #ifndef SOBIT_EDU_CONTROLLER
 #define SOBIT_EDU_CONTROLLER
 
-#include <geometry_msgs/Point.h>
 #include <ros/ros.h>
-
-#include <sobit_edu_library/sobit_turtlebot_controller.hpp>
+#include <geometry_msgs/Point.h>
 #include <tf/transform_listener.h>
 #include <trajectory_msgs/JointTrajectory.h>
 
-#include <sobit_common_msg/current_state.h>
-#include <sobit_common_msg/current_state_array.h>
+#include "sobit_edu_library/sobit_turtlebot_controller.hpp"
+#include "sobits_msgs/current_state.h"
+#include "sobits_msgs/current_state_array.h"
 
 namespace sobit_edu {
     enum Joint { ARM_SHOULDER_PAN_JOINT = 0, 
@@ -69,7 +68,7 @@ namespace sobit_edu {
 
             double arm_wrist_tilt_current_ = 0.;
             double hand_current_ = 0.;
-            void callbackCurrentStateArray( const sobit_common_msg::current_state_array );
+            void callbackCurrentStateArray( const sobits_msgs::current_state_array );
             ros::Subscriber sub_current_state_array = nh_.subscribe( "/current_state_array", 1, &SobitEduController::callbackCurrentStateArray, this );
 
         public:
