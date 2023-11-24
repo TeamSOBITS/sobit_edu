@@ -47,7 +47,7 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 pybind_add_module(sobit_edu_module MODULE src/sobit_turtlebot_controller.cpp
                                           src/sobit_edu_controller.cpp
-                                          src/sobit_edu_pybind.cpp)
+                                          src/sobit_edu_library.cpp)
 
 install(
   TARGETS ${PROJECT_NAME}
