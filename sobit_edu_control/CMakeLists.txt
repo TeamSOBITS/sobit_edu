@@ -13,7 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   hardware_interface
   roscpp
   rospy
-  sobit_common_msg
+  sobits_msgs
+  sobits_common
 )
 catkin_package()
  
