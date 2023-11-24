@@ -38,7 +38,7 @@ namespace sobit_edu {
 
             ros::Publisher pub_arm_control_;
             ros::Publisher pub_head_camera_control_;  
-            // tf2::TransformListener listener_;
+            ros::Subscriber   sub_curr_arm;
 
             tf2_ros::Buffer            tfBuffer_;
             tf2_ros::TransformListener tfListener_;

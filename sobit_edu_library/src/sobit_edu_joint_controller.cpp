@@ -15,12 +15,18 @@ const double sobit_edu::SobitEduJointController::grasp_max_z_cm = 80.0;
 SobitEduJointController::SobitEduJointController( const std::string &name ) : ROSCommonNode(name), nh_(), pnh_("~"), tfBuffer_(), tfListener_(tfBuffer_) {
     pub_arm_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/arm_trajectory_controller/command", 1) ;
     pub_head_camera_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/head_camera_trajectory_controller/command", 1 );
+
+    sub_curr_arm    = nh_.subscribe( "/current_state_array", 1, &SobitEduJointController::callbackCurrArm, this );
+
     loadPose();
 }
 
 SobitEduJointController::SobitEduJointController( ) : ROSCommonNode(), nh_(), pnh_("~"), tfBuffer_(), tfListener_(tfBuffer_) {
     pub_arm_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/arm_trajectory_controller/command", 1 );
-    pub_head_camera_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/head_camera_trajectory_controller/command", 1 );    
+    pub_head_camera_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/head_camera_trajectory_controller/command", 1 );
+
+    sub_curr_arm    = nh_.subscribe( "/current_state_array", 1, &SobitEduJointController::callbackCurrArm, this );
+
     loadPose();
 }
 
@@ -349,7 +355,7 @@ bool SobitEduJointController::moveHandToTargetCoord(    const double goal_positi
     printf( "ARM DEG: %f\t%f\t%f\t%f\t%f\n", shoulder_roll_joint_deg, shoulder_flex_joint_deg, arm_elbow_tilt_joint_deg, arm_wrist_tilt_joint_deg, hand_deg );
     ROS_INFO( "goal_position_pos = (%f, %f, %f)", goal_position_pos_x_cm, goal_position_pos_y_cm, goal_position_pos_z_cm );
     // ROS_INFO("result_pos = (%f, %f, %f)", for_kinematics_x, for_kinematics_z, for_kinematics_z);
-    ros::Duration(2.0).sleep();
+    // ros::Duration(2.0).sleep();
 
     return is_reached;
 }
