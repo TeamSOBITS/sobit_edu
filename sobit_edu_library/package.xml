@@ -18,34 +18,18 @@
   <author email="choi.7f@gmail.com">Team SOBITS</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-
-  <!-- <depend>roscpp</depend>
+  <depend>dynamixel_sdk</depend>
+  <depend>roscpp</depend>
   <depend>rospy</depend>
-  <depend>pybind11_catkin</depend>
-  <depend>joint_limits_interface</depend>
-  <depend>controller_manager</depend>
-  <depend>hardware_interface</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
-  <depend>trajectory_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>nav_msgs</depend>
-  <depend>sobits_msgs</depend> -->
-
-
-  <depend>controller_manager</depend>
-  <depend>dynamixel_sdk</depend>
-  <depend>hardware_interface</depend>
-  <depend>roscpp</depend>
-  <depend>rospy</depend>
-  <depend>sobits_msgs</depend>
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>trajectory_msgs</depend>
   <depend>nav_msgs</depend>
-  <depend>tf</depend>
   <depend>pybind11_catkin</depend>
+  <depend>sobits_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

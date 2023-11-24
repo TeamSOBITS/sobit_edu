@@ -1,12 +1,13 @@
-#include "ros/ros.h"
-#include <sobit_edu_library/sobit_edu_controller.hpp>
-#include <sobit_edu_library/sobit_turtlebot_controller.hpp>
+#include <ros/ros.h>
+#include "sobit_edu_library/sobit_edu_joint_controller.hpp"
+#include "sobit_edu_library/sobit_edu_wheel_controller.hpp"
+
 
 int main(int argc, char *argv[]) {
     ros::init(argc, argv, "sobit_edu_grasp");
 
-    sobit_edu::SobitEduController edu_arm_ctr;
-    sobit_edu::SobitEduController edu_wheel_ctr;
+    sobit_edu::SobitEduJointController edu_arm_ctr;
+    sobit_edu::SobitEduWheelController edu_wheel_ctr;
 
     double grasp_flag = false;
     std::string target_name = "pringle";
@@ -21,10 +22,10 @@ int main(int argc, char *argv[]) {
     ros::Duration(2.0).sleep();
 
     // Move the hand towards the target "target_name"
-    // grasp_flag = edu_arm_ctr.moveGripperToTarget(target_name, 0.0, 0.0, 0.0)
+    // grasp_flag = edu_arm_ctr.moveHandToTarget(target_name, 0.0, 0.0, 0.0)
     // Caution: We shift the x axis target posiition -0.3 to avoid collision
-    grasp_flag = edu_arm_ctr.moveGripperToTargetTF(target_name, -0.3, 0.0, 0.0);
-    grasp_flag = edu_arm_ctr.moveGripperToTargetCoord(0.5, 0.5, 0.5, -0.3, 0.0, 0.0);
+    grasp_flag = edu_arm_ctr.moveHandToTargetTF(target_name, -0.3, 0.0, 0.0);
+    grasp_flag = edu_arm_ctr.moveHandToTargetCoord(0.5, 0.5, 0.5, -0.3, 0.0, 0.0);
     std::cout << "Is grasped? " << (grasp_flag? "True":"False") << std::endl;
     ros::Duration(2.0).sleep();
 
