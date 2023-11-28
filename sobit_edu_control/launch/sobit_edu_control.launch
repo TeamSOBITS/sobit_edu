@@ -1,6 +1,12 @@
 <launch>
 
-  <arg name="urdf_file"       default="$(find xacro)/xacro '$(find sobit_edu_description)/robots/sobit_edu.urdf.xacro'" />
+  <!-- Activate Mobile-Base (true), Arm (true), Head (true) -->
+  <arg name="enable_mb"           default="true"/>
+  <arg name="enable_arm"          default="true"/>
+  <arg name="enable_head"         default="true"/>
+
+  <arg name="urdf_file"           default="$(find xacro)/xacro '$(find sobit_edu_description)/robots/sobit_edu.urdf.xacro'" />
+
   <arg name="paused"          default="false"/>
   <arg name="use_sim_time"    default="true"/>
   <arg name="gui"             default="True"/>
@@ -10,15 +16,45 @@
   <param name="use_gui" value="$(arg gui)"/>
   <param name="robot_description" command="$(arg urdf_file)" />
 
-  <!-- Load joint controller configurations from YAML file to parameter server -->
-  <rosparam file="$(find sobit_edu_control)/config/position_control.yaml" command="load"/>
-  <rosparam file="$(find sobit_edu_control)/config/joint_limit.yaml"      command="load"/>
-  
-  <node name="sobit_edu_control" pkg="sobits_common" type="dynamixel_servo_control" output="screen"/>
+  <!-- Load Poses -->
+  <include file="$(find sobit_edu_library)/launch/load_sobit_edu_pose.launch"/>
 
-  <!-- load the controllers -->
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="arm_trajectory_controller head_camera_trajectory_controller joint_state_controller"/>
+
+  <!-- Load joint controller configurations from YAML file to parameter server -->
+  <rosparam file="$(find sobit_edu_control)/config/joint_limit.yaml" command="load"/>
+
+  <!-- Load the controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller"/>
+
+  <group if="$(eval arg('enable_arm') and arg('enable_head'))">
+      <node name="sobit_edu_arm_head_control" pkg="sobits_common" type="dynamixel_servo_control" output="screen"/>
+      <rosparam file="$(find sobit_edu_control)/config/state_control_dynamixel_arm_head.yaml"    command="load"/>
+  </group>
+
+  <group if="$(eval arg('enable_arm'))">
+      <group if="$(eval not(arg('enable_head')))">
+          <node name="sobit_edu_arm_head_control" pkg="sobits_common" type="dynamixel_servo_control" output="screen"/>
+          <rosparam file="$(find sobit_edu_control)/config/state_control_dynamixel_arm.yaml" command="load"/>
+      </group>
+
+      <rosparam file="$(find sobit_edu_control)/config/state_control_arm.yaml" command="load"/>
+      <node name="controller_arm" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="arm_trajectory_controller"/>
+  </group>
   
+  <group if="$(eval arg('enable_head'))">
+      <group if="$(eval not(arg('enable_arm')))">
+          <node name="sobit_edu_arm_head_control" pkg="sobits_common" type="dynamixel_servo_control" output="screen"/>
+          <rosparam file="$(find sobit_edu_control)/config/state_control_dynamixel_head.yaml" command="load"/>
+      </group>
+
+      <rosparam file="$(find sobit_edu_control)/config/state_control_head.yaml" command="load"/>
+      <node name="controller_head" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="head_camera_trajectory_controller"/>
+  </group>
+
+  <!-- <group if="$(eval arg('enable_mb'))">
+      <node name="controller_wheel" pkg="sobit_edu_control" type="sobit_edu_control" output="screen"/>
+  </group> -->
+
   <!-- convert joint states to TF transforms for rviz, etc -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
 
