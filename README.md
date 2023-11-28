@@ -83,7 +83,7 @@ TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレ�
 | ------------- | ------------- |
 | Ubuntu | 20.04 (Focal Fossa) |
 | ROS | Noetic Ninjemys |
-| Python | 3.0~ |
+| Python | 3.8 |
 
 > [!NOTE]
 > `Ubuntu`や`ROS`のインストール方法に関しては，[SOBIT Manual](https://github.com/TeamSOBITS/sobits_manual#%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)に参照してください．
@@ -133,8 +133,8 @@ TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレ�
     <arg name="open_rviz"           default="true"/>
     ...
    ```
-    > [!NOTE]
-    > 使用したい機能に応じて，`true`か`false`かに書き換えてください．
+> [!NOTE]
+> 使用したい機能に応じて，`true`か`false`かに書き換えてください．
 
 2. [minimal.launch](sobit_edu_bringup/launch/minimal.launch)というlaunchファイルを実行します．
    ```sh
@@ -170,7 +170,7 @@ $ roslaunch sobit_edu_description display.launch
 
 
 ### ジョイントコントローラ
-SOBIT_EDUのパンチルト機構とマニピュレータを動かすための情報まとめです．
+SOBIT EDUのパンチルト機構とマニピュレータを動かすための情報まとめです．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
@@ -179,121 +179,123 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
 1.  `moveToPose()` : 決められたポーズに動かします．
     ```cpp
     bool moveToPose(
-        const std::string& pose_name,   # ポーズ名
-        const double sec = 5.0          # 動作時間 (s)
+        const std::string& pose_name,   // ポーズ名
+        const double sec = 5.0          // 動作時間 (s)
     );
     ```
+
 > [!NOTE]
 > 既存のポーズは[sobit_edu_pose.yaml](sobit_edu_library/config/sobit_edu_pose.yaml)に確認でいます．ポーズの作成方法については[ポーズの設定方法](#ポーズの設定方法)をご参照ください．
 
 2.  `moveJoint()` : 指定されたジョイントを任意の角度を動かします．
     ```cpp
     bool sobit::SobitEduJointController::moveJoint (
-        const Joint joint_num,          # ジョイント名 (定数名)
-        const double rad,               # 回転角度 (rad)
-        const double sec = 5.0,         # 回転時間 (s)
-        bool is_sleep = true            # 回転後に待機するかどうか
+        const Joint joint_num,          // ジョイント名 (定数名)
+        const double rad,               // 回転角度 (rad)
+        const double sec = 5.0,         // 回転時間 (s)
+        bool is_sleep = true            // 回転後に待機するかどうか
     );
     ```
+
 > [!NOTE]
 > `ジョイント名`は[ジョイント名](#ジョイント名)をご確認ください．
 
 3.  `moveAllJoint()` : 指定されたジョイントを任意の角度を動かします．
     ```cpp
     bool sobit::SobitEduJointController::moveJoint (
-        const double arm_shoulder_pan,  # 各ジョイントの回転角度(arm_shoulder_pan) 
-        const double arm_shoulder_tilt, # 各ジョイントの回転角度(arm_shoulder_tilt)
-        const double arm_elbow_tilt,    # 各ジョイントの回転角度(arm_elbow_tilt)
-        const double arm_wrist_tilt,    # 各ジョイントの回転角度(arm_wrist_tilt)
-        const double hand,              # 各ジョイントの回転角度(hand)
-        const double head_camera_pan,   # 各ジョイントの回転角度(head_camera_pan)
-        const double head_camera_tilt,  # 各ジョイントの回転角度(head_camera_tilt)
-        const double sec = 5.0,         # 回転時間 (s)
-        bool is_sleep = true            # 回転後に待機するかどうか
+        const double arm_shoulder_pan,  // 各ジョイントの回転角度(arm_shoulder_pan) 
+        const double arm_shoulder_tilt, // 各ジョイントの回転角度(arm_shoulder_tilt)
+        const double arm_elbow_tilt,    // 各ジョイントの回転角度(arm_elbow_tilt)
+        const double arm_wrist_tilt,    // 各ジョイントの回転角度(arm_wrist_tilt)
+        const double hand,              // 各ジョイントの回転角度(hand)
+        const double head_camera_pan,   // 各ジョイントの回転角度(head_camera_pan)
+        const double head_camera_tilt,  // 各ジョイントの回転角度(head_camera_tilt)
+        const double sec = 5.0,         // 回転時間 (s)
+        bool is_sleep = true            // 回転後に待機するかどうか
     );
     ```
 
-4.  `moveHeadPanTilt()` : パンチルト機構を任意の角度に動かす
+1.  `moveHeadPanTilt()` : パンチルト機構を任意の角度に動かす
     ```cpp
     bool sobit::SobitEduJointController::moveHeadPanTilt(
-        const double pan_rad,           # パンの回転角度 (rad)
-        const double tilt_rad,          # チルトの回転角度 (rad)
-        const double sec = 5.0,         # 移動時間 (s)
-        bool is_sleep = true            # 回転後に待機するかどうか
+        const double pan_rad,           // パンの回転角度 (rad)
+        const double tilt_rad,          // チルトの回転角度 (rad)
+        const double sec = 5.0,         // 移動時間 (s)
+        bool is_sleep = true            // 回転後に待機するかどうか
     );
     ```
  
-5.  `moveArm()` : アームの関節を任意の角度に動かします．
+1.  `moveArm()` : アームの関節を任意の角度に動かします．
     ```cpp
     bool sobit::SobitEduJointController::moveArm(
-        const double arm_shoulder_pan,  # 各ジョイントの回転角度(arm_shoulder_pan) 
-        const double arm_shoulder_tilt, # 各ジョイントの回転角度(arm_shoulder_tilt)
-        const double arm_elbow_tilt,    # 各ジョイントの回転角度(arm_elbow_tilt)
-        const double arm_wrist_tilt,    # 各ジョイントの回転角度(arm_wrist_tilt)
-        const double hand,              # 各ジョイントの回転角度(hand)
-        const double sec = 5.0,         # 回転時間 (s)
-        bool is_sleep = true            # 回転後に待機するかどうか
+        const double arm_shoulder_pan,  // 各ジョイントの回転角度(arm_shoulder_pan) 
+        const double arm_shoulder_tilt, // 各ジョイントの回転角度(arm_shoulder_tilt)
+        const double arm_elbow_tilt,    // 各ジョイントの回転角度(arm_elbow_tilt)
+        const double arm_wrist_tilt,    // 各ジョイントの回転角度(arm_wrist_tilt)
+        const double hand,              // 各ジョイントの回転角度(hand)
+        const double sec = 5.0,         // 回転時間 (s)
+        bool is_sleep = true            // 回転後に待機するかどうか
     );
     ```
 
 
-6.  `moveGripperToTargetCoord()` : ハンドをxyz座標に動かします（把持モード）．
+1.  `moveGripperToTargetCoord()` : ハンドをxyz座標に動かします（把持モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToTargetCoord(
-        const double goal_position_x,       # 把持目的地のx (m)
-        const double goal_position_y,       # 把持目的地のy (m)
-        const double goal_position_z,       # 把持目的地のz (m)
-        const double diff_goal_position_x,  # xyz座標のx軸をシフトする (m)
-        const double diff_goal_position_y,  # xyz座標のy軸をシフトする (m)
-        const double diff_goal_position_z   # xyz座標のz軸をシフトする (m)
+        const double goal_position_x,       // 把持目的地のx (m)
+        const double goal_position_y,       // 把持目的地のy (m)
+        const double goal_position_z,       // 把持目的地のz (m)
+        const double diff_goal_position_x,  // xyz座標のx軸をシフトする (m)
+        const double diff_goal_position_y,  // xyz座標のy軸をシフトする (m)
+        const double diff_goal_position_z   // xyz座標のz軸をシフトする (m)
     );
     ```
 
-7.  `moveGripperToTargetTF()` : ハンドをtf名に動かします（把持モード）．
+1.  `moveGripperToTargetTF()` : ハンドをtf名に動かします（把持モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToTargetTF(
-        const std::string& target_name,     # 把持目的tf名
-        const double diff_goal_position_x,  # xyz座標のx軸をシフトする (m)
-        const double diff_goal_position_y,  # xyz座標のy軸をシフトする (m)
-        const double diff_goal_position_z   # xyz座標のz軸をシフトする (m)
+        const std::string& target_name,     // 把持目的tf名
+        const double diff_goal_position_x,  // xyz座標のx軸をシフトする (m)
+        const double diff_goal_position_y,  // xyz座標のy軸をシフトする (m)
+        const double diff_goal_position_z   // xyz座標のz軸をシフトする (m)
     );
     ```
 
-8.  `moveGripperToPlaceCoord()` : ハンドをxyz座標に動かします（配置モード）．
+1.  `moveGripperToPlaceCoord()` : ハンドをxyz座標に動かします（配置モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToPlaceCoord(
-        const double goal_position_x,       # 配置目的地のx (m)
-        const double goal_position_y,       # 配置目的地のy (m)
-        const double goal_position_z,       # 配置目的地のz (m)
-        const double diff_goal_position_x,  # xyz座標のx軸をシフトする (m)
-        const double diff_goal_position_y,  # xyz座標のy軸をシフトする (m)
-        const double diff_goal_position_z   # xyz座標のz軸をシフトする (m)
+        const double goal_position_x,       // 配置目的地のx (m)
+        const double goal_position_y,       // 配置目的地のy (m)
+        const double goal_position_z,       // 配置目的地のz (m)
+        const double diff_goal_position_x,  // xyz座標のx軸をシフトする (m)
+        const double diff_goal_position_y,  // xyz座標のy軸をシフトする (m)
+        const double diff_goal_position_z   // xyz座標のz軸をシフトする (m)
     ); 
     ```
 
-9.  `moveGripperToPlaceTF()` : ハンドをtf名に動かします（配置モード）．
+1.  `moveGripperToPlaceTF()` : ハンドをtf名に動かします（配置モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToPlaceTF(
-        const std::string& target_name,     # 配置目的tf名
-        const double diff_goal_position_x,  # xyz座標のx軸をシフトする (m)
-        const double diff_goal_position_y,  # xyz座標のy軸をシフトする (m)
-        const double diff_goal_position_z   # xyz座標のz軸をシフトする (m)
+        const std::string& target_name,     // 配置目的tf名
+        const double diff_goal_position_x,  // xyz座標のx軸をシフトする (m)
+        const double diff_goal_position_y,  // xyz座標のy軸をシフトする (m)
+        const double diff_goal_position_z   // xyz座標のz軸をシフトする (m)
     );
     ```
 
-10.  `graspDecision()` : 定めた範囲内の電流値を超えた場合，把持判定を返す．
+1.  `graspDecision()` : 定めた範囲内の電流値を超えた場合，把持判定を返す．
     ```cpp
     bool sobit::SobitEduJointController::graspDecision(
-        const int min_curr = 300,       # trueを返す最小の電流値
-        const int max_curr = 1000       # trueを返す最大の電流値
+        const int min_curr = 300,       // trueを返す最小の電流値
+        const int max_curr = 1000       // trueを返す最大の電流値
      );
     ```
 
-11.  `placeDecision()` : 定めた範囲内の電流値を超えた場合，配置判定を返す．
+1.  `placeDecision()` : 定めた範囲内の電流値を超えた場合，配置判定を返す．
     ```cpp
     bool sobit::SobitEduJointController::graspDecision( 
-        const int min_curr = 500,       # trueを返す最小の電流値
-        const int max_curr = 1000       # trueを返す最大の電流値
+        const int min_curr = 500,       // trueを返す最小の電流値
+        const int max_curr = 1000       // trueを返す最大の電流値
     );
     ```
 
@@ -350,19 +352,19 @@ SOBIT EDUの移動機構を動かすための情報まとめです．
 1.  `controlWheelLinear()` : 並進（直進移動・斜め移動・横移動）を移動させます．
     ```cpp
     bool sobit::SobitEduWheelController::controlWheelLinear (
-        const double distance,            # 直進移動距離 (m)
+        const double distance,            // 直進移動距離 (m)
     )
     ```  
 2.  `controlWheelRotateRad()` : 回転運動を行う(弧度法：Radian)
     ```cpp
     bool sobit::SobitEduWheelController::controlWheelRotateRad (
-        const double angle_rad,             # 中心回転角度 (rad)
+        const double angle_rad,             // 中心回転角度 (rad)
     )
     ```  
 3.  `controlWheelRotateDeg()`   :   回転運動を行う(度数法：Degree)
     ```cpp
     bool sobit::SobitEduWheelController::controlWheelRotateDeg ( 
-        const double angle_deg,             # 中心回転角度 (deg)
+        const double angle_deg,             // 中心回転角度 (deg)
     )
     ```
 
@@ -386,11 +388,11 @@ SOBIT EDUはオープンソースハードウェアとして[OnShape](https://ca
 
 1. Onshapeにアクセスしましょう．
 
-    > [!NOTE]
-    > ファイルをダウンロードするために，`OnShape`のアカウントを作成する必要がありません．ただし，本ドキュメント全体をコピする場合，アカウントの作成を推薦します．
+> [!NOTE]
+> ファイルをダウンロードするために，`OnShape`のアカウントを作成する必要がありません．ただし，本ドキュメント全体をコピする場合，アカウントの作成を推薦します．
 
-1. `Instances`の中にパーツを右クリックで選択します．
-1. 一覧が表示され，`Export`ボタンを押してください．
+2. `Instances`の中にパーツを右クリックで選択します．
+2. 一覧が表示され，`Export`ボタンを押してください．
 1. 表示されたウィンドウの中に，`Format`という項目があります．`STEP`を選択してください．
 1. 最後に，青色の`Export`ボタンを押してダウンロードが開始されます．
 
@@ -406,7 +408,7 @@ TBD
 ### ロボットの特徴
 | 項目 | 詳細 |
 | --- | --- |
-| 最大直進速度 | 0.7[m/s] |
+| 最大直進速度 | 0.65[m/s] |
 | 最大回転速度 | 3.1415[rad/s] |
 | 最大ペイロード | 0.35[kg] |
 | サイズ (長さx幅x高さ) | 640x400x1150[mm] |
@@ -451,10 +453,11 @@ TBD
 <!-- マイルストーン -->
 ## マイルストーン
 
-- [ ] exampleファイルの修正
-- [ ] Readmeの英語化
-- [ ] ドキュメンテーションの充実
-- [ ] コーディングスタイルの統一
+- [x] パラメタによるSOBIT PROと移動機構のみの切り替え
+- [x] exampleファイルの修正
+- [x] OSS
+    - [x] ドキュメンテーションの充実
+    - [x] コーディングスタイルの統一
 
 現時点のバッグや新規機能の依頼を確認するために[Issueページ][license-url] をご覧ください．
 
@@ -464,10 +467,7 @@ TBD
 <!-- 変更履歴 -->
 ## 変更履歴
 
-- 1.0: SOBIT EDUのソフトウェア改良 (2023-11-21)
-  - 詳細 1
-  - 詳細 2
-  - 詳細 3
+- 
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
@@ -521,4 +521,4 @@ Distributed under the MIT License. See `LICENSE.txt` for more NOTErmation.
 [issues-shield]: https://img.shields.io/github/issues/TeamSOBITS/sobit_edu.svg?style=for-the-badge
 [issues-url]: https://github.com/TeamSOBITS/sobit_edu/issues
 [license-shield]: https://img.shields.io/github/license/TeamSOBITS/sobit_edu.svg?style=for-the-badge
-[license-url]: https://github.com/TeamSOBITS/sobit_edu/blob/master/LICENSE
+[license-url]: LICENSE
