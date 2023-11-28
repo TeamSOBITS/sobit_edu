@@ -123,7 +123,7 @@ TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレ�
 <!-- 実行・操作方法 -->
 ## 実行・操作方法
 
-1. SOBIT EDUの起動する機能をパラメタとして[minimal.launch](sobit_edu_bringup/launch/minimal.launch)に設定します．
+1. SOBIT EDUの起動する機能をパラメータとして[minimal.launch](sobit_edu_bringup/launch/minimal.launch)に設定します．
    ```xml
     <!-- Activate Mobile-Base (true), Arm (true), Head (true) -->
     <arg name="enable_mb"           default="true"/>
@@ -186,9 +186,9 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
 > [!NOTE]
 > 既存のポーズは[sobit_edu_pose.yaml](sobit_edu_library/config/sobit_edu_pose.yaml)に確認でいます．ポーズの作成方法については[ポーズの設定方法](#ポーズの設定方法)をご参照ください．
 
-1.  `moveJoint()` : 指定されたジョイントを任意の角度も動かします．
+2.  `moveJoint()` : 指定されたジョイントを任意の角度を動かします．
     ```cpp
-    bool sobit::SobitProJointController::moveJoint (
+    bool sobit::SobitEduJointController::moveJoint (
         const Joint joint_num,          # ジョイント名 (定数名)
         const double rad,               # 回転角度 (rad)
         const double sec = 5.0,         # 回転時間 (s)
@@ -198,9 +198,24 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
 > [!NOTE]
 > `ジョイント名`は[ジョイント名](#ジョイント名)をご確認ください．
 
-1.  `moveHeadPanTilt()` : パンチルト機構を任意の角度に動かす
+3.  `moveAllJoint()` : 指定されたジョイントを任意の角度を動かします．
     ```cpp
-    bool sobit::SobitProJointController::moveHeadPanTilt(
+    bool sobit::SobitEduJointController::moveJoint (
+        const double arm_shoulder_pan,  # 各ジョイントの回転角度(arm_shoulder_pan) 
+        const double arm_shoulder_tilt, # 各ジョイントの回転角度(arm_shoulder_tilt)
+        const double arm_elbow_tilt,    # 各ジョイントの回転角度(arm_elbow_tilt)
+        const double arm_wrist_tilt,    # 各ジョイントの回転角度(arm_wrist_tilt)
+        const double hand,              # 各ジョイントの回転角度(hand)
+        const double head_camera_pan,   # 各ジョイントの回転角度(head_camera_pan)
+        const double head_camera_tilt,  # 各ジョイントの回転角度(head_camera_tilt)
+        const double sec = 5.0,         # 回転時間 (s)
+        bool is_sleep = true            # 回転後に待機するかどうか
+    );
+    ```
+
+4.  `moveHeadPanTilt()` : パンチルト機構を任意の角度に動かす
+    ```cpp
+    bool sobit::SobitEduJointController::moveHeadPanTilt(
         const double pan_rad,           # パンの回転角度 (rad)
         const double tilt_rad,          # チルトの回転角度 (rad)
         const double sec = 5.0,         # 移動時間 (s)
@@ -208,28 +223,23 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
     );
     ```
  
-1.  `moveArm()` : アームの関節を任意の角度に動かします．
+5.  `moveArm()` : アームの関節を任意の角度に動かします．
     ```cpp
-    bool sobit::SobitProJointController::moveArm(
-        const double arm_shoulder_pan, 
-        const double arm_shoulder_tilt, 
-        const double arm_elbow_tilt, 
-        const double arm_wrist_tilt, 
-        const double hand, const double sec = 5.0, bool is_sleep = true
-        const double arm1,              # ARM_SHOULDER_TILT_JOINTの回転角度 (rad)
-        const double arm2,              # ARM_ELBOW_UPPER_TILT_JOINTの回転角度 (rad)
-        const double arm3,              # ARM_ELBOW_LOWER_TILT_JOINTの回転角度 (rad)
-        const double arm3_pan,          # ARM_ELBOW_LOWER_PAN_JOINTの回転角度 (rad)
-        const double arm4,              # ARM_WRIST_TILT_JOINTの回転角度 (rad)
+    bool sobit::SobitEduJointController::moveArm(
+        const double arm_shoulder_pan,  # 各ジョイントの回転角度(arm_shoulder_pan) 
+        const double arm_shoulder_tilt, # 各ジョイントの回転角度(arm_shoulder_tilt)
+        const double arm_elbow_tilt,    # 各ジョイントの回転角度(arm_elbow_tilt)
+        const double arm_wrist_tilt,    # 各ジョイントの回転角度(arm_wrist_tilt)
+        const double hand,              # 各ジョイントの回転角度(hand)
         const double sec = 5.0,         # 回転時間 (s)
         bool is_sleep = true            # 回転後に待機するかどうか
     );
     ```
 
 
-1.  `moveGripperToTargetCoord()` : ハンドをxyz座標に動かします（把持モード）．
+6.  `moveGripperToTargetCoord()` : ハンドをxyz座標に動かします（把持モード）．
     ```cpp
-    bool sobit::SobitProJointController::moveGripperToTargetCoord(
+    bool sobit::SobitEduJointController::moveGripperToTargetCoord(
         const double goal_position_x,       # 把持目的地のx (m)
         const double goal_position_y,       # 把持目的地のy (m)
         const double goal_position_z,       # 把持目的地のz (m)
@@ -239,9 +249,9 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
     );
     ```
 
-1.  `moveGripperToTargetTF()` : ハンドをtf名に動かします（把持モード）．
+7.  `moveGripperToTargetTF()` : ハンドをtf名に動かします（把持モード）．
     ```cpp
-    bool sobit::SobitProJointController::moveGripperToTargetTF(
+    bool sobit::SobitEduJointController::moveGripperToTargetTF(
         const std::string& target_name,     # 把持目的tf名
         const double diff_goal_position_x,  # xyz座標のx軸をシフトする (m)
         const double diff_goal_position_y,  # xyz座標のy軸をシフトする (m)
@@ -249,21 +259,21 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
     );
     ```
 
-1.  `moveGripperToPlaceCoord()` : ハンドをxyz座標に動かします（配置モード）．
+8.  `moveGripperToPlaceCoord()` : ハンドをxyz座標に動かします（配置モード）．
     ```cpp
-    bool sobit::SobitProJointController::moveGripperToPlaceCoord(
+    bool sobit::SobitEduJointController::moveGripperToPlaceCoord(
         const double goal_position_x,       # 配置目的地のx (m)
-        const double goal_position_y,       # 配置目的地のx (m)
-        const double goal_position_z,       # 配置目的地のx (m)
+        const double goal_position_y,       # 配置目的地のy (m)
+        const double goal_position_z,       # 配置目的地のz (m)
         const double diff_goal_position_x,  # xyz座標のx軸をシフトする (m)
         const double diff_goal_position_y,  # xyz座標のy軸をシフトする (m)
         const double diff_goal_position_z   # xyz座標のz軸をシフトする (m)
     ); 
     ```
 
-1.  `moveGripperToPlaceTF()` : ハンドをtf名に動かします（配置モード）．
+9.  `moveGripperToPlaceTF()` : ハンドをtf名に動かします（配置モード）．
     ```cpp
-    bool sobit::SobitProJointController::moveGripperToPlaceTF(
+    bool sobit::SobitEduJointController::moveGripperToPlaceTF(
         const std::string& target_name,     # 配置目的tf名
         const double diff_goal_position_x,  # xyz座標のx軸をシフトする (m)
         const double diff_goal_position_y,  # xyz座標のy軸をシフトする (m)
@@ -271,16 +281,27 @@ SOBIT_EDUのパンチルト機構とマニピュレータを動かすための�
     );
     ```
 
-1.  `graspDecision()` : 定めた範囲内の電流値を超えた場合，配置判定を返す．
+10.  `graspDecision()` : 定めた範囲内の電流値を超えた場合，把持判定を返す．
     ```cpp
-    bool sobit::SobitProJointController::graspDecision( );
+    bool sobit::SobitEduJointController::graspDecision(
+        const int min_curr = 300,       # trueを返す最小の電流値
+        const int max_curr = 1000       # trueを返す最大の電流値
+     );
+    ```
+
+11.  `placeDecision()` : 定めた範囲内の電流値を超えた場合，配置判定を返す．
+    ```cpp
+    bool sobit::SobitEduJointController::graspDecision( 
+        const int min_curr = 500,       # trueを返す最小の電流値
+        const int max_curr = 1000       # trueを返す最大の電流値
+    );
     ```
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
 #### ジョイント名
-SOBIT PROのジョイント名とその定数名を以下の通りです．
+SOBIT EDUのジョイント名とその定数名を以下の通りです．
 
 
 | ジョイント番号 | ジョイント名 | ジョイント定数名 |
@@ -320,7 +341,7 @@ sobit_edu_pose:
 ```  
 
 ### ホイールコントローラ
-SOBIT PROの移動機構を動かすための情報まとめです．
+SOBIT EDUの移動機構を動かすための情報まとめです．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
@@ -328,20 +349,19 @@ SOBIT PROの移動機構を動かすための情報まとめです．
 #### 動作関数
 1.  `controlWheelLinear()` : 並進（直進移動・斜め移動・横移動）を移動させます．
     ```cpp
-    bool sobit::SobitProWheelController::controlWheelLinear (
-        const double distance_x,            # x方向への直進移動距離 (m)
-        const double distance_y,            # y方向への直進移動距離 (m)
+    bool sobit::SobitEduWheelController::controlWheelLinear (
+        const double distance,            # 直進移動距離 (m)
     )
     ```  
 2.  `controlWheelRotateRad()` : 回転運動を行う(弧度法：Radian)
     ```cpp
-    bool sobit::SobitProWheelController::controlWheelRotateRad (
+    bool sobit::SobitEduWheelController::controlWheelRotateRad (
         const double angle_rad,             # 中心回転角度 (rad)
     )
     ```  
-3.  controlWheelRotateDeg()   :   回転運動を行う(度数法：Degree)
+3.  `controlWheelRotateDeg()`   :   回転運動を行う(度数法：Degree)
     ```cpp
-    bool sobit::SobitProWheelController::controlWheelRotateDeg ( 
+    bool sobit::SobitEduWheelController::controlWheelRotateDeg ( 
         const double angle_deg,             # 中心回転角度 (deg)
     )
     ```
@@ -370,7 +390,7 @@ SOBIT EDUはオープンソースハードウェアとして[OnShape](https://ca
     > ファイルをダウンロードするために，`OnShape`のアカウントを作成する必要がありません．ただし，本ドキュメント全体をコピする場合，アカウントの作成を推薦します．
 
 1. `Instances`の中にパーツを右クリックで選択します．
-1. 一覧が表示され，`Export`ブタンを押してください．
+1. 一覧が表示され，`Export`ボタンを押してください．
 1. 表示されたウィンドウの中に，`Format`という項目があります．`STEP`を選択してください．
 1. 最後に，青色の`Export`ボタンを押してダウンロードが開始されます．
 
@@ -432,9 +452,9 @@ TBD
 ## マイルストーン
 
 - [ ] exampleファイルの修正
-- [ ] OSS
-    - [ ] ドキュメンテーションの充実
-    - [ ] コーディングスタイルの統一
+- [ ] Readmeの英語化
+- [ ] ドキュメンテーションの充実
+- [ ] コーディングスタイルの統一
 
 現時点のバッグや新規機能の依頼を確認するために[Issueページ][license-url] をご覧ください．
 
@@ -492,13 +512,13 @@ Distributed under the MIT License. See `LICENSE.txt` for more NOTErmation.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/TeamSOBITS/sobit_pro.svg?style=for-the-badge
-[contributors-url]: https://github.com/TeamSOBITS/sobit_pro/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/TeamSOBITS/sobit_pro.svg?style=for-the-badge
-[forks-url]: https://github.com/TeamSOBITS/sobit_pro/network/members
-[stars-shield]: https://img.shields.io/github/stars/TeamSOBITS/sobit_pro.svg?style=for-the-badge
-[stars-url]: https://github.com/TeamSOBITS/sobit_pro/stargazers
-[issues-shield]: https://img.shields.io/github/issues/TeamSOBITS/sobit_pro.svg?style=for-the-badge
-[issues-url]: https://github.com/TeamSOBITS/sobit_pro/issues
-[license-shield]: https://img.shields.io/github/license/TeamSOBITS/sobit_pro.svg?style=for-the-badge
-[license-url]: https://github.com/TeamSOBITS/sobit_pro/blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/TeamSOBITS/sobit_edu.svg?style=for-the-badge
+[contributors-url]: https://github.com/TeamSOBITS/sobit_edu/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/TeamSOBITS/sobit_edu.svg?style=for-the-badge
+[forks-url]: https://github.com/TeamSOBITS/sobit_edu/network/members
+[stars-shield]: https://img.shields.io/github/stars/TeamSOBITS/sobit_edu.svg?style=for-the-badge
+[stars-url]: https://github.com/TeamSOBITS/sobit_edu/stargazers
+[issues-shield]: https://img.shields.io/github/issues/TeamSOBITS/sobit_edu.svg?style=for-the-badge
+[issues-url]: https://github.com/TeamSOBITS/sobit_edu/issues
+[license-shield]: https://img.shields.io/github/license/TeamSOBITS/sobit_edu.svg?style=for-the-badge
+[license-url]: https://github.com/TeamSOBITS/sobit_edu/blob/master/LICENSE
