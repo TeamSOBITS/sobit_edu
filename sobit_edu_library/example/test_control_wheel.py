@@ -15,20 +15,20 @@ def test_control_wheel():
     vel = Twist()
     vel.linear.x = 0.1
 
-    # for angular in np.arange(-math.pi/2, math.pi/2, 0.01):
-    #     vel.angular.z = angular
-    #     print("linear = " + str(vel.linear.x) + "\tangular = " + str(vel.angular.z))
-    #     pub.publish(vel)
-    #     rospy.sleep(0.1)
+    for angular in np.arange(-math.pi/2, math.pi/2, 0.01):
+        vel.angular.z = angular
+        print("linear = " + str(vel.linear.x) + "\tangular = " + str(vel.angular.z))
+        pub.publish(vel)
+        rospy.sleep(0.1)
     
-    # for angular in np.arange(math.pi/2, -math.pi/2, 0.01):
-    #     vel.angular.z = angular
-    #     print("linear = " + str(vel.linear.x) + "\tangular = " + str(vel.angular.z))
-    #     pub.publish(vel)
-    #     rospy.sleep(0.1)
+    for angular in np.arange(math.pi/2, -math.pi/2, 0.01):
+        vel.angular.z = angular
+        print("linear = " + str(vel.linear.x) + "\tangular = " + str(vel.angular.z))
+        pub.publish(vel)
+        rospy.sleep(0.1)
     
-    # zero_vel = Twist()
-    # pub.publish(zero_vel)
+    zero_vel = Twist()
+    pub.publish(zero_vel)
 
     """
     args = sys.argv

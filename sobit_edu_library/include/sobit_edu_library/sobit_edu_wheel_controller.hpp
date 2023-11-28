@@ -18,8 +18,8 @@
 
 
 namespace sobit_edu {
-    class SobitEduWheelController  : public ROSCommonNode {
-        protected :
+    class SobitEduWheelController  : private ROSCommonNode {
+        private :
             ros::NodeHandle nh_;
             ros::NodeHandle pnh_;
             
@@ -43,6 +43,7 @@ namespace sobit_edu {
 
             double rad2Deg( const double rad );
             double deg2Rad( const double deg );
+
     };
 }
 
