@@ -24,8 +24,10 @@
      <arg name="serialport" value="$(arg serialport)" />
    </include>
   </group>
-   
 
+  <!--URG-->
+  <include file="$(find sobit_edu_bringup)/launch/urg.launch"/>
+   
   <!-- Actuators Control-->
   <include file="$(find sobit_edu_control)/launch/sobit_edu_control.launch">
       <arg name="enable_mb"   value="$(arg enable_mb)"/>
