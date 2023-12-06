@@ -12,7 +12,8 @@ ros_packages=(
     "sobit_common" \
     "sobits_msgs" \
     "urg_node" \
-    "azure_kinect_ros_driver"
+    "azure_kinect_ros_driver" \
+    "turtlebot2_on_noetic"
 )
 
 # Clone all packages
