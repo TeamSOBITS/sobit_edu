@@ -1,36 +1,48 @@
-#include <sobit_edu_library/sobit_edu_controller.hpp>
+#include "sobit_edu_library/sobit_edu_joint_controller.hpp"
+#include "sobit_edu_library/sobit_edu_wheel_controller.hpp"
+
 
 using namespace sobit_edu;
 
-const double sobit_edu::SobitEduController::base_to_shoulder_flex_joint_z_cm = 52.2;
-const double sobit_edu::SobitEduController::base_to_shoulder_flex_joint_x_cm = 12.2;
-const double sobit_edu::SobitEduController::arm_upper_link_x_cm = 14.8;
-const double sobit_edu::SobitEduController::arm_upper_link_z_cm = 2.4;
-const double sobit_edu::SobitEduController::arm_outer_link_x_cm = 15.0;
-const double sobit_edu::SobitEduController::grasp_min_z_cm = 35.0;
-const double sobit_edu::SobitEduController::grasp_max_z_cm = 80.0;
+const double sobit_edu::SobitEduJointController::base_to_shoulder_flex_joint_z_cm = 52.2;
+const double sobit_edu::SobitEduJointController::base_to_shoulder_flex_joint_x_cm = 12.2;
+const double sobit_edu::SobitEduJointController::arm_upper_link_x_cm = 14.8;
+const double sobit_edu::SobitEduJointController::arm_upper_link_z_cm = 2.4;
+const double sobit_edu::SobitEduJointController::arm_outer_link_x_cm = 15.0;
+const double sobit_edu::SobitEduJointController::grasp_min_z_cm = 35.0;
+const double sobit_edu::SobitEduJointController::grasp_max_z_cm = 80.0;
 
-SobitEduController::SobitEduController( const std::string &name ) : SobitTurtlebotController( name ) {
+SobitEduJointController::SobitEduJointController( const std::string &name ) : ROSCommonNode(name), nh_(), pnh_("~"), tfBuffer_(), tfListener_(tfBuffer_) {
     pub_arm_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/arm_trajectory_controller/command", 1) ;
     pub_head_camera_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/head_camera_trajectory_controller/command", 1 );
+
+    sub_curr_arm    = nh_.subscribe( "/current_state_array", 1, &SobitEduJointController::callbackCurrArm, this );
+
     loadPose();
 }
 
-SobitEduController::SobitEduController( ) : SobitTurtlebotController( ) {
+SobitEduJointController::SobitEduJointController( ) : ROSCommonNode(), nh_(), pnh_("~"), tfBuffer_(), tfListener_(tfBuffer_) {
     pub_arm_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/arm_trajectory_controller/command", 1 );
-    pub_head_camera_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/head_camera_trajectory_controller/command", 1 );    
+    pub_head_camera_control_ = nh_.advertise<trajectory_msgs::JointTrajectory>( "/head_camera_trajectory_controller/command", 1 );
+
+    sub_curr_arm    = nh_.subscribe( "/current_state_array", 1, &SobitEduJointController::callbackCurrArm, this );
+
     loadPose();
 }
 
-void SobitEduController::loadPose( ) {
+void SobitEduJointController::loadPose( ) {
     XmlRpc::XmlRpcValue pose_val;
+
     if ( !nh_.hasParam("/sobit_edu_pose") ) return; 
     nh_.getParam( "/sobit_edu_pose", pose_val );
+
     int pose_num = pose_val.size();
     pose_list_.clear();
+
     for ( int i = 0; i < pose_num; i++ ) {
         Pose                pose;
         std::vector<double> joint_val(9, 0.0);
+
         pose.pose_name                              = static_cast<std::string>(pose_val[i]["pose_name"]); 
         joint_val[Joint::ARM_SHOULDER_PAN_JOINT]    = static_cast<double>(pose_val[i][joint_names_[ARM_SHOULDER_PAN_JOINT]]); 
         joint_val[Joint::ARM_SHOULDER_1_TILT_JOINT] = static_cast<double>(pose_val[i][joint_names_[ARM_SHOULDER_1_TILT_JOINT]]); 
@@ -41,13 +53,16 @@ void SobitEduController::loadPose( ) {
         joint_val[Joint::HAND_JOINT]                = static_cast<double>(pose_val[i][joint_names_[HAND_JOINT]]); 
         joint_val[Joint::HEAD_CAMERA_PAN_JOINT]     = static_cast<double>(pose_val[i][joint_names_[HEAD_CAMERA_PAN_JOINT]]); 
         joint_val[Joint::HEAD_CAMERA_TILT_JOINT]    = static_cast<double>(pose_val[i][joint_names_[HEAD_CAMERA_TILT_JOINT]]); 
+        
         pose.joint_val                              = joint_val;
+        
         pose_list_.push_back( pose );
     }
+
     return;
 }
 
-bool SobitEduController::moveToPose( const std::string &pose_name, const double sec ) {
+bool SobitEduJointController::moveToPose( const std::string &pose_name, const double sec ) {
     bool                is_find = false;
     std::vector<double> joint_val;
     for ( auto& pose : pose_list_ ) {
@@ -72,7 +87,7 @@ bool SobitEduController::moveToPose( const std::string &pose_name, const double 
     } 
 }
 
-bool SobitEduController::moveAllJoint( const double arm_shoulder_pan, 
+bool SobitEduJointController::moveAllJoint( const double arm_shoulder_pan, 
                                              const double arm_shoulder_tilt, 
                                              const double arm_elbow_tilt, 
                                              const double arm_wrist_tilt, 
@@ -84,6 +99,7 @@ bool SobitEduController::moveAllJoint( const double arm_shoulder_pan,
     try {
         trajectory_msgs::JointTrajectory arm_joint_trajectory;
         trajectory_msgs::JointTrajectory head_camera_joint_trajectory;
+
         setJointTrajectory( joint_names_[Joint::ARM_SHOULDER_PAN_JOINT], arm_shoulder_pan, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_SHOULDER_1_TILT_JOINT], arm_shoulder_tilt, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_SHOULDER_2_TILT_JOINT], -arm_shoulder_tilt, sec, &arm_joint_trajectory );
@@ -91,21 +107,29 @@ bool SobitEduController::moveAllJoint( const double arm_shoulder_pan,
         addJointTrajectory( joint_names_[Joint::ARM_ELBOW_2_TILT_JOINT], -arm_elbow_tilt, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_WRIST_TILT_JOINT], arm_wrist_tilt, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::HAND_JOINT], -hand, sec, &arm_joint_trajectory );
+        
         setJointTrajectory( joint_names_[Joint::HEAD_CAMERA_PAN_JOINT], head_camera_pan, sec, &head_camera_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::HEAD_CAMERA_TILT_JOINT], head_camera_tilt, sec, &head_camera_joint_trajectory );
+        
         checkPublishersConnection ( pub_arm_control_ );
         checkPublishersConnection ( pub_head_camera_control_ );
         pub_arm_control_.publish( arm_joint_trajectory );
         pub_head_camera_control_.publish( head_camera_joint_trajectory );
+        
         if ( is_sleep ) ros::Duration( sec ).sleep();
+        
         return true;
+
     } catch ( const std::exception& ex ) {
         ROS_ERROR( "%s", ex.what() );
         return false;
     }
 }
 
-bool SobitEduController::moveJoint( const Joint joint_num, const double rad, const double sec, bool is_sleep ) {
+bool SobitEduJointController::moveJoint(    const Joint joint_num, 
+                                            const double rad, 
+                                            const double sec, 
+                                            bool is_sleep ) {
     try {
         trajectory_msgs::JointTrajectory joint_trajectory;
 
@@ -116,11 +140,14 @@ bool SobitEduController::moveJoint( const Joint joint_num, const double rad, con
         if ( joint_num == 1 || joint_num == 3 ) {
             setJointTrajectory( joint_names_[joint_num], rad, sec, &joint_trajectory );
             addJointTrajectory(joint_names_[joint_num + 1], -rad, sec, &joint_trajectory);
+        
         } else if ( joint_num == 2 || joint_num == 4 ) {
             setJointTrajectory( joint_names_[joint_num], -rad, sec, &joint_trajectory );
             addJointTrajectory(joint_names_[joint_num - 1], rad, sec, &joint_trajectory);
+        
         } else if ( joint_num == 6 ) {
             setJointTrajectory( joint_names_[joint_num], -rad, sec, &joint_trajectory );
+        
         } else {
             setJointTrajectory( joint_names_[joint_num], rad, sec, &joint_trajectory );
         }
@@ -132,32 +159,50 @@ bool SobitEduController::moveJoint( const Joint joint_num, const double rad, con
             checkPublishersConnection ( pub_head_camera_control_ );
             pub_head_camera_control_.publish( joint_trajectory );
         }
+        
         if ( is_sleep ) ros::Duration( sec ).sleep();
+        
         return true;
+    
     } catch ( const std::exception& ex ) {
         ROS_ERROR( "%s", ex.what() );
         return false;
     }
 }
 
-bool SobitEduController::moveHeadPanTilt( const double pan_rad, const double tilt_rad, const double sec, bool is_sleep ) {
+bool SobitEduJointController::moveHeadPanTilt(  const double pan_rad, 
+                                                const double tilt_rad, 
+                                                const double sec, 
+                                                bool is_sleep ) {
     try {
         trajectory_msgs::JointTrajectory joint_trajectory;
+
         setJointTrajectory( joint_names_[Joint::HEAD_CAMERA_PAN_JOINT], pan_rad, sec, &joint_trajectory );
         addJointTrajectory( joint_names_[Joint::HEAD_CAMERA_TILT_JOINT], tilt_rad, sec, &joint_trajectory );
+        
         checkPublishersConnection ( pub_head_camera_control_ );
         pub_head_camera_control_.publish( joint_trajectory );
+        
         if ( is_sleep ) ros::Duration( sec ).sleep();
+        
         return true;
+    
     } catch ( const std::exception& ex ) {
         ROS_ERROR( "%s", ex.what() );
         return false;
     }
 }
 
-bool SobitEduController::moveArm ( const double arm_shoulder_pan, const double arm_shoulder_tilt, const double arm_elbow_tilt, const double arm_wrist_tilt, const double hand, const double sec, bool is_sleep ) {
+bool SobitEduJointController::moveArm (     const double arm_shoulder_pan, 
+                                            const double arm_shoulder_tilt, 
+                                            const double arm_elbow_tilt, 
+                                            const double arm_wrist_tilt, 
+                                            const double hand, 
+                                            const double sec, 
+                                            bool is_sleep ) {
     try {
         trajectory_msgs::JointTrajectory arm_joint_trajectory;
+
         setJointTrajectory( joint_names_[Joint::ARM_SHOULDER_PAN_JOINT], arm_shoulder_pan, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_SHOULDER_1_TILT_JOINT], arm_shoulder_tilt, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_SHOULDER_2_TILT_JOINT], -arm_shoulder_tilt, sec, &arm_joint_trajectory );
@@ -165,10 +210,14 @@ bool SobitEduController::moveArm ( const double arm_shoulder_pan, const double a
         addJointTrajectory( joint_names_[Joint::ARM_ELBOW_2_TILT_JOINT], -arm_elbow_tilt, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::ARM_WRIST_TILT_JOINT], arm_wrist_tilt, sec, &arm_joint_trajectory );
         addJointTrajectory( joint_names_[Joint::HAND_JOINT], -hand, sec, &arm_joint_trajectory );
+        
         checkPublishersConnection ( pub_arm_control_ );
         pub_arm_control_.publish( arm_joint_trajectory );
+        
         if ( is_sleep ) ros::Duration( sec ).sleep();
+        
         return true;
+    
     } catch ( const std::exception& ex ) {
         ROS_ERROR( "%s", ex.what() );
         return false;
@@ -177,8 +226,13 @@ bool SobitEduController::moveArm ( const double arm_shoulder_pan, const double a
 
 // TODO: Forward Kinematics Method (check result)
 
-bool SobitEduController::moveGripperToTargetCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ){
-    sobit_edu::SobitTurtlebotController wheel_ctrl;
+bool SobitEduJointController::moveHandToTargetCoord(    const double goal_position_x, 
+                                                        const double goal_position_y, 
+                                                        const double goal_position_z, 
+                                                        const double diff_goal_position_x, 
+                                                        const double diff_goal_position_y, 
+                                                        const double diff_goal_position_z ){
+    sobit_edu::SobitEduWheelController wheel_ctrl;
     geometry_msgs::Point shift;
 
     // // Calculate goal_position_pos + difference(gap)
@@ -248,7 +302,7 @@ bool SobitEduController::moveGripperToTargetCoord( const double goal_position_x,
         double arm_elbow_tilt_joint_cos = (base_to_shoulder_flex_joint_z_cm - arm_upper_link_z_cm - goal_position_pos_z_cm) / arm_outer_link_x_cm;
         arm_elbow_tilt_joint_rad = std::acos(arm_elbow_tilt_joint_cos);
         arm_wrist_tilt_joint_rad = std::asin(arm_elbow_tilt_joint_cos);
-        shoulder_flex_joint_rad = -SobitTurtlebotController::deg2Rad(90.0);
+        shoulder_flex_joint_rad = -wheel_ctrl.deg2Rad(90.0);
 
         base_to_arm_wrist_tilt_joint_x_cm = base_to_shoulder_flex_joint_x_cm + arm_upper_link_z_cm + arm_outer_link_x_cm * std::cos(arm_elbow_tilt_joint_rad);
     }
@@ -256,7 +310,7 @@ bool SobitEduController::moveGripperToTargetCoord( const double goal_position_x,
     // Calculate wheel movement (diagonal)
     // - Rotate the robot
     const double rot_rad = std::atan2(goal_position_pos_y_cm, goal_position_pos_x_cm);
-    ROS_INFO( "rot_rad = %f(deg:%f)", rot_rad, SobitTurtlebotController::rad2Deg(rot_rad) );
+    // ROS_INFO( "rot_rad = %f(deg:%f)", rot_rad, SobitEduWheelController::rad2Deg(rot_rad) );
     wheel_ctrl.controlWheelRotateRad(rot_rad);
     ros::Duration(3.0).sleep();
 
@@ -290,44 +344,58 @@ bool SobitEduController::moveGripperToTargetCoord( const double goal_position_x,
     // ros::Duration(3.0).sleep();
 
     // - Move arm (OPEN)
-    hand_rad = SobitTurtlebotController::deg2Rad(90.0);
+    hand_rad = wheel_ctrl.deg2Rad(90.0);
     bool is_reached = moveArm(shoulder_roll_joint_rad, shoulder_flex_joint_rad, arm_elbow_tilt_joint_rad, arm_wrist_tilt_joint_rad, hand_rad);
+    double shoulder_roll_joint_deg = wheel_ctrl.rad2Deg (shoulder_roll_joint_rad);
+    double shoulder_flex_joint_deg = wheel_ctrl.rad2Deg (shoulder_flex_joint_rad);
+    double arm_elbow_tilt_joint_deg = wheel_ctrl.rad2Deg (arm_elbow_tilt_joint_rad); 
+    double arm_wrist_tilt_joint_deg = wheel_ctrl.rad2Deg (arm_wrist_tilt_joint_rad); 
+    double hand_deg = wheel_ctrl.rad2Deg (hand_rad);
     printf( "ARM RAD: %f\t%f\t%f\t%f\t%f\n", shoulder_roll_joint_rad, shoulder_flex_joint_rad, arm_elbow_tilt_joint_rad, arm_wrist_tilt_joint_rad, hand_rad );
-    printf( "ARM DEG: %f\t%f\t%f\t%f\t%f\n", rad2Deg (shoulder_roll_joint_rad), rad2Deg (shoulder_flex_joint_rad), rad2Deg (arm_elbow_tilt_joint_rad), rad2Deg (arm_wrist_tilt_joint_rad), rad2Deg (hand_rad) );
+    printf( "ARM DEG: %f\t%f\t%f\t%f\t%f\n", shoulder_roll_joint_deg, shoulder_flex_joint_deg, arm_elbow_tilt_joint_deg, arm_wrist_tilt_joint_deg, hand_deg );
     ROS_INFO( "goal_position_pos = (%f, %f, %f)", goal_position_pos_x_cm, goal_position_pos_y_cm, goal_position_pos_z_cm );
     // ROS_INFO("result_pos = (%f, %f, %f)", for_kinematics_x, for_kinematics_z, for_kinematics_z);
-    ros::Duration(2.0).sleep();
+    // ros::Duration(2.0).sleep();
 
     return is_reached;
 }
 
-bool SobitEduController::moveGripperToTargetTF( const std::string &goal_position_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
-    sobit_edu::SobitTurtlebotController wheel_ctrl;
-    tf::StampedTransform transform_base_to_target;
+bool SobitEduJointController::moveHandToTargetTF(   const std::string &goal_position_name, 
+                                                    const double diff_goal_position_x, 
+                                                    const double diff_goal_position_y, 
+                                                    const double diff_goal_position_z ) {
+    sobit_edu::SobitEduWheelController wheel_ctrl;
+    geometry_msgs::TransformStamped transformStamped;
     geometry_msgs::Point shift;
     
     bool tf_flag = false;
 
     try {
-        listener_.waitForTransform( "base_footprint", goal_position_name, ros::Time(0), ros::Duration(2.0) );
-        listener_.lookupTransform( "base_footprint", goal_position_name, ros::Time(0), transform_base_to_target );
+        tfBuffer_.canTransform( "base_footprint", goal_position_name, ros::Time(0), ros::Duration(2.0) );
+        transformStamped = tfBuffer_.lookupTransform( "base_footprint", goal_position_name, ros::Time(0));
         tf_flag = true;
-    } catch ( tf::TransformException ex ) {
+    } catch ( tf2::TransformException ex ) {
         ROS_ERROR( "ERROR: %s", ex.what() );
         return false;
     }
 
     // // Send goal_position_pos
-    const double goal_position_x = transform_base_to_target.getOrigin().x();
-    const double goal_position_y = transform_base_to_target.getOrigin().y();
-    const double goal_position_z = transform_base_to_target.getOrigin().z();
+    // const double goal_position_x = transform_base_to_target.getOrigin().x();
+    // const double goal_position_y = transform_base_to_target.getOrigin().y();
+    // const double goal_position_z = transform_base_to_target.getOrigin().z();
+    auto& tf_target_to_arm = transformStamped.transform.translation;
 
-    bool is_reached = moveGripperToTargetCoord(goal_position_x, goal_position_y, goal_position_z, diff_goal_position_x, diff_goal_position_y, diff_goal_position_z);
+    bool is_reached = moveHandToTargetCoord(tf_target_to_arm.x, tf_target_to_arm.y, tf_target_to_arm.z, diff_goal_position_x, diff_goal_position_y, diff_goal_position_z);
 
     return is_reached;
 }
 
-bool SobitEduController::moveGripperToPlaceCoord( const double goal_position_x, const double goal_position_y, const double goal_position_z, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
+bool SobitEduJointController::moveHandToPlaceCoord( const double goal_position_x, 
+                                                    const double goal_position_y, 
+                                                    const double goal_position_z, 
+                                                    const double diff_goal_position_x, 
+                                                    const double diff_goal_position_y, 
+                                                    const double diff_goal_position_z ) {
     geometry_msgs::Point shift;
 
     // 作成中
@@ -336,7 +404,7 @@ bool SobitEduController::moveGripperToPlaceCoord( const double goal_position_x, 
     /** 目標値から0.1[m]程下げた位置までアームを移動 **/
     /**  ハンドに負荷がかかった場合はそこで停止する  **/
     while( -target_z < diff_goal_position_z ) {
-        moveGripperToTargetCoord( goal_position_x, goal_position_y, goal_position_z, 
+        moveHandToTargetCoord( goal_position_x, goal_position_y, goal_position_z, 
                                   diff_goal_position_x, diff_goal_position_y, diff_goal_position_z );
         
         // ハンドのジョイントに負荷がかかった場合、そこで停止する
@@ -351,50 +419,52 @@ bool SobitEduController::moveGripperToPlaceCoord( const double goal_position_x, 
     return true;
 }
 
-bool SobitEduController::moveGripperToPlaceTF( const std::string& target_name, const double diff_goal_position_x, const double diff_goal_position_y, const double diff_goal_position_z ) {
+bool SobitEduJointController::moveHandToPlaceTF(    const std::string& target_name, 
+                                                    const double diff_goal_position_x, 
+                                                    const double diff_goal_position_y, 
+                                                    const double diff_goal_position_z ) {
     geometry_msgs::Point shift;
 
-    tf::StampedTransform transform_base_to_target;
+    geometry_msgs::TransformStamped transform_base_to_target;
     try {
-        listener_.waitForTransform("base_footprint", target_name, ros::Time(0), ros::Duration(2.0));
-        listener_.lookupTransform("base_footprint", target_name, ros::Time(0), transform_base_to_target);
-    } catch ( tf::TransformException ex ) {
+        tfBuffer_.canTransform("base_footprint", target_name, ros::Time(0), ros::Duration(2.0));
+        transform_base_to_target = tfBuffer_.lookupTransform("base_footprint", target_name, ros::Time(0));
+    } catch ( tf2::TransformException ex ) {
         ROS_ERROR("%s", ex.what());
         return false;
     }
 
-    moveGripperToPlaceCoord( transform_base_to_target.getOrigin().x(), transform_base_to_target.getOrigin().y(), transform_base_to_target.getOrigin().z(),
+    auto& goal_position = transform_base_to_target.transform.translation;
+
+    moveHandToPlaceCoord( goal_position.x, goal_position.y, goal_position.z,
                                         diff_goal_position_x, diff_goal_position_y, diff_goal_position_z );
     return true;
 }
 
-bool SobitEduController::graspDecision() {
-    while ( hand_current_ == 0. ) {
-        ros::spinOnce();
-    }
-    ros::spinOnce();
-    std::cout << "hand_current_ :" << hand_current_ << std::endl;
-    if ( 500 <= hand_current_ && hand_current_ <= 1000 ) {
-        return true;
-    } else {
-        return false;
-    }
+bool SobitEduJointController::graspDecision( const int min_curr, const int max_curr ) {
+    bool is_grasped = false;
+
+    // Spin until the current value is obtained
+    while( hand_current_ == 0. ) ros::spinOnce();
+
+    // ros::spinOnce();
+    std::cout << "hand_current_ = " << hand_current_ << std::endl;
+
+    is_grasped = (min_curr <= hand_current_ && hand_current_ <= max_curr) ? true : false;
+
+    return is_grasped;
 }
 
-void SobitEduController::callbackCurrentStateArray( const sobit_common_msg::current_state_array msg ) {
-    ros::spinOnce();
+bool SobitEduJointController::placeDecision( const int min_curr, const int max_curr ){
+    bool is_placed = false;
 
-    for ( const auto current_state : msg.current_state_array ) {
-        if ( current_state.joint_name == "ARM_WRIST_TILT_JOINT" ) {
-            //std::cout << "\njoint_name:" << current_state.joint_name << std::endl;
-            //std::cout << "\njoint_current:" << current_state.current_ma << std::endl;
-            arm_wrist_tilt_current_ = current_state.current_ma;
-        }
+    // Spin until the current value is obtained
+    while( arm_wrist_tilt_current_ == 0. ) ros::spinOnce();
 
-        if ( current_state.joint_name == "HAND_JOINT" ) {
-            //std::cout << "\njoint_name:" << current_state.joint_name << std::endl;
-            //std::cout << "\njoint_current:" << current_state.current_ma << std::endl;
-            hand_current_ = current_state.current_ma;
-        }
-    }
+    // ros::spinOnce();
+    std::cout << "arm_wrist_tilt_joint_curr_ = " << arm_wrist_tilt_current_ << std::endl;
+
+    is_placed = (min_curr <= arm_wrist_tilt_current_ && arm_wrist_tilt_current_ <= max_curr) ? true : false;
+
+    return is_placed;
 }

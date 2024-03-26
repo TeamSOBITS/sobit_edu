@@ -6,18 +6,34 @@
    <arg name="simulation"        default="$(env TURTLEBOT_SIMULATION)"   doc="set flags to indicate this turtle is run in simulation mode."/>
    <arg name="serialport"        default="/dev/input/kobuki"             doc="used by create to configure the port it is connected on [/dev/input/kobuki]"/>
 
-   <param name="/use_sim_time" value="$(arg simulation)"/>
+    <!-- Activate Mobile-Base (true), Arm (true), Head (true) -->
+   <arg name="enable_mb"       default="true"/>
+   <arg name="enable_arm"      default="true"/>
+   <arg name="enable_head"     default="true"/>
 
+    <!-- param -->
+   <param name="/use_sim_time" value="$(arg simulation)"/>
    <param name="/proportional_control" type="double" value="0.10"/>
    <param name="/derivation_control"   type="double" value="0.40"/>
    <param name="/integral_control"     type="double" value="0.80"/>
 
-   <include file="$(find turtlebot_bringup)/launch/includes/mobile_base.launch.xml">
+   <!-- Turtlebot -->
+  <group if="$(eval arg('enable_mb'))">
+    <include file="$(find turtlebot_bringup)/launch/includes/mobile_base.launch.xml">
      <arg name="base"       value="$(arg base)" />
      <arg name="serialport" value="$(arg serialport)" />
    </include>
+  </group>
 
-  <include file="$(find sobit_edu_control)/launch/sobit_edu_control.launch"/>
-  <include file="$(find sobit_edu_library)/launch/load_sobit_edu_pose.launch"/>
+  <!--URG-->
+  <include file="$(find sobit_edu_bringup)/launch/urg.launch"/>
+   
+  <!-- Actuators Control-->
+  <include file="$(find sobit_edu_control)/launch/sobit_edu_control.launch">
+      <arg name="enable_mb"   value="$(arg enable_mb)"/>
+      <arg name="enable_arm"  value="$(arg enable_arm)"/>
+      <arg name="enable_head" value="$(arg enable_head)"/>
+  </include>
+  <!-- <include file="$(find sobit_edu_library)/launch/load_sobit_edu_pose.launch"/> -->
 
 </launch>

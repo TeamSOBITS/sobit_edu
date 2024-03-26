@@ -3,28 +3,27 @@
   href="http://download.ros.org/schema/package_format3.xsd"
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>sobit_edu_bringup</name>
+  <name>sobit_edu</name>
   <version>0.0.0</version>
   <description>
-    This package allows shared configuration with SOBITS robots
+    ROS packages for SOBIT EDU (meta package).
   </description>
   <maintainer email="kumarugby1029@gmail.com">Yuki Okuma</maintainer>
 
   <license>BSD</license>
 
   <url type="website">https://home.soka.ac.jp/~choi/index.html</url>
-  <url type="repository">https://github.com/TeamSOBITS/sobit_common</url>
-  <url type="bugtracker">https://github.com/TeamSOBITS/sobit_common/issues</url>
+  <url type="repository">https://github.com/TeamSOBITS/sobit_edu</url>
+  <url type="bugtracker">https://github.com/TeamSOBITS/sobit_edu/issues</url>
   <author email="choi.7f@gmail.com">Team SOBITS</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  
+  <exec_depend>sobit_edu_bringup</exec_depend>
+  <exec_depend>sobit_edu_control</exec_depend>
+  <exec_depend>sobit_edu_description</exec_depend>
+  <exec_depend>sobit_edu_library</exec_depend>
+  
+  <export><metapackage/></export>
 
-  <depend>rospy</depend>
-  <depend>sensor_msgs</depend>
-
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- Other tools can request additional information be placed here -->
-
-  </export>
 </package>
