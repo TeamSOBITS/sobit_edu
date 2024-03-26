@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(sobit_edu_library)
 
+cmake_policy(SET CMP0002 OLD)
+set(ALLOW_DUPLICATE_CUSTOM_TARGETS TRUE)
+
 ## Compile as C++14, supported in ROS Noetic and newer
 add_compile_options(-std=c++14)
 
