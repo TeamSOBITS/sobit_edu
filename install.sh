@@ -4,7 +4,7 @@ echo "╔══╣ Setup: SOBIT EDU (STARTING) ╠══╗"
 
 
 # Keep track of the current directory
-CURRENT_DIR=`pwd`
+DIR=`pwd`
 cd ..
 
 # Dowload required packages for SOBIT EDU
@@ -29,6 +29,10 @@ for ((i = 0; i < ${#ros_packages[@]}; i++)) {
         cd ..
     fi
 }
+
+# Setup Turtlebot2 (Kobuki) for ROS Noetic
+cd ${DIR}
+bash ../turtlebot2_on_noetic/turtlebot/setup_kobuki.sh
 
 # Download ROS packages
 sudo apt-get update
