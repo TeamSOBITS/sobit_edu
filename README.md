@@ -47,7 +47,6 @@
       </ul>
     </li>
     <li><a href="#マイルストーン">マイルストーン</a></li>
-    <li><a href="#変更履歴">変更履歴</a></li>
     <!-- <li><a href="#contributing">Contributing</a></li> -->
     <!-- <li><a href="#license">License</a></li> -->
     <li><a href="#参考文献">参考文献</a></li>
@@ -467,14 +466,6 @@ TBD
     - [x] コーディングスタイルの統一
 
 現時点のバッグや新規機能の依頼を確認するために[Issueページ][issues-url] をご覧ください．
-
-<p align="right">(<a href="#readme-top">上に戻る</a>)</p>
-
-
-<!-- 変更履歴 -->
-## 変更履歴
-
-- 
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
