@@ -19,7 +19,7 @@ ros_packages=(
 # Clone all packages
 for ((i = 0; i < ${#ros_packages[@]}; i++)) {
     echo "Clonning: ${ros_packages[i]}"
-    git clone -b feature/oss https://github.com/TeamSOBITS/${ros_packages[i]}.git
+    git clone https://github.com/TeamSOBITS/${ros_packages[i]}.git
 
     # Check if install.sh exists in each package
     if [ -f ${ros_packages[i]}/install.sh ]; then
@@ -30,18 +30,25 @@ for ((i = 0; i < ${#ros_packages[@]}; i++)) {
     fi
 }
 
+# Download ROS packages
+sudo apt-get update
+sudo apt-get install -y \
+    ros-$ROS_DISTRO-pybind11-catkin \
+    ros-$ROS_DISTRO-robot-state-publisher \
+    ros-$ROS_DISTRO-joint-state-controller \
+    ros-$ROS_DISTRO-joint-state-publisher \
+    ros-$ROS_DISTRO-joint-state-publisher-gui \
+    ros-$ROS_DISTRO-joint-limits-interface \
+    ros-$ROS_DISTRO-hardware-interface \
+    ros-$ROS_DISTRO-transmission-interface \
+    ros-$ROS_DISTRO-controller-interface \
+    ros-$ROS_DISTRO-controller-manager \
+    ros-$ROS_DISTRO-tf2 \
+    ros-$ROS_DISTRO-tf2-ros
 
-# Setting up sound configuration
-echo "pacmd load-module module-native-protocol-unix socket=/tmp/pulseaudio.socket &> /dev/null" >> ~/.bashrc
-echo "#!bin/bash
-touch /tmp/pulseaudio.client.conf
-echo \"default-server = unix:/tmp/pulseaudio.socket \n 
-      # Prevent a server running in the container \n 
-      autospawn = no \n 
-      daemon-binary = /bin/true \n
-      # Prevent the use of shared memory \n
-      enable-shm = false\" >> /tmp/pulseaudio.client.conf" | sudo tee /etc/profile.d/sound_setup.sh
-sudo bash /etc/profile.d/sound_setup.sh
+# Install joy package
+sudo apt-get install -y \
+    ros-$ROS_DISTRO-joy
 
 # Setting up Dynamixel USB configuration (SOBIT EDU: Head and Arm Robot Mechanism)
 echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6015\", SYMLINK+=\"input/dx_upper\", MODE=\"0666\"" | sudo tee /etc/udev/rules.d/dx_upper.rules
