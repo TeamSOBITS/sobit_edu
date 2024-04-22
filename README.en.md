@@ -41,7 +41,7 @@
     　<a href="#hardware">Hardware</a>
       <ul>
         <li><a href="#how-to-download-3d-parts">How to download 3D Parts</a></li>
-        <li><a href="#robot-assembly">Robot Assembly</a></li>
+        <li><a href="#electronic-circuit-diagram">Electronic Circuit Diagram</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#bill-of-material-BOM">Bill of Material (BOM)</a></li>
       </ul>
@@ -151,6 +151,7 @@ First, please set up the following environment before proceeding to the next ins
 
 
 ### Visualize on Rviz
+
 As a preliminary step to running the actual machine, SOBIT EDU can be visualized on Rviz to display the robot's configuration.
 
 ```sh
@@ -164,17 +165,20 @@ If it works correctly, Rviz will be displayed as follows.
 
 
 ## Software
+
 <details>
 <summary>Summary of information on SOBIT EDU and related software</summary>
 
 
 ### Joint Controller
+
 This is a summary of information for moving the pan-tilt mechanism and manipulators of SOBIT EDU.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 #### Movement Methods
+
 1.  `moveToPose()` : Move it to a predetermined pose.
     ```cpp
     bool moveToPose(
@@ -302,6 +306,7 @@ This is a summary of information for moving the pan-tilt mechanism and manipulat
 
 
 #### Joints name
+
 The joint names of SOBIT EDU and their constants are listed below.
 
 
@@ -322,6 +327,7 @@ The joint names of SOBIT EDU and their constants are listed below.
 
 
 #### How to set new poses
+
 Poses can be added and edited in the file [sobit_edu_pose.yaml](sobit_edu_library/config/sobit_edu_pose.yaml). The format is as follows:
 
 
@@ -343,12 +349,14 @@ sobit_edu_pose:
 ```  
 
 ### Wheel Controller
+
 This is a summary of information for moving the SOBIT EDU moving mechanism.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-#### 動作関数
+#### Wheel Movement Methodes
+
 1.  `controlWheelLinear()` : Perform translational motion (straight-line, diagonal, or lateral movement).
     ```cpp
     bool sobit::SobitEduWheelController::controlWheelLinear (
@@ -374,6 +382,7 @@ This is a summary of information for moving the SOBIT EDU moving mechanism.
 
 
 ## Hardware
+
 SOBIT EDU is available as open source hardware at [OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e?renderMode=0&uiState=654e03c33dd8e732221dd868)．
 
 ![SOBIT EDU in OnShape](sobit_edu/docs/img/sobit_edu_onshape.png)
@@ -400,12 +409,14 @@ SOBIT EDU is available as open source hardware at [OnShape](https://cad.onshape.
 
 
 ### Electronic Circuit Diagram
+
 TBD
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-### ロボットの特徴
+### Features
+
 | Item | Details |
 | --- | --- |
 | Maximum linear velocity | 0.65[m/s] |
@@ -427,7 +438,7 @@ TBD
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-### 部品リスト（BOM）
+### Bill of Material (BOM)
 
 | Part | Model Number | Quantity | Where to Buy |
 | --- | --- | --- | --- |
@@ -458,7 +469,7 @@ TBD
     - [x] Improved documentation
     - [x] Unified coding style
 
-See the [open issues][license-url] for a full list of proposed features (and known issues).
+See the [open issues][issues-url] for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

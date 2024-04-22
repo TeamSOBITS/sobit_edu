@@ -41,7 +41,7 @@
     　<a href="#ハードウェア">ハードウェア</a>
       <ul>
         <li><a href="#パーツのダウンロード方法">パーツのダウンロード方法</a></li>
-        <li><a href="#ロボットの組み立て">ロボットの組み立て</a></li>
+        <li><a href="#電子回路">電子回路</a></li>
         <li><a href="#ロボットの特徴">ロボットの特徴</a></li>
         <li><a href="#部品リスト（BOM）">部品リスト（BOM）</a></li>
       </ul>
@@ -61,10 +61,10 @@
 
 ![SOBIT EDU](sobit_edu/docs/img/sobit_edu.png)
 
-TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレータ（SOBIT EDU）を動かすためのライブラリです．
+TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレータ（SOBIT EDU）を動かすためのライブラリである．
 
 > [!WARNING]
-> 初心者の場合，実機のロボットを扱う際に，先輩方に付き添ってもらいながらロボットを動かしましょう．
+> 初心者の場合，実機のロボットを扱う際に，先輩方に付き添ってもらいながらロボットを動かしょう．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
@@ -73,7 +73,7 @@ TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレ�
 <!-- セットアップ -->
 ## セットアップ
 
-ここで，本レポジトリのセットアップ方法について説明します．
+ここで，本レポジトリのセットアップ方法について説明する．
 
 ### 環境条件
 
@@ -90,28 +90,28 @@ TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレ�
 
 ### インストール方法
 
-1. ROSの`src`フォルダに移動します．
+1. ROSの`src`フォルダに移動する．
    ```sh
    $ roscd
    # もしくは，"cd ~/catkin_ws/"へ移動．
    $ cd src/
    ```
-2. 本レポジトリをcloneします．
+2. 本レポジトリをcloneする．
    ```sh
    $ git clone https://github.com/TeamSOBITS/sobit_edu
    ```
-3. レポジトリの中へ移動します．
+3. レポジトリの中へ移動する．
    ```sh
    $ cd sobit_edu/
    ```
-4. 依存パッケージをインストールします．
+4. 依存パッケージをインストールする．
    ```sh
    $ bash install.sh
    ```
-5. パッケージをコンパイルします．
+5. パッケージをコンパイルする．
    ```sh
    $ roscd
-   # もしくは，"cd ~/catkin_ws/"へ移動．
+   # もしくは，"cd ~/catkin_ws/"へ移動する．
    $ catkin_make
    ```
 
@@ -123,7 +123,7 @@ TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレ�
 <!-- 実行・操作方法 -->
 ## 実行・操作方法
 
-1. SOBIT EDUの起動する機能をパラメータとして[minimal.launch](sobit_edu_bringup/launch/minimal.launch)に設定します．
+1. SOBIT EDUの起動する機能をパラメータとして[minimal.launch](sobit_edu_bringup/launch/minimal.launch)に設定する．
    ```xml
     <!-- Activate Mobile-Base (true), Arm (true), Head (true) -->
     <arg name="enable_mb"           default="true"/>
@@ -136,29 +136,30 @@ TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレ�
 > [!NOTE]
 > 使用したい機能に応じて，`true`か`false`かに書き換えてください．
 
-2. [minimal.launch](sobit_edu_bringup/launch/minimal.launch)というlaunchファイルを実行します．
+2. [minimal.launch](sobit_edu_bringup/launch/minimal.launch)というlaunchファイルを実行する．
    ```sh
    $ roslaunch sobit_edu_bringup minimal.launch
    ```
-3. [任意] デモプログラムを実行してみましょう．
+3. [任意] デモプログラムを実行してみよう．
    ```sh
    $ rosrun sobit_edu_library test_controll_wheel.py
    ```
 
 > [!NOTE]
-> SOBIT EDUの動作方法になれるため，[example](sobit_edu_library/example/)フォルダを確認し，それぞれのサンプルファイルから動作関数を学びましょう．
+> SOBIT EDUの動作方法に慣れるため，[example](sobit_edu_library/example/)フォルダを確認し，それぞれのサンプルファイルから動作関数を学ぼう．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
 ### Rviz上の可視化
-実機を動かす前段階として，Rviz上でSOBIT EDUを可視化し，ロボットの構成を表示することができます．
+
+実機を動かす前段階として，Rviz上でSOBIT EDUを可視化し，ロボットの構成を表示することができる．
 
 ```sh
 $ roslaunch sobit_edu_description display.launch
 ```
 
-正常に動作した場合は，次のようにRvizが表示されます．
+正常に動作した場合は，次のようにRvizが表示される．
 ![SOBIT EDU Display with Rviz](sobit_edu/docs/img/sobit_edu_display.png)
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
@@ -170,13 +171,15 @@ $ roslaunch sobit_edu_description display.launch
 
 
 ### ジョイントコントローラ
-SOBIT EDUのパンチルト機構とマニピュレータを動かすための情報まとめです．
+
+SOBIT EDUのパンチルト機構とマニピュレータを動かすための情報まとめとなる．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
 #### 動作関数
-1.  `moveToPose()` : 決められたポーズに動かします．
+
+1.  `moveToPose()` : 決められたポーズに動かす．
     ```cpp
     bool moveToPose(
         const std::string& pose_name,   // ポーズ名
@@ -187,7 +190,7 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
 > [!NOTE]
 > 既存のポーズは[sobit_edu_pose.yaml](sobit_edu_library/config/sobit_edu_pose.yaml)に確認でいます．ポーズの作成方法については[ポーズの設定方法](#ポーズの設定方法)をご参照ください．
 
-2.  `moveJoint()` : 指定されたジョイントを任意の角度を動かします．
+2.  `moveJoint()` : 指定されたジョイントを任意の角度を動かす．
     ```cpp
     bool sobit::SobitEduJointController::moveJoint (
         const Joint joint_num,          // ジョイント名 (定数名)
@@ -200,7 +203,7 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
 > [!NOTE]
 > `ジョイント名`は[ジョイント名](#ジョイント名)をご確認ください．
 
-3.  `moveAllJoint()` : 指定されたジョイントを任意の角度を動かします．
+3.  `moveAllJoint()` : 指定されたジョイントを任意の角度を動かす．
     ```cpp
     bool sobit::SobitEduJointController::moveJoint (
         const double arm_shoulder_pan,  // 各ジョイントの回転角度(arm_shoulder_pan) 
@@ -225,7 +228,7 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
     );
     ```
  
-1.  `moveArm()` : アームの関節を任意の角度に動かします．
+1.  `moveArm()` : アームの関節を任意の角度に動かす．
     ```cpp
     bool sobit::SobitEduJointController::moveArm(
         const double arm_shoulder_pan,  // 各ジョイントの回転角度(arm_shoulder_pan) 
@@ -239,7 +242,7 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
     ```
 
 
-1.  `moveGripperToTargetCoord()` : ハンドをxyz座標に動かします（把持モード）．
+1.  `moveGripperToTargetCoord()` : ハンドをxyz座標に動かす（把持モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToTargetCoord(
         const double goal_position_x,       // 把持目的地のx (m)
@@ -251,7 +254,7 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
     );
     ```
 
-1.  `moveGripperToTargetTF()` : ハンドをtf名に動かします（把持モード）．
+1.  `moveGripperToTargetTF()` : ハンドをtf名に動かす（把持モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToTargetTF(
         const std::string& target_name,     // 把持目的tf名
@@ -261,7 +264,7 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
     );
     ```
 
-1.  `moveGripperToPlaceCoord()` : ハンドをxyz座標に動かします（配置モード）．
+1.  `moveGripperToPlaceCoord()` : ハンドをxyz座標に動かす（配置モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToPlaceCoord(
         const double goal_position_x,       // 配置目的地のx (m)
@@ -273,7 +276,7 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
     ); 
     ```
 
-1.  `moveGripperToPlaceTF()` : ハンドをtf名に動かします（配置モード）．
+1.  `moveGripperToPlaceTF()` : ハンドをtf名に動かす（配置モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToPlaceTF(
         const std::string& target_name,     // 配置目的tf名
@@ -303,7 +306,8 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
 
 
 #### ジョイント名
-SOBIT EDUのジョイント名とその定数名を以下の通りです．
+
+SOBIT EDUのジョイント名とその定数名を以下の通りとなる．
 
 
 | ジョイント番号 | ジョイント名 | ジョイント定数名 |
@@ -323,7 +327,8 @@ SOBIT EDUのジョイント名とその定数名を以下の通りです．
 
 
 #### ポーズの設定方法
-[sobit_edu_pose.yaml](sobit_edu_library/config/sobit_edu_pose.yaml)というファイルでポーズの追加・編集ができます．以下のようなフォーマットになります．
+
+[sobit_edu_pose.yaml](sobit_edu_library/config/sobit_edu_pose.yaml)というファイルでポーズの追加・編集ができます．以下のようなフォーマットになる．
 
 ```yaml
 sobit_edu_pose:
@@ -343,13 +348,13 @@ sobit_edu_pose:
 ```  
 
 ### ホイールコントローラ
-SOBIT EDUの移動機構を動かすための情報まとめです．
+SOBIT EDUの移動機構を動かすための情報まとめとなる．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
 #### 動作関数
-1.  `controlWheelLinear()` : 並進（直進移動・斜め移動・横移動）を移動させます．
+1.  `controlWheelLinear()` : 並進（直進移動・斜め移動・横移動）を移動さす．
     ```cpp
     bool sobit::SobitEduWheelController::controlWheelLinear (
         const double distance,            // 直進移動距離 (m)
@@ -374,6 +379,7 @@ SOBIT EDUの移動機構を動かすための情報まとめです．
 
 
 ## ハードウェア
+
 SOBIT EDUはオープンソースハードウェアとして[OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e?renderMode=0&uiState=654e03c33dd8e732221dd868)にて公開しております．
 
 ![SOBIT EDU in OnShape](sobit_edu/docs/img/sobit_edu_onshape.png)
@@ -386,26 +392,28 @@ SOBIT EDUはオープンソースハードウェアとして[OnShape](https://ca
 
 ### パーツのダウンロード方法
 
-1. Onshapeにアクセスしましょう．
+1. Onshapeにアクセスしてみよう．
 
 > [!NOTE]
-> ファイルをダウンロードするために，`OnShape`のアカウントを作成する必要がありません．ただし，本ドキュメント全体をコピする場合，アカウントの作成を推薦します．
+> ファイルをダウンロードするために，`OnShape`のアカウントを作成する必要がない．ただし，本ドキュメント全体をコピする場合，アカウントの作成を推薦する．
 
-2. `Instances`の中にパーツを右クリックで選択します．
+2. `Instances`の中にパーツを右クリックで選択する．
 2. 一覧が表示され，`Export`ボタンを押してください．
-1. 表示されたウィンドウの中に，`Format`という項目があります．`STEP`を選択してください．
-1. 最後に，青色の`Export`ボタンを押してダウンロードが開始されます．
+1. 表示されたウィンドウの中に，`Format`という項目がある．`STEP`を選択してください．
+1. 最後に，青色の`Export`ボタンを押してダウンロードが開始される．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
-### ロボットの組み立て
+### 電子回路
+
 TBD
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
 
 ### ロボットの特徴
+
 | 項目 | 詳細 |
 | --- | --- |
 | 最大直進速度 | 0.65[m/s] |
@@ -419,7 +427,7 @@ TBD
 | IMU | LSM6DSMUS |
 | スピーカー | モノラルスピーカー |
 | マイク | モノラルガンマイクロホン |
-| アクチュエータ (アーム) |7 x XM430-W320 |
+| アクチュエータ (アーム) | 7 x XM430-W320 |
 | 移動機構 | TurtleBot2 |
 | 電源 | 2 x Makita 6.0Ah 18V |
 | PC接続 | USB |
@@ -458,7 +466,7 @@ TBD
     - [x] ドキュメンテーションの充実
     - [x] コーディングスタイルの統一
 
-現時点のバッグや新規機能の依頼を確認するために[Issueページ][license-url] をご覧ください．
+現時点のバッグや新規機能の依頼を確認するために[Issueページ][issues-url] をご覧ください．
 
 <p align="right">(<a href="#readme-top">上に戻る</a>)</p>
 
