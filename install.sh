@@ -48,11 +48,12 @@ sudo apt-get install -y \
     ros-$ROS_DISTRO-controller-interface \
     ros-$ROS_DISTRO-controller-manager \
     ros-$ROS_DISTRO-tf2 \
-    ros-$ROS_DISTRO-tf2-ros
-
-# Install joy package
-sudo apt-get install -y \
+    ros-$ROS_DISTRO-tf2-ros \
+    ros-$ROS_DISTRO-sensor-msgs \
+    ros-$ROS_DISTRO-trajectory-msgs \
+    ros-$ROS_DISTRO-geometry-msgs \
     ros-$ROS_DISTRO-joy
+
 
 # Setting up Dynamixel USB configuration (SOBIT EDU: Head and Arm Robot Mechanism)
 echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6015\", SYMLINK+=\"input/dx_upper\", MODE=\"0666\"" | sudo tee /etc/udev/rules.d/dx_upper.rules
@@ -77,9 +78,6 @@ sudo udevadm control --reload-rules
 
 # Trigger the new rules
 sudo udevadm trigger
-
-# Go back to previous directory
-cd ${CURRENT_DIR}
 
 
 echo "╚══╣ Setup: SOBIT EDU (FINISHED) ╠══╝"
