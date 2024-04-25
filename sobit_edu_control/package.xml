@@ -18,9 +18,6 @@
   <author email="choi.7f@gmail.com">Team SOBITS</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>dynamixel_sdk</depend>
-  <depend>sobits_msgs</depend>
-  <depend>sobits_common</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
