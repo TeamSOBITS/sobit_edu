@@ -23,7 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES sobit_pro_bringup
- CATKIN_DEPENDS rospy sensor_msgs
+ CATKIN_DEPENDS rospy sensor_msgs trajectory_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
