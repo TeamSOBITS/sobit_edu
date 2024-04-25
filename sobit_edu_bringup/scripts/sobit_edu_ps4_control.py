@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import rospy
-import tf
+
 from sensor_msgs.msg import Joy
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from sensor_msgs.msg import JointState
@@ -9,24 +9,24 @@ from geometry_msgs.msg import Twist
 
 class Joy_control:
     def __init__(self):
-        #subscriber
-        self.sub_joy = rospy.Subscriber('/joy', Joy, self.Joy_Callback, queue_size=1)
+        # Subscriber
+        self.sub_joy         = rospy.Subscriber('/joy', Joy, self.Joy_Callback, queue_size=1)
         self.sub_joint_state = rospy.Subscriber('/joint_states', JointState, self.Joint_state_Callback, queue_size=10)
-        #publisher
+
+        # Publisher
         self.pub_joint_trajectory = rospy.Publisher('/joint_trajectory', JointTrajectory, queue_size=10)
-        self.pub_twist = rospy.Publisher('/cmd_vel_mux/input/navi',Twist,queue_size=10)
-        #rate
-        self.rate = rospy.Rate(5)
-        #subscriberのメッセージを受け取る変数
-        self.joint_state_msg = JointState()     
-        self.joy_button = [0] * 17
-        self.left_joystick_lr = 0
-        self.left_joystick_ud = 0
+        self.pub_twist            = rospy.Publisher('/cmd_vel_mux/input/navi',Twist,queue_size=10)
+
+        # Parameters
+        self.joint_state_msg   = JointState()     
+        self.joy_button        = [0] * 17
+        self.left_joystick_lr  = 0
+        self.left_joystick_ud  = 0
         self.right_joystick_lr = 0
         self.right_joystick_ud = 0
-        self.magnifications = 0.3
+        self.magnifications    = 0.3
 
-        #ボタンを押してるか押してないかに使う変数
+        # Other buttons
         """
         self.cross_button = False
         self.circle_button = False
@@ -48,60 +48,83 @@ class Joy_control:
         self.top_arrow_button = False
         self.bottom_arrow_button = False
         self.left_arrow_button = False
-        self.right_arrow_button = False"""
+        self.right_arrow_button = False
+        """
+
 
     def Joint_state_Callback(self, msg):
-        if msg.name[0] == "joint1":
+        if msg.name:
             self.joint_state_msg = msg
 
 
     def Joy_Callback(self, msg):
-        self.joy_button = msg.buttons
-        self.left_joystick_lr = msg.axes[0] * self.magnifications
-        self.left_joystick_ud = msg.axes[1] * self.magnifications
+        self.joy_button        = msg.buttons
+        self.left_joystick_lr  = msg.axes[0] * self.magnifications
+        self.left_joystick_ud  = msg.axes[1] * self.magnifications
         self.right_joystick_lr = msg.axes[3] * self.magnifications
         self.right_joystick_ud = msg.axes[4] * self.magnifications
-        if self.joy_button[6] == True:#L2ボタンが押される
-            rospy.loginfo("手先を操作するモード")
-            self.move_joint("hand_motor_joint", self.left_joystick_ud + self.joint_state_msg.position[8])
-        
-        #カメラを動かす
-        elif self.joy_button[7] == True:#R2ボタンが押される
-            rospy.loginfo("カメラを動かすモード")
-            self.move_joint("xtion_joint3", self.left_joystick_ud + self.joint_state_msg.position[9])
-        
-        #左手を動かす
-        elif self.joy_button[4] == True:#L1ボタンが押される
-            rospy.loginfo("腕を動かすモード")
-            if self.joy_button[1] == True:#×ボタンが押される
-                self.move_joint("joint6", - self.left_joystick_ud + self.joint_state_msg.position[5])
-            elif self.joy_button[2] == True:#○ボタンが押される
-                self.move_joint("joint4", - self.left_joystick_ud + self.joint_state_msg.position[3])
-            elif self.joy_button[3] == True:#△ボタンが押される
-                self.move_joint("joint2", - self.left_joystick_ud + self.joint_state_msg.position[1])
-            elif self.joy_button[0] == True:#□ボタンが押される
-                self.move_joint("joint1", self.left_joystick_ud + self.joint_state_msg.position[0])
-        
-        elif self.joy_button[12] == True:#スタートボタンを押す
-            self.magnifications = 0.3
-            self.move_joint("joint1", 0)
-            self.move_joint("joint2", 0)
-            self.move_joint("joint4", 1.31)
-            self.move_joint("joint6", 0)
-            self.move_joint("hand_motor_joint", 0)
-            self.move_joint("xtion_joint3", -1.5708)
 
-        #elif self.left_joystick_lr == 0 and self.left_joystick_ud == 0 and self.right_joystick_lr == 0 and self.right_joystick_ud == 0:
-            #print("not publish")
-            #pass
-        #足を動かすモード
+        # L2 button pressed: Move the end effector
+        if self.joy_button[6]:
+            rospy.loginfo("Mode: end effector control")
+
+            self.move_joint("hand_joint", self.left_joystick_ud + self.joint_state_msg.position[8])
+        
+        # R2 button pressed: Move the camera
+        elif self.joy_button[7]:
+            rospy.loginfo("Mode: camera control")
+
+            if self.joy_button[1]:
+                self.move_joint("head_camera_pan_joint" ,   self.left_joystick_ud + self.joint_state_msg.position[9])
+
+            elif self.joy_button[2]:
+                self.move_joint("head_camera_tilt_joint", - self.left_joystick_ud + self.joint_state_msg.position[10])
+
+        # L1 button pressed: Move the arm
+        elif self.joy_button[4]:
+            rospy.loginfo("Mode: arm control")
+
+            # x button pressed
+            if self.joy_button[1]:
+                self.move_joint("arm_wrist_tilt_joint"     , - self.left_joystick_ud + self.joint_state_msg.position[5])
+            
+            # circle button pressed
+            elif self.joy_button[2]:
+                self.move_joint("arm_elbow_1_tilt_joint"   , - self.left_joystick_ud + self.joint_state_msg.position[3])
+            
+            # triangle button pressed
+            elif self.joy_button[3]:
+                self.move_joint("arm_shoulder_1_tilt_joint", - self.left_joystick_ud + self.joint_state_msg.position[1])
+            
+            # square button pressed
+            elif self.joy_button[0]:
+                self.move_joint("arm_shoulder_pan_joint"   ,   self.left_joystick_ud + self.joint_state_msg.position[0])
+        
+        # Start button pressed: Initialize the robot
+        elif self.joy_button[12]:
+            self.magnifications = 0.3
+
+            self.move_joint("head_camera_pan_joint"    , 0.0)
+            self.move_joint("head_camera_tilt_joint"   , 0.0)
+            self.move_joint("arm_shoulder_pan_joint"   , 0.0)
+            self.move_joint("arm_shoulder_1_tilt_joint", 0.0)
+            self.move_joint("arm_elbow_1_tilt_joint"   , 0.0)
+            self.move_joint("arm_wrist_tilt_joint"     , 0.0)
+            self.move_joint("hand_motor_joint"         , 0.0)
+            self.move_joint("hand_joint"               , 0.0)
+
+        # elif self.left_joystick_lr == 0 and self.left_joystick_ud == 0 and self.right_joystick_lr == 0 and self.right_joystick_ud == 0:
+        #     pass
+
+        # Move the legs
         else:
-            rospy.loginfo("足を動かすモード")
+            rospy.loginfo("Mode: leg control")
+
             twist = Twist()
             twist.linear.x = self.left_joystick_ud * 0.2
             twist.angular.z = self.left_joystick_lr * 0.8
-            self.pub_twist.publish(twist)
 
+            self.pub_twist.publish(twist)
 
 
     def move_joint(self, joint_name, value):
@@ -111,10 +134,8 @@ class Joy_control:
         send_data = JointTrajectory()
         send_data.joint_names.append(joint_name)
         send_data.points.append(point)
-        #send_dataを送信
+
         self.pub_joint_trajectory.publish(send_data)
-
-
 
 
 if __name__ == '__main__':
