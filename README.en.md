@@ -245,12 +245,14 @@ This is a summary of information for moving the pan-tilt mechanism and manipulat
 1.  `moveGripperToTargetCoord()` : Move the hand to xyz coordinates (grasp mode).
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToTargetCoord(
-        const double goal_position_x,       // Grasp destination x [m]
-        const double goal_position_y,       // Grasp destination y [m]
-        const double goal_position_z,       // Grasp destination z [m]
-        const double diff_goal_position_x,  // Shift the x-axis [m]
-        const double diff_goal_position_y,  // Shift the y-axis [m]
-        const double diff_goal_position_z   // Shift the z-axis [m]
+        const double target_pos_x,       // Grasp destination x [m]
+        const double target_pos_y,       // Grasp destination y [m]
+        const double target_pos_z,       // Grasp destination z [m]
+        const double shift_x,            // Shift the x-axis [m]
+        const double shift_y,            // Shift the y-axis [m]
+        const double shift_z             // Shift the z-axis [m]
+        const double sec = 5.0,          // Moving Duration [s]
+        bool is_sleep = true             // Flag for sleep after movement
     );
     ```
 
@@ -258,21 +260,25 @@ This is a summary of information for moving the pan-tilt mechanism and manipulat
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToTargetTF(
         const std::string& target_name,     // Grasp Target tf name
-        const double diff_goal_position_x,  // Shift the x-axis [m]
-        const double diff_goal_position_y,  // Shift the y-axis [m]
-        const double diff_goal_position_z   // Shift the z-axis [m]
+        const double shift_x,               // Shift the x-axis [m]
+        const double shift_y,               // Shift the y-axis [m]
+        const double shift_z                // Shift the z-axis [m]
+        const double sec = 5.0,             // Moving Duration [s]
+        bool is_sleep = true                // Flag for sleep after movement
     );
     ```
 
 1.  `moveGripperToPlaceCoord()` : Moves the hand to xyz coordinates (placement mode).
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToPlaceCoord(
-        const double goal_position_x,       // Place destination x [m]
-        const double goal_position_y,       // Place destination y [m]
-        const double goal_position_z,       // Place destination z [m]
-        const double diff_goal_position_x,  // Shift the x-axis [m]
-        const double diff_goal_position_y,  // Shift the y-axis [m]
-        const double diff_goal_position_z   // Shift the z-axis [m]
+        const double target_pos_x,       // Place destination x [m]
+        const double target_pos_y,       // Place destination y [m]
+        const double target_pos_z,       // Place destination z [m]
+        const double shift_x,            // Shift the x-axis [m]
+        const double shift_y,            // Shift the y-axis [m]
+        const double shift_z             // Shift the z-axis [m]
+        const double sec = 5.0,          // Moving Duration [s]
+        bool is_sleep = true             // Flag for sleep after movement
     ); 
     ```
 
@@ -280,9 +286,11 @@ This is a summary of information for moving the pan-tilt mechanism and manipulat
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToPlaceTF(
         const std::string& target_name,     // Place Target tf name
-        const double diff_goal_position_x,  // Shift the x-axis [m]
-        const double diff_goal_position_y,  // Shift the y-axis [m]
-        const double diff_goal_position_z   // Shift the z-axis [m]
+        const double shift_x,               // Shift the x-axis [m]
+        const double shift_y,               // Shift the y-axis [m]
+        const double shift_z                // Shift the z-axis [m]
+        const double sec = 5.0,             // Moving Duration [s]
+        bool is_sleep = true                // Flag for sleep after movement
     );
     ```
 
@@ -337,9 +345,7 @@ sobit_edu_pose:
         pose_name: "pose_name",
         arm_shoulder_pan_joint: 0.00,
         arm_shoulder_1_tilt_joint: 1.5708,
-        arm_shoulder_2_tilt_joint: -1.5708,
         arm_elbow_1_tilt_joint: -1.40,
-        arm_elbow_2_tilt_joint: 1.40,
         arm_wrist_tilt_joint: -0.17,
         hand_joint: -1.00,
         head_camera_pan_joint: 0.00,
@@ -383,7 +389,7 @@ This is a summary of information for moving the SOBIT EDU moving mechanism.
 
 ## Hardware
 
-SOBIT EDU is available as open source hardware at [OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e?renderMode=0&uiState=654e03c33dd8e732221dd868)．
+SOBIT EDU is available as open source hardware at [OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e?renderMode=0&uiState=662a5d8830d630406046120b)．
 
 ![SOBIT EDU in OnShape](sobit_edu/docs/img/sobit_edu_onshape.png)
 
@@ -472,8 +478,6 @@ TBD
 See the [open issues][issues-url] for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 
 <!-- CONTRIBUTING -->

@@ -244,12 +244,14 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
 1.  `moveGripperToTargetCoord()` : ハンドをxyz座標に動かす（把持モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToTargetCoord(
-        const double goal_position_x,       // 把持目的地のx (m)
-        const double goal_position_y,       // 把持目的地のy (m)
-        const double goal_position_z,       // 把持目的地のz (m)
-        const double diff_goal_position_x,  // xyz座標のx軸をシフトする (m)
-        const double diff_goal_position_y,  // xyz座標のy軸をシフトする (m)
-        const double diff_goal_position_z   // xyz座標のz軸をシフトする (m)
+        const double target_pos_x,       // 把持目的地のx (m)
+        const double target_pos_y,       // 把持目的地のy (m)
+        const double target_pos_z,       // 把持目的地のz (m)
+        const double shift_x,            // xyz座標のx軸をシフトする (m)
+        const double shift_y,            // xyz座標のy軸をシフトする (m)
+        const double shift_z             // xyz座標のz軸をシフトする (m)
+        const double sec = 5.0,          // 回転時間 (s)
+        bool is_sleep = true             // 回転後に待機するかどうか
     );
     ```
 
@@ -257,21 +259,25 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToTargetTF(
         const std::string& target_name,     // 把持目的tf名
-        const double diff_goal_position_x,  // xyz座標のx軸をシフトする (m)
-        const double diff_goal_position_y,  // xyz座標のy軸をシフトする (m)
-        const double diff_goal_position_z   // xyz座標のz軸をシフトする (m)
+        const double shift_x,               // xyz座標のx軸をシフトする (m)
+        const double shift_y,               // xyz座標のy軸をシフトする (m)
+        const double shift_z                // xyz座標のz軸をシフトする (m)
+        const double sec = 5.0,             // 回転時間 (s)
+        bool is_sleep = true                // 回転後に待機するかどうか
     );
     ```
 
 1.  `moveGripperToPlaceCoord()` : ハンドをxyz座標に動かす（配置モード）．
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToPlaceCoord(
-        const double goal_position_x,       // 配置目的地のx (m)
-        const double goal_position_y,       // 配置目的地のy (m)
-        const double goal_position_z,       // 配置目的地のz (m)
-        const double diff_goal_position_x,  // xyz座標のx軸をシフトする (m)
-        const double diff_goal_position_y,  // xyz座標のy軸をシフトする (m)
-        const double diff_goal_position_z   // xyz座標のz軸をシフトする (m)
+        const double target_pos_x,       // 配置目的地のx (m)
+        const double target_pos_y,       // 配置目的地のy (m)
+        const double target_pos_z,       // 配置目的地のz (m)
+        const double shift_x,            // xyz座標のx軸をシフトする (m)
+        const double shift_y,            // xyz座標のy軸をシフトする (m)
+        const double shift_z             // xyz座標のz軸をシフトする (m)
+        const double sec = 5.0,          // 回転時間 (s)
+        bool is_sleep = true             // 回転後に待機するかどうか
     ); 
     ```
 
@@ -279,9 +285,11 @@ SOBIT EDUのパンチルト機構とマニピュレータを動かすための�
     ```cpp
     bool sobit::SobitEduJointController::moveGripperToPlaceTF(
         const std::string& target_name,     // 配置目的tf名
-        const double diff_goal_position_x,  // xyz座標のx軸をシフトする (m)
-        const double diff_goal_position_y,  // xyz座標のy軸をシフトする (m)
-        const double diff_goal_position_z   // xyz座標のz軸をシフトする (m)
+        const double shift_x,               // xyz座標のx軸をシフトする (m)
+        const double shift_y,               // xyz座標のy軸をシフトする (m)
+        const double shift_z                // xyz座標のz軸をシフトする (m)
+        const double sec = 5.0,             // 回転時間 (s)
+        bool is_sleep = true                // 回転後に待機するかどうか
     );
     ```
 
@@ -335,9 +343,7 @@ sobit_edu_pose:
         pose_name: "pose_name",
         arm_shoulder_pan_joint: 0.00,
         arm_shoulder_1_tilt_joint: 1.5708,
-        arm_shoulder_2_tilt_joint: -1.5708,
         arm_elbow_1_tilt_joint: -1.40,
-        arm_elbow_2_tilt_joint: 1.40,
         arm_wrist_tilt_joint: -0.17,
         hand_joint: -1.00,
         head_camera_pan_joint: 0.00,
@@ -379,7 +385,7 @@ SOBIT EDUの移動機構を動かすための情報まとめとなる．
 
 ## ハードウェア
 
-SOBIT EDUはオープンソースハードウェアとして[OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e?renderMode=0&uiState=654e03c33dd8e732221dd868)にて公開しております．
+SOBIT EDUはオープンソースハードウェアとして[OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e?renderMode=0&uiState=662a5d8830d630406046120b)にて公開しております．
 
 ![SOBIT EDU in OnShape](sobit_edu/docs/img/sobit_edu_onshape.png)
 
