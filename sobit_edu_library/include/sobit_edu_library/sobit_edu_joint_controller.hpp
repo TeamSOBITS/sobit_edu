@@ -57,13 +57,13 @@ namespace sobit_edu {
             double arm_wrist_tilt_current_ = 0.;
             double hand_current_ = 0.;
 
-            static const double base_to_shoulder_flex_joint_z_cm;
-            static const double base_to_shoulder_flex_joint_x_cm;
-            static const double arm_upper_link_x_cm;
-            static const double arm_upper_link_z_cm;
-            static const double arm_outer_link_x_cm;
-            static const double grasp_min_z_cm;
-            static const double grasp_max_z_cm;
+            static constexpr const double base_to_shoulder_flex_joint_z_cm = 52.2;
+            static constexpr const double base_to_shoulder_flex_joint_x_cm = 12.2;
+            static constexpr const double arm_upper_link_x_cm = 14.8;
+            static constexpr const double arm_upper_link_z_cm = 2.4;
+            static constexpr const double arm_outer_link_x_cm = 15.0;
+            static constexpr const double grasp_min_z_cm = 35.0;
+            static constexpr const double grasp_max_z_cm = 80.0;
 
             void setJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
             void addJointTrajectory( const std::string& joint_name, const double rad, const double sec, trajectory_msgs::JointTrajectory* jt );
@@ -84,43 +84,31 @@ namespace sobit_edu {
                                 const double hand,
                                 const double head_camera_pan,
                                 const double head_camera_tilt,
-                                const double sec,
-                                bool         is_sleep = true );
-            bool moveJoint(     const Joint joint_num, 
-                                const double rad, 
-                                const double sec = 5.0, 
-                                bool is_sleep = true );
-            bool moveArm(       const double arm_shoulder_pan, 
-                                const double arm_shoulder_tilt, 
-                                const double arm_elbow_tilt, 
-                                const double arm_wrist_tilt, 
-                                const double hand, 
-                                const double sec = 5.0, 
-                                bool is_sleep = true );
+                                const double sec, bool is_sleep = true );
+            bool moveJoint( const Joint joint_num, 
+                            const double rad, 
+                            const double sec = 5.0, bool is_sleep = true );
+            bool moveArm(   const double arm_shoulder_pan, 
+                            const double arm_shoulder_tilt, 
+                            const double arm_elbow_tilt, 
+                            const double arm_wrist_tilt, 
+                            const double hand, 
+                            const double sec = 5.0, bool is_sleep = true );
             bool moveHeadPanTilt(   const double pan_rad, 
                                     const double tilt_rad, 
-                                    const double sec = 5.0, 
-                                    bool is_sleep = true );  
-            bool moveHandToTargetCoord(     const double goal_position_x, 
-                                            const double goal_position_y, 
-                                            const double goal_position_z, 
-                                            const double diff_goal_position_x, 
-                                            const double diff_goal_position_y, 
-                                            const double diff_goal_position_z );
-            bool moveHandToTargetTF(    const std::string &target_name, 
-                                        const double diff_goal_position_x, 
-                                        const double diff_goal_position_y, 
-                                        const double diff_goal_position_z );
-            bool moveHandToPlaceCoord(  const double goal_position_x, 
-                                        const double goal_position_y, 
-                                        const double goal_position_z, 
-                                        const double diff_goal_position_x, 
-                                        const double diff_goal_position_y, 
-                                        const double diff_goal_position_z );
-            bool moveHandToPlaceTF(     const std::string& target_name, 
-                                        const double diff_goal_position_x, 
-                                        const double diff_goal_position_y, 
-                                        const double diff_goal_position_z );
+                                    const double sec = 5.0, bool is_sleep = true );  
+            bool moveHandToTargetCoord( const double target_pos_x, const double target_pos_y, const double target_pos_z, 
+                                        const double shift_x     , const double shift_y     , const double shift_z,
+                                        const double sec = 5.0, bool is_sleep = true );
+            bool moveHandToTargetTF(    const std::string &target_name,
+                                        const double shift_x, const double shift_y, const double shift_z,
+                                        const double sec = 5.0, bool is_sleep = true);
+            bool moveHandToPlaceCoord(  const double target_pos_x, const double target_pos_y, const double target_pos_z, 
+                                        const double shift_x     , const double shift_y     , const double shift_z,
+                                        const double sec = 5.0, bool is_sleep = true );
+            bool moveHandToPlaceTF( const std::string& target_name,
+                                    const double shift_x, const double shift_y, const double shift_z,
+                                    const double sec = 5.0, bool is_sleep = true );
             bool graspDecision( const int min_curr = 300, const int max_curr = 1000 );
             bool placeDecision( const int min_curr = 500, const int max_curr = 1000 );
     };
@@ -180,7 +168,7 @@ inline void sobit_edu::SobitEduJointController::callbackCurrArm( const sobits_ms
 
     for( const auto actuator : msg.current_state_array ){
         if( actuator.joint_name == joint_names_[ARM_WRIST_TILT_JOINT] ) arm_wrist_tilt_current_ = actuator.current_ma;
-        if( actuator.joint_name == joint_names_[HAND_JOINT] )        hand_current_        = actuator.current_ma;
+        if( actuator.joint_name == joint_names_[HAND_JOINT] )           hand_current_           = actuator.current_ma;
     }
 }
 

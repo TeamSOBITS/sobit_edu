@@ -32,50 +32,38 @@ PYBIND11_MODULE( sobit_edu_module, m ) {
             pybind11::arg( "hand" ),
             pybind11::arg( "head_camera_pan" ),
             pybind11::arg( "head_camera_tilt" ),
-            pybind11::arg( "sec" ) = 5.0, 
-            pybind11::arg( "is_sleep" ) = true)
+            pybind11::arg( "sec" ) = 5.0, pybind11::arg( "is_sleep" ) = true)
         .def( "moveJoint", &SobitEduJointController::moveJoint, "moveJoint", 
             pybind11::arg( "joint_num" ),
             pybind11::arg( "rad" ),
-            pybind11::arg( "sec" ) = 5.0,
-            pybind11::arg( "is_sleep" ) = true )
+            pybind11::arg( "sec" ) = 5.0, pybind11::arg( "is_sleep" ) = true )
         .def( "moveHeadPanTilt", &SobitEduJointController::moveHeadPanTilt, "move Head PanTilt", 
             pybind11::arg( "pan_rad" ),
             pybind11::arg( "tilt_rad" ),
-            pybind11::arg( "sec" ) = 5.0,
-            pybind11::arg( "is_sleep" ) = true )
+            pybind11::arg( "sec" ) = 5.0, pybind11::arg( "is_sleep" ) = true )
         .def( "moveArm", &SobitEduJointController::moveArm, "move Arm",
             pybind11::arg( "arm_shoulder_pan" ),
             pybind11::arg( "arm_shoulder_tilt" ),
             pybind11::arg( "arm_elbow_tilt" ),
             pybind11::arg( "arm_wrist_tilt" ),
             pybind11::arg( "hand" ),
-            pybind11::arg( "sec" ) = 5.0,
-            pybind11::arg( "is_sleep" ) = true )
+            pybind11::arg( "sec" ) = 5.0, pybind11::arg( "is_sleep" ) = true )
         .def( "moveHandToTargetCoord", &SobitEduJointController::moveHandToTargetCoord, "moveHandToTargetCoord",
-            pybind11::arg( "goal_position_x" ),
-            pybind11::arg( "goal_position_y" ),
-            pybind11::arg( "goal_position_z" ),
-            pybind11::arg( "diff_goal_position_x" ),
-            pybind11::arg( "diff_goal_position_y" ),
-            pybind11::arg( "diff_goal_position_z" ) )
+            pybind11::arg( "target_pos_x" ), pybind11::arg( "target_pos_y" ), pybind11::arg( "target_pos_z" ),
+            pybind11::arg( "shift_x" ), pybind11::arg( "shift_y" ), pybind11::arg( "shift_z" ),
+            pybind11::arg( "sec" ) = 5.0, pybind11::arg( "is_sleep" ) = true )
         .def( "moveHandToTargetTF", &SobitEduJointController::moveHandToTargetTF, "moveHandToTargetTF",
             pybind11::arg( "target_name" ),
-            pybind11::arg( "diff_goal_position_x" ),
-            pybind11::arg( "diff_goal_position_y" ),
-            pybind11::arg( "diff_goal_position_z" ) )
+            pybind11::arg( "shift_x" ), pybind11::arg( "shift_y" ), pybind11::arg( "shift_z" ),
+            pybind11::arg( "sec" ) = 5.0, pybind11::arg( "is_sleep" ) = true )
         .def( "moveHandToPlaceCoord", &SobitEduJointController::moveHandToPlaceCoord, "move Hand To Placeable Position Coordinate",
-            pybind11::arg( "goal_position_x" ),
-            pybind11::arg( "goal_position_y" ),
-            pybind11::arg( "goal_position_z" ),
-            pybind11::arg( "diff_goal_position_x" ),
-            pybind11::arg( "diff_goal_position_y" ),
-            pybind11::arg( "diff_goal_position_z" ) )
+            pybind11::arg( "target_pos_x" ), pybind11::arg( "target_pos_y" ), pybind11::arg( "target_pos_z" ),
+            pybind11::arg( "shift_x" ), pybind11::arg( "shift_y" ), pybind11::arg( "shift_z" ),
+            pybind11::arg( "sec" ) = 5.0, pybind11::arg( "is_sleep" ) = true )
         .def( "moveHandToPlaceTF", &SobitEduJointController::moveHandToPlaceTF, "move Hand To Placeable Position TF",
             pybind11::arg( "target_name" ),
-            pybind11::arg( "diff_goal_position_x" ),
-            pybind11::arg( "diff_goal_position_y" ),
-            pybind11::arg( "diff_goal_position_z" ) )
+            pybind11::arg( "shift_x" ), pybind11::arg( "shift_y" ), pybind11::arg( "shift_z" ),
+            pybind11::arg( "sec" ) = 5.0, pybind11::arg( "is_sleep" ) = true )
         .def( "graspDecision", &SobitEduJointController::graspDecision, "grasp Decision",
             pybind11::arg( "min_curr" ) = 300, 
             pybind11::arg( "max_curr" ) = 1000)
