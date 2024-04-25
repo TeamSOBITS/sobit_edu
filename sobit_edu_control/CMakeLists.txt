@@ -7,9 +7,6 @@ add_compile_options(-std=c++14)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  dynamixel_sdk
-  sobits_msgs
-  sobits_common
 )
 
 ###################################
@@ -25,7 +22,4 @@ catkin_package(
   # INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS
-  dynamixel_sdk
-  sobits_msgs
-  sobits_common
 )
