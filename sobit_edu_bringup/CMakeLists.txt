@@ -7,6 +7,8 @@ project(sobit_edu_bringup)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
+  trajectory_msgs
+  geometry_msgs
 )
 
 ###################################
