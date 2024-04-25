@@ -7,7 +7,7 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Twist
 
-class Joy_control:
+class JoyControl:
     def __init__(self):
         # Subscriber
         self.sub_joy         = rospy.Subscriber('/joy', Joy, self.Joy_Callback, queue_size=1)
@@ -140,5 +140,5 @@ class Joy_control:
 
 if __name__ == '__main__':
     rospy.init_node('sobit_edu_ps3_control_node')
-    jc = Joy_control()
+    jc = JoyControl()
     rospy.spin()
