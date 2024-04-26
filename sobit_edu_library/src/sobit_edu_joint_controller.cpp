@@ -33,18 +33,18 @@ void SobitEduJointController::loadPose( ) {
 
     for ( int i = 0; i < pose_num; i++ ) {
         Pose                pose;
-        std::vector<double> joint_val(joint_names_.size(), 0.0);
+        std::vector<double> joint_val(Joint::JOINT_NUM, 0.0);
 
         pose.pose_name                              =   static_cast<std::string>(pose_val[i]["pose_name"]); 
-        joint_val[Joint::ARM_SHOULDER_PAN_JOINT]    =   static_cast<double>(pose_val[i][joint_names_[ARM_SHOULDER_PAN_JOINT]]); 
-        joint_val[Joint::ARM_SHOULDER_1_TILT_JOINT] =   static_cast<double>(pose_val[i][joint_names_[ARM_SHOULDER_1_TILT_JOINT]]); 
-        joint_val[Joint::ARM_SHOULDER_2_TILT_JOINT] = - static_cast<double>(pose_val[i][joint_names_[ARM_SHOULDER_1_TILT_JOINT]]); 
-        joint_val[Joint::ARM_ELBOW_1_TILT_JOINT]    =   static_cast<double>(pose_val[i][joint_names_[ARM_ELBOW_1_TILT_JOINT]]); 
-        joint_val[Joint::ARM_ELBOW_2_TILT_JOINT]    = - static_cast<double>(pose_val[i][joint_names_[ARM_ELBOW_1_TILT_JOINT]]); 
-        joint_val[Joint::ARM_WRIST_TILT_JOINT]      =   static_cast<double>(pose_val[i][joint_names_[ARM_WRIST_TILT_JOINT]]); 
-        joint_val[Joint::HAND_JOINT]                =   static_cast<double>(pose_val[i][joint_names_[HAND_JOINT]]); 
-        joint_val[Joint::HEAD_CAMERA_PAN_JOINT]     =   static_cast<double>(pose_val[i][joint_names_[HEAD_CAMERA_PAN_JOINT]]); 
-        joint_val[Joint::HEAD_CAMERA_TILT_JOINT]    =   static_cast<double>(pose_val[i][joint_names_[HEAD_CAMERA_TILT_JOINT]]); 
+        joint_val[Joint::ARM_SHOULDER_PAN_JOINT]    =   static_cast<double>(pose_val[i][joint_names_[Joint::ARM_SHOULDER_PAN_JOINT]]); 
+        joint_val[Joint::ARM_SHOULDER_1_TILT_JOINT] =   static_cast<double>(pose_val[i][joint_names_[Joint::ARM_SHOULDER_1_TILT_JOINT]]); 
+        joint_val[Joint::ARM_SHOULDER_2_TILT_JOINT] = - static_cast<double>(pose_val[i][joint_names_[Joint::ARM_SHOULDER_1_TILT_JOINT]]); 
+        joint_val[Joint::ARM_ELBOW_1_TILT_JOINT]    =   static_cast<double>(pose_val[i][joint_names_[Joint::ARM_ELBOW_1_TILT_JOINT]]); 
+        joint_val[Joint::ARM_ELBOW_2_TILT_JOINT]    = - static_cast<double>(pose_val[i][joint_names_[Joint::ARM_ELBOW_1_TILT_JOINT]]); 
+        joint_val[Joint::ARM_WRIST_TILT_JOINT]      =   static_cast<double>(pose_val[i][joint_names_[Joint::ARM_WRIST_TILT_JOINT]]); 
+        joint_val[Joint::HAND_JOINT]                =   static_cast<double>(pose_val[i][joint_names_[Joint::HAND_JOINT]]); 
+        joint_val[Joint::HEAD_CAMERA_PAN_JOINT]     =   static_cast<double>(pose_val[i][joint_names_[Joint::HEAD_CAMERA_PAN_JOINT]]); 
+        joint_val[Joint::HEAD_CAMERA_TILT_JOINT]    =   static_cast<double>(pose_val[i][joint_names_[Joint::HEAD_CAMERA_TILT_JOINT]]); 
         
         pose.joint_val                              =   joint_val;
         
