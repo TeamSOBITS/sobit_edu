@@ -105,6 +105,3 @@ add_executable(test_place example/test_place.cpp
                           src/sobit_edu_wheel_controller.cpp)
 target_link_libraries(test_place ${catkin_LIBRARIES} ${PYTHON_LIBRARIES})
 add_dependencies(test_place ${catkin_EXPORTED_TARGETS})
-
-
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
