@@ -385,7 +385,7 @@ SOBIT EDUの移動機構を動かすための情報まとめとなる．
 
 ## ハードウェア
 
-SOBIT EDUはオープンソースハードウェアとして[OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e?renderMode=0&uiState=662a5d8830d630406046120b)にて公開しております．
+SOBIT EDUはオープンソースハードウェアとして[OnShape](https://cad.onshape.com/documents/0aff733aa8798f27efd96de3/w/e6c482276f9b94eef89215b6/e/a80437dc83d4b5d5f30b153e)にて公開しております．
 
 ![SOBIT EDU in OnShape](sobit_edu/docs/img/sobit_edu_onshape.png)
 
