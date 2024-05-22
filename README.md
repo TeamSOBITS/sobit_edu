@@ -141,7 +141,7 @@ TurtleBot2をベースとしてSOBITSが開発したモバイルマニピュレ�
    ```
 3. [任意] デモプログラムを実行してみよう．
    ```sh
-   $ rosrun sobit_edu_library test_controll_wheel.py
+   $ rosrun sobit_edu_library test_control_wheel.py
    ```
 
 > [!NOTE]
