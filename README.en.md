@@ -141,7 +141,7 @@ First, please set up the following environment before proceeding to the next ins
    ```
 3. [Optional] Let's run the demo program.
    ```sh
-   $ rosrun sobit_edu_library test_controll_wheel.py
+   $ rosrun sobit_edu_library test_control_wheel.py
    ```
 
 > [!NOTE]
