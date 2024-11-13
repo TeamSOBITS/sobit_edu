@@ -9,7 +9,7 @@ cd ..
 
 # Dowload required packages for SOBIT EDU
 ros_packages=(
-    "sobit_common" \
+    "sobits_common" \
     "sobits_msgs" \
     "urg_node" \
     "azure_kinect_ros_driver" \
