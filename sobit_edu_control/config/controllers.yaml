@@ -1,0 +1,31 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+velocity_controller:
+  ros__parameters:
+    joints:      ### アームなどの関節＝Dynamixelのモータ名を全部リストで！
+      - "shoulder_1"   ### ロボットごとに変わるのはこの辺かな
+      - "shoulder_2"   ### みたいな
+
+joint_trajectory_controller:
+  ros__parameters:
+    joints:      ### アームなどの関節＝Dynamixelのモータ名を全部リストで！
+      - "shoulder_1"   ### ロボットごとに変わるのはこの辺かな
+      - "shoulder_2"   ### みたいな
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+      - velocity

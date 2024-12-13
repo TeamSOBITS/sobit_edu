@@ -1,3 +1,0 @@
-<launch>
-    <rosparam command="load" file="$(find sobit_edu_library)/config/sobit_edu_pose.yaml"/>
-</launch>
