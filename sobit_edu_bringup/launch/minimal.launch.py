@@ -18,16 +18,21 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 import xacro
+import yaml
 
 
 def generate_launch_description():
     robot_name = "sobit_edu"  ### 各ロボットの名前にする
+    bringup_pkg = robot_name + "_bringup"
+    description_pkg = robot_name + "_description"
+    controller_pkg = robot_name + "_control"
     
     
     ##====================turtle bot2=================================================
-    
     share_dir = get_package_share_directory('kobuki_node')
     # There are two different ways to pass parameters to a non-composed node;
     # either by specifying the path to the file containing the parameters, or by
@@ -35,47 +40,22 @@ def generate_launch_description():
     # When starting a *composed* node on the other hand, only the dictionary
     # style is supported.  To keep the code between the non-composed and
     # composed launch file similar, we use that style here as well.
-    params_file = os.path.join(share_dir, 'config', 'kobuki_node_params.yaml')
+    params_file = os.path.join(share_dir, "config", "kobuki_node_params.yaml")
     with open(params_file, 'r') as f:
         params = yaml.safe_load(f)['kobuki_ros_node']['ros__parameters']
-    kobuki_ros_node = launch_ros.actions.Node(package='kobuki_node',
+    kobuki_ros_node = Node(package='kobuki_node',
                                               executable='kobuki_ros_node',
                                               output='both',
                                               parameters=[params])
     ##==================================================================================
-    
-    
-    
+
     ##==================urg=============================================================
-    urg_node_dir = get_package_share_directory('urg_node')
-    launch_description = LaunchDescription([
-        DeclareLaunchArgument(
-            'sensor_interface',
-            default_value='serial',
-            description='sensor_interface: supported: serial, ethernet')])
-
-    def expand_param_file_name(context):
-        param_file = os.path.join(
-                urg_node_dir, 'launch',
-                'urg_node_' + context.launch_configurations['sensor_interface'] + '.yaml')
-        if os.path.exists(param_file):
-            return [SetLaunchConfiguration('param', param_file)]
-
-    param_file_path = OpaqueFunction(function=expand_param_file_name)
-    launch_description.add_action(param_file_path)
-
-    hokuyo_node = Node(
-        package='urg_node', node_executable='urg_node', output='screen',
-        parameters=[LaunchConfiguration('param')]
-        )
-
-    launch_description.add_action(hokuyo_node)  
+    # urg_launch_py = IncludeLaunchDescription(
+    #         PythonLaunchDescriptionSource([os.path.join(
+    #         get_package_share_directory(bringup_pkg), 'launch'),
+    #         'urg.launch.py'])
+    #         ) 
     ##==================================================================================
-    
-    
-    bringup_pkg = robot_name + "_bringup"
-    description_pkg = robot_name + "_description"
-    controller_pkg = robot_name + "_control"
 
     rviz_config = os.path.join(get_package_share_directory(
         bringup_pkg), "rviz", "real.rviz")

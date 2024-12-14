@@ -14,14 +14,24 @@ controller_manager:
 velocity_controller:
   ros__parameters:
     joints:      ### アームなどの関節＝Dynamixelのモータ名を全部リストで！
-      - "shoulder_1"   ### ロボットごとに変わるのはこの辺かな
-      - "shoulder_2"   ### みたいな
+      - arm_shoulder_pan_joint
+      - arm_shoulder_1_tilt_joint
+      - arm_elbow_1_tilt_joint
+      - arm_wrist_tilt_joint
+      - hand_joint
+      - head_camera_pan_joint
+      - head_camera_tilt_joint
 
 joint_trajectory_controller:
   ros__parameters:
-    joints:      ### アームなどの関節＝Dynamixelのモータ名を全部リストで！
-      - "shoulder_1"   ### ロボットごとに変わるのはこの辺かな
-      - "shoulder_2"   ### みたいな
+    joints:
+      - arm_shoulder_pan_joint
+      - arm_shoulder_1_tilt_joint
+      - arm_elbow_1_tilt_joint
+      - arm_wrist_tilt_joint
+      - hand_joint
+      - head_camera_pan_joint
+      - head_camera_tilt_joint
 
     command_interfaces:
       - position

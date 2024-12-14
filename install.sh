@@ -9,17 +9,13 @@ cd ..
 
 # Dowload required packages for SOBIT EDU
 ros_packages=(
-    "sobits_common" \
-    "sobits_msgs" \
-    "urg_node" \
-    "azure_kinect_ros_driver" \
-    "turtlebot2_on_noetic"
 )
 
 # Clone all packages
 for ((i = 0; i < ${#ros_packages[@]}; i++)) {
     echo "Clonning: ${ros_packages[i]}"
-    git clone https://github.com/TeamSOBITS/${ros_packages[i]}.git
+    git clone -b feature-$ROS_DISTRO-devel https://github.com/TeamSOBITS/${ros_packages[i]}.git
+    git clone -b $ROS_DISTRO-devel https://github.com/TeamSOBITS/${ros_packages[i]}.git
 
     # Check if install.sh exists in each package
     if [ -f ${ros_packages[i]}/install.sh ]; then
@@ -32,12 +28,18 @@ for ((i = 0; i < ${#ros_packages[@]}; i++)) {
 
 # Setup Turtlebot2 (Kobuki) for ROS Noetic
 cd ${DIR}
-bash ../turtlebot2_on_noetic/turtlebot/setup_kobuki.sh
+# bash ../turtlebot2_on_noetic/turtlebot/setup_kobuki.sh
 
 # Download ROS packages
 sudo apt-get update
 sudo apt-get install -y \
-    ros-$ROS_DISTRO-pybind11-catkin \
+    ros-$ROS_DISTRO-ecl-linear-algebra \
+    ros-$ROS_DISTRO-kobuki-ros-interfaces \
+    ros-$ROS_DISTRO-kobuki-core \
+    ros-$ROS_DISTRO-laser-proc \
+    ros-$ROS_DISTRO-urg-c \
+    ros-$ROS_DISTRO-urg-node \
+    ros-$ROS_DISTRO-urg-node-msgs \\
     ros-$ROS_DISTRO-robot-state-publisher \
     ros-$ROS_DISTRO-joint-state-controller \
     ros-$ROS_DISTRO-joint-state-publisher \
