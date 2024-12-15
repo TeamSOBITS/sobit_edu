@@ -21,7 +21,7 @@ def generate_launch_description():
 
     def expand_param_file_name(context):
         param_file = os.path.join(
-                urg_node_dir, 'launch',
+                urg_node_dir, 'config',
                 'urg_node_' + context.launch_configurations['sensor_interface'] + '.yaml')
         if os.path.exists(param_file):
             return [SetLaunchConfiguration('param', param_file)]

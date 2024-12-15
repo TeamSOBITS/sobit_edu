@@ -18,6 +18,10 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument
+from launch.actions import OpaqueFunction
+from launch.actions import SetLaunchConfiguration
+from launch.substitutions import LaunchConfiguration
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
@@ -49,17 +53,48 @@ def generate_launch_description():
                                               parameters=[params])
     ##==================================================================================
 
+
     ##==================urg=============================================================
-    # urg_launch_py = IncludeLaunchDescription(
-    #         PythonLaunchDescriptionSource([os.path.join(
-    #         get_package_share_directory(bringup_pkg), 'launch'),
-    #         'urg.launch.py'])
-    #         ) 
+
+    ## 仮想でTFをだして無理やりつなげている＝URDF周りがわからなすぎる ##
+    vtb_node = Node(package='virtual_tf_broadcaster', executable='virtual_tf_broadcaster', name='base_to_lidar', output='screen',
+                    parameters=[{'source_frame_name': 'base_footprint',
+                                'target_frame_name': 'lidar',
+                                'rqt_reconfigure': False,
+                                'pose': {'x'   : 0.2, 'y'    : 0.0, 'z'  : 0.2,
+                                        'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0,}}])
+    ## ここまで仮想TF ##
+
+    urg_node_dir = get_package_share_directory('urg_node')
+    launch_description = LaunchDescription([
+        DeclareLaunchArgument(
+            'sensor_interface',
+            default_value='ethernet',
+            description='sensor_interface: supported: serial, ethernet')])
+
+    def expand_param_file_name(context):
+        param_file = os.path.join(
+                urg_node_dir, 'config',
+                'urg_node_' + context.launch_configurations['sensor_interface'] + '.yaml')
+        if os.path.exists(param_file):
+            return [SetLaunchConfiguration('param', param_file)]
+
+    param_file_path = OpaqueFunction(function=expand_param_file_name)
+    launch_description.add_action(param_file_path)
+
+    hokuyo_node = Node(
+        package='urg_node', executable='urg_node_driver', output='screen',
+        parameters=[LaunchConfiguration('param')]
+        )
+    launch_description.add_action(hokuyo_node)
     ##==================================================================================
+
 
     rviz_config = os.path.join(get_package_share_directory(
         bringup_pkg), "rviz", "real.rviz")
     
+
+    ## ここからSOBIT LIGHTを参照してコピペ
     robot_description = os.path.join(get_package_share_directory(
         description_pkg), "robots", robot_name + "_robot.urdf.xacro")
     robot_description_config = \
@@ -109,6 +144,7 @@ def generate_launch_description():
             {"use_sim_time": 'False'},],
         output="screen",
     )
+    ## ここまでコピペ
 
     rviz2_node = Node(
         package="rviz2",
@@ -119,8 +155,9 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-    	launch_description,
     	kobuki_ros_node,
+        vtb_node,
+    	launch_description,
         ros2_control_node,
         joint_state_broadcaster_node,
         velocity_controller_node,

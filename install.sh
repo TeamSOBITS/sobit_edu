@@ -14,7 +14,7 @@ ros_packages=(
 # Clone all packages
 for ((i = 0; i < ${#ros_packages[@]}; i++)) {
     echo "Clonning: ${ros_packages[i]}"
-    git clone -b feature-$ROS_DISTRO-devel https://github.com/TeamSOBITS/${ros_packages[i]}.git
+    git clone -b feature/$ROS_DISTRO-devel https://github.com/TeamSOBITS/${ros_packages[i]}.git
     git clone -b $ROS_DISTRO-devel https://github.com/TeamSOBITS/${ros_packages[i]}.git
 
     # Check if install.sh exists in each package
@@ -39,7 +39,7 @@ sudo apt-get install -y \
     ros-$ROS_DISTRO-laser-proc \
     ros-$ROS_DISTRO-urg-c \
     ros-$ROS_DISTRO-urg-node \
-    ros-$ROS_DISTRO-urg-node-msgs \\
+    ros-$ROS_DISTRO-urg-node-msgs \
     ros-$ROS_DISTRO-robot-state-publisher \
     ros-$ROS_DISTRO-joint-state-controller \
     ros-$ROS_DISTRO-joint-state-publisher \
@@ -57,6 +57,8 @@ sudo apt-get install -y \
     ros-$ROS_DISTRO-joy
 
 
+### ここから下は未確認。いるいらないがわからない。
+'''
 # Setting up Dynamixel USB configuration (SOBIT EDU: Head and Arm Robot Mechanism)
 echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6015\", SYMLINK+=\"input/dx_upper\", MODE=\"0666\"" | sudo tee /etc/udev/rules.d/dx_upper.rules
 
@@ -80,6 +82,6 @@ sudo udevadm control --reload-rules
 
 # Trigger the new rules
 sudo udevadm trigger
-
+'''
 
 echo "╚══╣ Setup: SOBIT EDU (FINISHED) ╠══╝"
