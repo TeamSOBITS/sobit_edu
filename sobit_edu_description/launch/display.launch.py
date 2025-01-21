@@ -15,7 +15,7 @@ def generate_launch_description():
 
     use_gui = LaunchConfiguration('use_gui', default='True')
 
-    robot_name = "sobit_edu"  ### 各ロボットの名前にする
+    robot_name = "sobit_edu"
 
     description_pkg = robot_name + "_description"
 

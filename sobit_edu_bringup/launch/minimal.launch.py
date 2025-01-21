@@ -98,7 +98,7 @@ def generate_launch_description():
     robot_description = os.path.join(get_package_share_directory(
         description_pkg), "robots", robot_name + "_robot.urdf.xacro")
     robot_description_config = \
-        xacro.process_file(robot_description, mappings={'enable_gz' : 'False'})
+        xacro.process_file(robot_description, mappings={'enable_gz' : False})
 
     controller_config = os.path.join(
         get_package_share_directory(
@@ -141,7 +141,7 @@ def generate_launch_description():
         name="robot_state_publisher",
         parameters=[
             {"robot_description": robot_description_config.toxml()},
-            {"use_sim_time": 'False'},],
+            {"use_sim_time": False},],
         output="screen",
     )
     ## ここまでコピペ

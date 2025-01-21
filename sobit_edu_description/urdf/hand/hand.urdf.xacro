@@ -15,14 +15,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_back.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_back.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_back.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_back.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
@@ -59,14 +59,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_inner_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_inner_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
@@ -92,14 +92,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_inner_r.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_inner_r.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
@@ -125,14 +125,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_outer_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_outer_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
@@ -158,14 +158,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_outer_r.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_outer_r.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
@@ -191,14 +191,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_finger_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_finger_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_finger_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_finger_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
@@ -224,14 +224,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_finger_r.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_finger_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/hand/hand_finger_r.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_finger_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>

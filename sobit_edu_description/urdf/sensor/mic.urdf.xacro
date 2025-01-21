@@ -12,14 +12,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2} 0 ${M_PI/2}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/sensor/mic_base.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/mic_base.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2} 0 ${M_PI/2}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/sensor/mic_base.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/mic_base.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </collision>
@@ -43,14 +43,14 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI} 0.0 ${M_PI/2}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/sensor/mic.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/mic.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI} 0.0 ${M_PI/2}" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/sensor/mic.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/mic.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </collision>

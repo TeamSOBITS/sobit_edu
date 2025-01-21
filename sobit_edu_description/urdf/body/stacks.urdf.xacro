@@ -3,7 +3,7 @@
   Hexagon stacks
  -->
 <robot name="stack_hexagons" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find turtlebot_description)/urdf/common_properties.urdf.xacro" />
+  <xacro:include filename="$(find turtlebot2_description)/urdf/common_properties.urdf.xacro" />
   
   <!-- Xacro properties -->
   <xacro:property name="M_SCALE" value="0.001" />
@@ -22,7 +22,7 @@
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 0.0" />
         <geometry>
           <!-- <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/pole_bottom.dae" /> -->
-          <mesh filename="package://sobit_edu_description/meshes/body/pole_bottom_39mm.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/body/pole_bottom_39mm.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
         </geometry>
         <material name="grey" />
       </visual>
@@ -54,7 +54,7 @@
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 0.0" />
         <geometry>
           <!-- <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/pole_middle.dae" /> -->
-          <mesh filename="package://sobit_edu_description/meshes/body/pole_middle_90mm.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/body/pole_middle_90mm.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
         </geometry>
         <material name="grey" />
       </visual>
@@ -86,7 +86,7 @@
         <origin xyz=" 0 0.0 0.0" rpy="${M_PI/2.0} 0.0 0.0" />
         <geometry>
           <!-- <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/pole_top.dae" /> -->
-          <mesh filename="package://sobit_edu_description/meshes/body/pole_top_200mm.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/body/pole_top_200mm.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
         </geometry>
         <material name="grey" />
       </visual>
@@ -117,7 +117,7 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/pole_kinect.dae" />
+          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/pole_kinect.dae" />
         </geometry>
       </visual>
       <collision>
@@ -159,7 +159,7 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/plate_bottom.dae" />
+          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_bottom.dae" />
         </geometry>
       </visual>  
       <collision>
@@ -197,13 +197,13 @@
       <visual>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/plate_middle.dae" />
+          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_middle.dae" />
         </geometry>
       </visual>  
       <collision>
         <origin xyz="0.01364 0.0 0.0" rpy="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/plate_simple.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
+          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_simple.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
         </geometry>
       </collision>
       <inertial>
@@ -233,13 +233,13 @@
         <!-- <origin xyz="0.0 0.0 -0.00325" rpy="0.0 0.0 0.0" /> -->
         <origin xyz="0.0 0.0 -0.0" rpy="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/plate_top.dae" />
+          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_top.dae" />
         </geometry>
       </visual>  
       <collision>
         <origin xyz="0.01364 0.0 0.0" rpy="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/plate_simple.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
+          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_simple.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
         </geometry>
       </collision>
       <inertial>

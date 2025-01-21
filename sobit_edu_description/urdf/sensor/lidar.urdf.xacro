@@ -13,14 +13,14 @@
       <visual>
         <origin rpy="0.0 0.0 ${M_PI}" xyz="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/sensor/lidar_base.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/lidar_base.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
         <origin rpy="0.0 0.0 ${M_PI}" xyz="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="package://sobit_edu_description/meshes/sensor/lidar_base.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/lidar_base.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>

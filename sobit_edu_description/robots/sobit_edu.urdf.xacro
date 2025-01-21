@@ -4,16 +4,21 @@
   <!-- Add Common Xacro: transmissions, colors -->
   <xacro:include filename="$(find sobit_edu_description)/urdf/common.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/materials.urdf.xacro" />
-
+  <xacro:include filename="$(find sobit_edu_description)/urdf/transmission.urdf.xacro" />
+  <xacro:include filename="$(find sobit_edu_description)/urdf/controllers.urdf.xacro" />
+  
 
   <!-- Add URDF: links, joints -->
   <xacro:include filename="$(find sobit_edu_description)/urdf/base/base.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/body/stacks.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/body/cover.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/arm/arm.urdf.xacro" />
+  <xacro:include filename="$(find sobit_edu_description)/urdf/arm/arm.transmission.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/hand/hand.urdf.xacro" />
+   <xacro:include filename="$(find sobit_edu_description)/urdf/hand/hand.transmission.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/back/back.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/head/head.urdf.xacro" />
+  <xacro:include filename="$(find sobit_edu_description)/urdf/head/head.transmission.xacro" />
   
   <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/matrix.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/mic.urdf.xacro" />
@@ -21,7 +26,7 @@
   <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/head_camera.urdf.xacro" />
   
   <xacro:include filename="$(find urg_node)/urdf/hokuyo_ust.urdf.xacro" />
-  <xacro:include filename="$(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" />
+  <!-- <xacro:include filename="$(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" /> -->
 
 
   <!-- Connect the previous Links and Joints -->
