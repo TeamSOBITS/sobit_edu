@@ -18,25 +18,16 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
-from launch.actions import OpaqueFunction
-from launch.actions import SetLaunchConfiguration
-from launch.substitutions import LaunchConfiguration
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 import xacro
-import yaml
 
 
 def generate_launch_description():
     robot_name = "sobit_edu"  ### 各ロボットの名前にする
-    bringup_pkg = robot_name + "_bringup"
-    description_pkg = robot_name + "_description"
-    controller_pkg = robot_name + "_control"
     
     
     ##====================turtle bot2=================================================
+    
     share_dir = get_package_share_directory('kobuki_node')
     # There are two different ways to pass parameters to a non-composed node;
     # either by specifying the path to the file containing the parameters, or by
@@ -44,37 +35,28 @@ def generate_launch_description():
     # When starting a *composed* node on the other hand, only the dictionary
     # style is supported.  To keep the code between the non-composed and
     # composed launch file similar, we use that style here as well.
-    params_file = os.path.join(share_dir, "config", "kobuki_node_params.yaml")
+    params_file = os.path.join(share_dir, 'config', 'kobuki_node_params.yaml')
     with open(params_file, 'r') as f:
         params = yaml.safe_load(f)['kobuki_ros_node']['ros__parameters']
-    kobuki_ros_node = Node(package='kobuki_node',
+    kobuki_ros_node = launch_ros.actions.Node(package='kobuki_node',
                                               executable='kobuki_ros_node',
                                               output='both',
                                               parameters=[params])
     ##==================================================================================
-
-
+    
+    
+    
     ##==================urg=============================================================
-
-    ## 仮想でTFをだして無理やりつなげている＝URDF周りがわからなすぎる ##
-    vtb_node = Node(package='virtual_tf_broadcaster', executable='virtual_tf_broadcaster', name='base_to_lidar', output='screen',
-                    parameters=[{'source_frame_name': 'base_footprint',
-                                'target_frame_name': 'lidar',
-                                'rqt_reconfigure': False,
-                                'pose': {'x'   : 0.2, 'y'    : 0.0, 'z'  : 0.2,
-                                        'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0,}}])
-    ## ここまで仮想TF ##
-
     urg_node_dir = get_package_share_directory('urg_node')
     launch_description = LaunchDescription([
         DeclareLaunchArgument(
             'sensor_interface',
-            default_value='ethernet',
+            default_value='serial',
             description='sensor_interface: supported: serial, ethernet')])
 
     def expand_param_file_name(context):
         param_file = os.path.join(
-                urg_node_dir, 'config',
+                urg_node_dir, 'launch',
                 'urg_node_' + context.launch_configurations['sensor_interface'] + '.yaml')
         if os.path.exists(param_file):
             return [SetLaunchConfiguration('param', param_file)]
@@ -83,22 +65,25 @@ def generate_launch_description():
     launch_description.add_action(param_file_path)
 
     hokuyo_node = Node(
-        package='urg_node', executable='urg_node_driver', output='screen',
+        package='urg_node', node_executable='urg_node', output='screen',
         parameters=[LaunchConfiguration('param')]
         )
-    launch_description.add_action(hokuyo_node)
-    ##==================================================================================
 
+    launch_description.add_action(hokuyo_node)  
+    ##==================================================================================
+    
+    
+    bringup_pkg = robot_name + "_bringup"
+    description_pkg = robot_name + "_description"
+    controller_pkg = robot_name + "_control"
 
     rviz_config = os.path.join(get_package_share_directory(
         bringup_pkg), "rviz", "real.rviz")
     
-
-    ## ここからSOBIT LIGHTを参照してコピペ
     robot_description = os.path.join(get_package_share_directory(
-        description_pkg), "robots", robot_name + "_robot.urdf.xacro")
+        description_pkg), "robots", robot_name + ".urdf.xacro")
     robot_description_config = \
-        xacro.process_file(robot_description, mappings={'enable_gz' : False})
+        xacro.process_file(robot_description, mappings={'enable_gz' : 'False'})
 
     controller_config = os.path.join(
         get_package_share_directory(
@@ -141,10 +126,9 @@ def generate_launch_description():
         name="robot_state_publisher",
         parameters=[
             {"robot_description": robot_description_config.toxml()},
-            {"use_sim_time": False},],
+            {"use_sim_time": 'False'},],
         output="screen",
     )
-    ## ここまでコピペ
 
     rviz2_node = Node(
         package="rviz2",
@@ -155,9 +139,8 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-    	kobuki_ros_node,
-        vtb_node,
     	launch_description,
+    	kobuki_ros_node,
         ros2_control_node,
         joint_state_broadcaster_node,
         velocity_controller_node,

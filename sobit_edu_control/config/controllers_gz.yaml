@@ -21,9 +21,7 @@
     joints:
       - arm_shoulder_pan_joint
       - arm_shoulder_1_tilt_joint
-      - arm_shoulder_2_tilt_joint
       - arm_elbow_1_tilt_joint
-      - arm_elbow_2_tilt_joint
       - arm_wrist_tilt_joint
       - hand_joint
       - head_camera_pan_joint
@@ -34,9 +32,7 @@
     joints:
       - arm_shoulder_pan_joint
       - arm_shoulder_1_tilt_joint
-      - arm_shoulder_2_tilt_joint
       - arm_elbow_1_tilt_joint
-      - arm_elbow_2_tilt_joint
       - arm_wrist_tilt_joint
       - hand_joint
       - head_camera_pan_joint

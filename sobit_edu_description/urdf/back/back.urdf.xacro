@@ -20,15 +20,16 @@
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI/2}" />
         <geometry>
+          <!-- <box size="0.22703561 0.359 0.66023535"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/back/back_base.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="1"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                 iyy="1.0" iyz="0.0"
-                 izz="1.0"/>
+        <mass value="8.80" />
+        <inertia ixx="${1/12*8.80*(0.0474**2+0.66023535**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*8.80*(0.22703561**2+0.0474**2)}"  iyz="0.0"
+                 izz="${1/12*8.80*(0.22703561**2+0.66023535**2)}" />
       </inertial>
     </link>
     

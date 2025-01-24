@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <robot name="head" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find sobit_edu_description)/urdf/head/head.transmission.xacro" />
+  <xacro:include filename="$(find sobit_edu_description)/urdf/head/head.gazebo.xacro" />
 
   <xacro:macro name="head" params="prefix parent">
 
@@ -19,17 +20,19 @@
         <material name="black" />
       </visual>
       <collision>
+        <!-- <origin xyz="0.0 0.0077 0.00825" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" /> -->
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
+          <!-- <box size="0.0285 0.0444 0.0905"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/head/head_camera_base.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
-        <mass value="0.08" />
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                 iyy="1.0" iyz="0.0"
-                 izz="1.0" />
+        <origin xyz="0.0 0.0077 0.00825" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <mass value="0.0014" />
+        <inertia ixx="${1/12*0.0014*(0.10471681**2+0.066**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.0014*(0.09414098**2+0.10471681**2)}"  iyz="0.0"
+                 izz="${1/12*0.0014*(0.09414098**2+0.066**2)}" />
       </inertial>
     </link>
 
@@ -51,17 +54,19 @@
         <material name="black" />
       </visual>
       <collision>
+        <!-- <origin xyz="0.0005 0.0 0.027375" rpy="0.0 0.0 ${-M_PI/2.0}" /> -->
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-M_PI/2.0}" />
         <geometry>
+          <!-- <box size="0.0454  0.0285 0.05475"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/head/head_camera_pan.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-M_PI/2.0}" />
-        <mass value="0.08" />
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                 iyy="1.0" iyz="0.0"
-                 izz="1.0" />
+        <origin xyz="0.0005 0.0 0.027375" rpy="0.0 0.0 ${-M_PI/2.0}" />
+        <mass value="0.0011" />
+        <inertia ixx="${1/12*0.0011*(0.05475**2+0.0285**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.0011*(0.0454**2+0.05475**2)}"  iyz="0.0"
+                 izz="${1/12*0.0011*(0.0454**2+0.0285**2)}" />
       </inertial>
     </link>
 
@@ -83,22 +88,25 @@
         <material name="black" />
       </visual>
       <collision>
+        <!-- <origin xyz="0.0 0.0217 0.05626305" rpy="0.0 0.0 ${M_PI/2.0}" /> -->
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI/2.0}" />
         <geometry>
+          <!-- <box size="0.11640236 0.0994 0.1175261"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/head/head_camera_tilt.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI/2.0}" />
-        <mass value="0.08" />
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                 iyy="1.0" iyz="0.0"
-                 izz="1.0" />
+        <origin xyz="0.0 0.0217 0.05626305" rpy="0.0 0.0 ${M_PI/2.0}" />
+        <mass value="0.0107" />
+        <inertia ixx="${1/12*0.0107*(0.1175261**2+0.0994**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.0107*(0.11640236**2+0.1175261**2)}"  iyz="0.0"
+                 izz="${1/12*0.0107*(0.11640236**2+0.0994**2)}" />
       </inertial>
     </link>
 
 
     <xacro:head_transmission prefix="${prefix}" />
+    <!-- <xacro:head_gazebo prefix="${prefix}" /> -->
 
   </xacro:macro>
 </robot>

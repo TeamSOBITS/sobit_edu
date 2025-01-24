@@ -23,15 +23,16 @@
       <collision>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
         <geometry>
+          <!-- <box size="0.12419999 0.12419999 0.031758"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/matrix_base.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
         <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="1" />
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                 iyy="1.0" iyz="0.0"
-                 izz="1.0" />
+        <mass value="0.078" />
+        <inertia ixx="${1/12*0.87*(0.12419999**2+0.031758**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.87*(0.12419999**2+0.12419999**2)}"  iyz="0.0"
+                 izz="${1/12*0.87*(0.12419999**2+0.031758**2)}" />
       </inertial>
     </link>
 
@@ -52,17 +53,19 @@
         <material name="blue" />
       </visual>
       <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+        <!-- <origin xyz="0.0 0.0 -0.0075" rpy="0.0 0.0 0.0" /> -->
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${M_PI}" />
         <geometry>
+          <!-- <box size="0.10782796 0.10779832 0.0206"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/matrix.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="1" />
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-                 iyy="1.0" iyz="0.0"
-                 izz="1.0" />
+        <origin xyz="0.0 0.0 -0.0075" rpy="0.0 0.0 0.0" />
+        <mass value="0.07" />
+        <inertia ixx="${1/12*0.87*(0.0206**2+0.10779832**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.87*(0.10782796**2+0.0206**2)}"  iyz="0.0"
+                 izz="${1/12*0.87*(0.10782796**2+0.10779832**2)}" />
       </inertial>
     </link>
 

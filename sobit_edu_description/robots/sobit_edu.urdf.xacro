@@ -1,24 +1,22 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- <robot name="sobit_edu" xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" xmlns:xacro="http://www.ros.org/wiki/xacro"> -->
+<robot name="sobit_edu" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<robot name="sobit_edu" xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- Add Common Xacro: transmissions, colors -->
   <xacro:include filename="$(find sobit_edu_description)/urdf/common.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/materials.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/transmission.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/controllers.urdf.xacro" />
-  
+
 
   <!-- Add URDF: links, joints -->
   <xacro:include filename="$(find sobit_edu_description)/urdf/base/base.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/body/stacks.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/body/cover.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/arm/arm.urdf.xacro" />
-  <xacro:include filename="$(find sobit_edu_description)/urdf/arm/arm.transmission.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/hand/hand.urdf.xacro" />
-   <xacro:include filename="$(find sobit_edu_description)/urdf/hand/hand.transmission.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/back/back.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/head/head.urdf.xacro" />
-  <xacro:include filename="$(find sobit_edu_description)/urdf/head/head.transmission.xacro" />
   
   <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/matrix.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/mic.urdf.xacro" />
@@ -27,7 +25,18 @@
   
   <xacro:include filename="$(find urg_node)/urdf/hokuyo_ust.urdf.xacro" />
   <!-- <xacro:include filename="$(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" /> -->
-
+  <!-- Add variables -->
+  <xacro:arg name="enable_gz"                 default="True" />
+  <xacro:arg name="robot_name"                default="sobit_edu" />
+  <xacro:controllers name="joints_control" enable_gz="$(arg enable_gz)" robot_name="$(arg robot_name)" />
+  <!-- Add URDF: gazebo -->
+  <!-- <xacro:include filename="$(find sobit_edu_description)/urdf/gazebo.urdf.xacro" /> -->
+  <gazebo>
+    <!-- <plugin filename="ignition-gazebo-joint-state-publisher-system" name="ignition::gazebo::systems::JointStatePublisher"> -->
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>sobit_edu/joint_states</topic>
+    </plugin>
+  </gazebo>
 
   <!-- Connect the previous Links and Joints -->
   <xacro:base/>

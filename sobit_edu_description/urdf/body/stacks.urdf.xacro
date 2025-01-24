@@ -203,7 +203,8 @@
       <collision>
         <origin xyz="0.01364 0.0 0.0" rpy="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_simple.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
+          <!-- <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/plate_simple.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" /> -->
+          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_middle.dae" />
         </geometry>
       </collision>
       <inertial>
@@ -239,7 +240,8 @@
       <collision>
         <origin xyz="0.01364 0.0 0.0" rpy="0.0 0.0 0.0" />
         <geometry>
-          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_simple.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
+          <!-- <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/plate_simple.stl" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" /> -->
+          <mesh filename="file://$(find turtlebot2_description)/meshes/stacks/hexagons/plate_top.dae" />
         </geometry>
       </collision>
       <inertial>

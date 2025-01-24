@@ -19,17 +19,19 @@
         <material name="black" />
       </visual>
       <collision>
+        <!-- <origin xyz="0 0 0" rpy="0.0 0.0 ${M_PI/2.0}" /> -->
         <origin xyz="0.02812 -0.04061 -0.05724" rpy="0.0 0.0 ${M_PI/2.0}" />
         <geometry>
+          <!-- <box size="0.09414098 0.066 0.10471681"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_back.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0 0 0" rpy="0.0 0.0 ${M_PI/2.0}" />
+        <mass value="0.87" />
+        <inertia ixx="${1/12*0.87*(0.10471681**2+0.066**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.87*(0.09414098**2+0.10471681**2)}"  iyz="0.0"
+                 izz="${1/12*0.87*(0.09414098**2+0.066**2)}" />
       </inertial>
     </link>
 
@@ -50,17 +52,19 @@
         <material name="black" />
       </visual>
       <collision>
+        <!-- <origin xyz="0 0.03541087 0.028" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" /> -->
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
+          <!-- <box size="0.03249864 0.10332039 0.056"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0 0.03541087 0.028" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <mass value="0.13" />
+        <inertia ixx="${1/12*0.13*(0.056**2+0.10332039**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.13*(0.03249864**2+0.056**2)}"  iyz="0.0"
+                 izz="${1/12*0.13*(0.03249864**2+0.10332039**2)}" />
       </inertial>
     </link>
 
@@ -80,17 +84,19 @@
         <material name="black" />
       </visual>
       <collision>
+        <!-- <origin xyz="0.0 0.03545391 0.028" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" /> -->
         <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
+          <!-- <box size="0.03232649 0.10323431 0.06"/> -->
           <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0.0 0.03545391 0.028" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <mass value="0.13" />
+        <inertia ixx="${1/12*0.13*(0.06**2+0.10323431**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.13*(0.03232649**2+0.06**2)}"  iyz="0.0"
+                 izz="${1/12*0.13*(0.03232649**2+0.10323431**2)}" />
       </inertial>
     </link>
 
@@ -117,11 +123,11 @@
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.025 -0.03" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="-0.0124985 0.04896524 0.009" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <mass value="0.16" />
+        <inertia ixx="${1/12*0.16*(0.044**2+0.11206952**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.16*(0.03913913**2+0.044**2)}"  iyz="0.0"
+                 izz="${1/12*0.16*(0.03913913**2+0.11206952**2)}" />
       </inertial>
     </link>
 
@@ -148,78 +154,78 @@
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 -0.025 -0.03" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0.0124985 0.04896524 0.009" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <mass value="0.16" />
+        <inertia ixx="${1/12*0.16*(0.044**2+0.11206952**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.16*(0.03913913**2+0.044**2)}"  iyz="0.0"
+                 izz="${1/12*0.16*(0.03913913**2+0.11206952**2)}" />
       </inertial>
     </link>
 
     <joint name="${prefix_hand}_outer_l_joint" type="continuous">
-      <parent link="${prefix_hand}_${prefix_finger}_l_link" />
+      <parent link="${prefix_hand}_base_link" />
       <child link="${prefix_hand}_outer_l_link" />
-      <origin xyz="-0.015 0.025 -0.03" rpy="0.0 0.0 0.0" />
+      <origin xyz="0 0 0" rpy="0.0 0.0 0.0" />
       <axis xyz="1 0 0" />
       <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1.0" offset="0" />
     </joint>
 
     <link name="${prefix_hand}_outer_l_link">
       <visual>
-        <origin xyz="-0.004 0.0 -0.07" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="-0.004 0.0 0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
           <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
-        <origin xyz="-0.004 0.0 -0.07" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="-0.004 0.0 0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
           <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_l.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="-0.004 0.0 -0.07" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0.0 0.035 0.028" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <mass value="0.08" />
+        <inertia ixx="${1/12*0.08*(0.056**2+0.08414213**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.08*(0.0141376**2+0.056**2)}"  iyz="0.0"
+                 izz="${1/12*0.08*(0.0141376**2+0.08414213**2)}" />
       </inertial>
     </link>
 
     <joint name="${prefix_hand}_outer_r_joint" type="continuous">
-      <parent link="${prefix_hand}_${prefix_finger}_r_link" />
+      <parent link="${prefix_hand}_base_link" />
       <child link="${prefix_hand}_outer_r_link" />
-      <origin xyz="-0.015 -0.025 -0.03" rpy="0.0 0.0 0.0" />
+      <origin xyz="0 -0.08 0" rpy="0.0 0.0 0.0" />
       <axis xyz="-1 0 0" />
       <mimic joint="${prefix_hand}_joint" multiplier="1.0" offset="0" />
     </joint>
 
     <link name="${prefix_hand}_outer_r_link">
       <visual>
-        <origin xyz="-0.004 0.0 -0.07" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="-0.004 0 0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
           <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
         <material name="black" />
       </visual>
       <collision>
-        <origin xyz="-0.004 0.0 -0.07" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="-0.004 0 0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
         <geometry>
           <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_r.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0.0 0.035 0.028" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <mass value="0.08" />
+        <inertia ixx="${1/12*0.08*(0.056**2+0.08414213**2)}"  ixy="0.0" ixz="0.0"
+                 iyy="${1/12*0.08*(0.0141376**2+0.056**2)}"  iyz="0.0"
+                 izz="${1/12*0.08*(0.0141376**2+0.08414213**2)}" />
       </inertial>
     </link>
 
     <xacro:hand_transmission prefix_hand="${prefix_hand}" prefix_finger="${prefix_finger}" />
-    <xacro:hand_gazebo prefix="${prefix_hand}" />
+    <!-- <xacro:hand_gazebo prefix="${prefix_hand}" /> -->
 
   </xacro:macro>
 </robot>

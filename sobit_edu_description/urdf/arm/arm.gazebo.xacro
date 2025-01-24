@@ -1,0 +1,36 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="arm_gazebo" params="prefix">
+    <gazebo reference="${prefix}_base_link">
+      <selfCollide>false</selfCollide>
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+    </gazebo>
+    <gazebo reference="${prefix}_shoulder_pan_link">
+      <selfCollide>false</selfCollide>
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+    </gazebo>
+    <gazebo reference="${prefix}_shoulder_1_tilt_link">
+      <selfCollide>false</selfCollide>
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+    </gazebo>
+    <gazebo reference="${prefix}_elbow_1_tilt_link">
+      <selfCollide>false</selfCollide>
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+    </gazebo>
+    <gazebo reference="${prefix}_wrist_tilt_link">
+      <selfCollide>false</selfCollide>
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+    </gazebo>
+    <gazebo>
+    <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+      <jointName>arm_shoulder_pan_joint, arm_shoulder_1_tilt_joint, arm_elbow_1_tilt_joint, arm_wrist_tilt_joint</jointName>
+      <updateRate>1000.0</updateRate>
+    </plugin>
+  </gazebo>
+  </xacro:macro>
+</robot>
