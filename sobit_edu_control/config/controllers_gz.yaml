@@ -24,6 +24,12 @@
       - arm_elbow_1_tilt_joint
       - arm_wrist_tilt_joint
       - hand_joint
+      - hand_inner_l_joint
+      - hand_inner_r_joint
+      - hand_outer_l_joint
+      - hand_outer_r_joint
+      - hand_finger_l_joint
+      - hand_finger_r_joint
       - head_camera_pan_joint
       - head_camera_tilt_joint
 
@@ -35,6 +41,12 @@
       - arm_elbow_1_tilt_joint
       - arm_wrist_tilt_joint
       - hand_joint
+      - hand_inner_l_joint
+      - hand_inner_r_joint
+      - hand_outer_l_joint
+      - hand_outer_r_joint
+      - hand_finger_l_joint
+      - hand_finger_r_joint
       - head_camera_pan_joint
       - head_camera_tilt_joint
 
@@ -49,8 +61,8 @@
 # https://control.ros.org/humble/doc/ros2_controllers/diff_drive_controller/doc/userdoc.html
 /**/diff_controller:
   ros__parameters:
-    left_wheel_names : ["base_l_drive_wheel_joint"]
-    right_wheel_names: ["base_r_drive_wheel_joint"]
+    left_wheel_names : ["wheel_l_joint"]
+    right_wheel_names: ["wheel_r_joint"]
 
     wheel_separation: 0.200
     #wheels_per_side: 1  # actually 2, but both are controlled by 1 signal
@@ -71,7 +83,7 @@
 
     cmd_vel_timeout: 0.5
     #publish_limited_velocity: true
-    use_stamped_vel: false
+    use_stamped_vel: true
     #velocity_rolling_window_size: 10
 
     # Velocity and acceleration limits

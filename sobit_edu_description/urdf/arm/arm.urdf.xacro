@@ -175,6 +175,6 @@
     <link name="${prefix}_wrist_tilt_link" />
 
     <xacro:arm_transmission prefix="${prefix}" />
-    <!-- <xacro:arm_gazebo prefix="${prefix}"/> -->
+    <xacro:arm_gazebo prefix="${prefix}"/>
   </xacro:macro>
 </robot>
