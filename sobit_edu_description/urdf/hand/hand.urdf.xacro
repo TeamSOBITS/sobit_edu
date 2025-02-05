@@ -219,7 +219,6 @@
     </link>
 
     <xacro:hand_transmission prefix_hand="${prefix_hand}" prefix_finger="${prefix_finger}" />
-    <xacro:hand_gazebo prefix="${prefix_hand}" />
 
   </xacro:macro>
 </robot>

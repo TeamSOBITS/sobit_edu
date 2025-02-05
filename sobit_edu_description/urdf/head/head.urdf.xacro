@@ -106,7 +106,7 @@
 
 
     <xacro:head_transmission prefix="${prefix}" />
-    <xacro:head_gazebo prefix="${prefix}" />
+    <!-- <xacro:head_gazebo prefix="${prefix}" /> -->
 
   </xacro:macro>
 </robot>

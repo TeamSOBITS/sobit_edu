@@ -25,7 +25,6 @@
       - arm_wrist_tilt_joint
       - hand_joint
       - hand_inner_l_joint
-      - hand_inner_r_joint
       - hand_outer_l_joint
       - hand_outer_r_joint
       - hand_finger_l_joint
@@ -42,13 +41,13 @@
       - arm_wrist_tilt_joint
       - hand_joint
       - hand_inner_l_joint
-      - hand_inner_r_joint
       - hand_outer_l_joint
       - hand_outer_r_joint
       - hand_finger_l_joint
       - hand_finger_r_joint
       - head_camera_pan_joint
       - head_camera_tilt_joint
+
 
     command_interfaces:
       - position

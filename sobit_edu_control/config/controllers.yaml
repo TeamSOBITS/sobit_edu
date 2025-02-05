@@ -1,4 +1,4 @@
-controller_manager:
+/**/controller_manager:
   ros__parameters:
     update_rate: 100  # Hz
 
@@ -7,21 +7,39 @@ controller_manager:
 
     joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
-
+    diff_controller:
+      type: diff_drive_controller/DiffDriveController
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-velocity_controller:
+/**/velocity_controller:
   ros__parameters:
-    joints:      ### アームなどの関節＝Dynamixelのモータ名を全部リストで！
-      - "shoulder_1"   ### ロボットごとに変わるのはこの辺かな
-      - "shoulder_2"   ### みたいな
+    joints:
+      - arm_shoulder_pan_joint
+      - arm_shoulder_1_tilt_joint
+      - arm_shoulder_2_tilt_joint
+      - arm_elbow_1_tilt_joint
+      - arm_elbow_2_tilt_joint
+      - arm_wrist_tilt_joint
+      - hand_joint
+      - head_camera_pan_joint
+      - head_camera_tilt_joint
 
-joint_trajectory_controller:
+
+
+/**/joint_trajectory_controller:
   ros__parameters:
-    joints:      ### アームなどの関節＝Dynamixelのモータ名を全部リストで！
-      - "shoulder_1"   ### ロボットごとに変わるのはこの辺かな
-      - "shoulder_2"   ### みたいな
+    joints:
+      - arm_shoulder_pan_joint
+      - arm_shoulder_1_tilt_joint
+      - arm_shoulder_2_tilt_joint
+      - arm_elbow_1_tilt_joint
+      - arm_elbow_2_tilt_joint
+      - arm_wrist_tilt_joint
+      - hand_joint
+      - head_camera_pan_joint
+      - head_camera_tilt_joint
+
 
     command_interfaces:
       - position
@@ -29,3 +47,4 @@ joint_trajectory_controller:
     state_interfaces:
       - position
       - velocity
+

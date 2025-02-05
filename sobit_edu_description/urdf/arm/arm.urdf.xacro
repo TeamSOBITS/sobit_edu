@@ -105,7 +105,7 @@
     </link>
 
 
-    <!-- <joint name="${prefix}_shoulder_2_tilt_joint" type="revolute">
+    <joint name="${prefix}_shoulder_2_tilt_joint" type="revolute">
       <parent link="${prefix}_shoulder_pan_link" />
       <child link="${prefix}_shoulder_2_tilt_link" />
       <origin xyz="0.0 0.0 0.0405" rpy="0.0 0.0 ${M_PI}" />
@@ -114,7 +114,7 @@
       <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}" />
     </joint>
 
-    <link name="${prefix}_shoulder_2_tilt_link" /> -->
+    <link name="${prefix}_shoulder_2_tilt_link" />
 
 
     <joint name="${prefix}_elbow_1_tilt_joint" type="revolute">
@@ -153,7 +153,7 @@
     </link>
 
 
-    <!-- <joint name="${prefix}_elbow_2_tilt_joint" type="revolute">
+    <joint name="${prefix}_elbow_2_tilt_joint" type="revolute">
       <parent link="${prefix}_shoulder_1_tilt_link" />
       <child link="${prefix}_elbow_2_tilt_link" />
       <origin xyz="0.02538 0.0 0.148" rpy="0.0 0.0 ${M_PI}" />
@@ -162,7 +162,7 @@
       <limit effort="30" lower="${-M_PI/2.0}" upper="${M_PI/2.0}" velocity="${M_PI/2.0}" />
     </joint>
 
-    <link name="${prefix}_elbow_2_tilt_link" /> -->
+    <link name="${prefix}_elbow_2_tilt_link" />
 
     <joint name="${prefix}_wrist_tilt_joint" type="revolute">
       <parent link="${prefix}_elbow_1_tilt_link" />
@@ -175,6 +175,6 @@
     <link name="${prefix}_wrist_tilt_link" />
 
     <xacro:arm_transmission prefix="${prefix}" />
-    <xacro:arm_gazebo prefix="${prefix}"/>
+    <!-- <xacro:arm_gazebo prefix="${prefix}"/> -->
   </xacro:macro>
 </robot>

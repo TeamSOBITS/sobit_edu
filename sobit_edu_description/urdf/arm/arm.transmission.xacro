@@ -7,10 +7,10 @@
 
     <xacro:position_joint_transmission joint="${prefix}_shoulder_1_tilt_joint" reduction="1" />
 
-    <!-- <xacro:position_joint_transmission joint="${prefix}_shoulder_2_tilt_joint" reduction="1" /> -->
+    <xacro:position_joint_transmission joint="${prefix}_shoulder_2_tilt_joint" reduction="1" />
     <xacro:position_joint_transmission joint="${prefix}_elbow_1_tilt_joint"    reduction="1" />
 
-    <!-- <xacro:position_joint_transmission joint="${prefix}_elbow_2_tilt_joint"    reduction="1" /> -->
+    <xacro:position_joint_transmission joint="${prefix}_elbow_2_tilt_joint"    reduction="1" />
     <xacro:position_joint_transmission joint="${prefix}_wrist_tilt_joint"      reduction="1" />
 
   </xacro:macro>

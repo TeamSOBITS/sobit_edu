@@ -109,8 +109,6 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=[
                     "/clock" + "@rosgraph_msgs/msg/Clock" + "[ignition.msgs.Clock",
-                    # "/kachaka/lidar/scan" + "@sensor_msgs/msg/LaserScan" + "[ignition.msgs.LaserScan",
-                    # "/kachaka/lidar/scan/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
                     "/tf" + "@tf2_msgs/msg/TFMessage" + "[ignition.msgs.TFMessage",
                     "/model/sobit_edu/pose" + "@geometry_msgs/msg/Pose" + "[ignition.msgs.Pose",
                     "/joint_states" + "@sensor_msgs/msg/JointState" + "[ignition.msgs.Model",

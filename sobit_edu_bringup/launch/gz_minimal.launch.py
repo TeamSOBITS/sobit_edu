@@ -68,12 +68,6 @@ def generate_launch_description():
                 'robot_coords_x': '0', # x 
                 'robot_coords_y': '0', # y
                 'robot_coords_Y': '0', # yaw
-                'enable_gz_front_cam_color' : 'True',
-                'enable_gz_back_cam_color' : 'True',
-                'enable_gz_head_cam_color' : 'True',
-                'enable_gz_head_cam_depth' : 'True',
-                'enable_gz_hand_cam_color' : 'True',
-                'enable_gz_hand_cam_depth' : 'True',
                 'enable_gz_lidar' : 'True',
                 'enable_gz_imu' : 'True',
             }.items()
@@ -102,5 +96,5 @@ def generate_launch_description():
         #         'enable_gz_imu' : 'True',
         #     }.items()
         # ),
-        rviz_node,
+        rviz_node
     ])

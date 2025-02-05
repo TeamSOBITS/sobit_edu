@@ -25,18 +25,18 @@
   
   <xacro:include filename="$(find urg_node)/urdf/hokuyo_ust.urdf.xacro" />
   <!-- <xacro:include filename="$(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" /> -->
-  <!-- Add variables -->
-  <xacro:arg name="enable_gz"                 default="True" />
-  <xacro:arg name="robot_name"                default="sobit_edu" />
-  <xacro:controllers name="joints_control" enable_gz="$(arg enable_gz)" robot_name="$(arg robot_name)" />
+  
+  
   <!-- Add URDF: gazebo -->
-  <!-- <xacro:include filename="$(find sobit_edu_description)/urdf/gazebo.urdf.xacro" /> -->
-  <gazebo>
-    <!-- <plugin filename="ignition-gazebo-joint-state-publisher-system" name="ignition::gazebo::systems::JointStatePublisher"> -->
-    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
-      <topic>sobit_edu/joint_states</topic>
-    </plugin>
-  </gazebo>
+  <xacro:include filename="$(find sobit_edu_description)/urdf/gazebo.urdf.xacro" />  
+  
+  <!-- Add variables -->
+  <xacro:arg name="enable_gz"                 default="False" />
+  <xacro:arg name="enable_gz_lidar"           default="True" />
+  <xacro:arg name="robot_name"                default="sobit_edu" />
+
+  <xacro:controllers name="joints_control" enable_gz="$(arg enable_gz)" robot_name="$(arg robot_name)" />
+
 
   <!-- Connect the previous Links and Joints -->
   <xacro:base/>
@@ -50,4 +50,14 @@
   <xacro:mic    prefix="mic"    parent="back_base_link" />
   <xacro:matrix prefix="matrix" parent="back_base_link" />
   <xacro:lidar  prefix="lidar"  parent="plate_bottom_link" />
+
+
+  <!-- Add Gazebo: plugins -->
+  <xacro:if value="${$(arg enable_gz)}">
+    <xacro:gazebo_sensors robot_name="$(arg robot_name)"
+
+      enable_gz_lidar="$(arg enable_gz_lidar)"
+      enable_gz_imu="$(arg enable_gz_imu)"
+    />
+  </xacro:if>
 </robot>
