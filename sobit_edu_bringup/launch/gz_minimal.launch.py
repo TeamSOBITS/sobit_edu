@@ -33,11 +33,13 @@ def generate_launch_description():
         arguments=['-d', rviz_config],
     )
 
+    ##### SOBIT LIGHT参照しにいっているので今後注意！！ #####
     world_file = os.path.join(get_package_share_directory(
         'sobit_light_description'), 
         'worlds',
         'empty_w_physics.sdf'
     )
+    ##### SOBIT LIGHT参照しにいっているので今後注意！！ #####
 
     return LaunchDescription([
         # Launch gazebo environment

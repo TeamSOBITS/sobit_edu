@@ -11,7 +11,10 @@ cd ..
 ros_packages=(
     "sobits_msgs" \
     "dynamixel_hardware" \
-    "realsense_ros"
+    "realsense_ros" \
+    "urg_node" \
+    "kobuki_ros" \
+    "turtlebot2_description"
 )
 
 #Clone all packages
@@ -48,10 +51,9 @@ sudo apt-get install -y \
     ros-$ROS_DISTRO-urg-node \
     ros-$ROS_DISTRO-urg-node-msgs \
     ros-$ROS_DISTRO-robot-state-publisher \
-    ros-$ROS_DISTRO-joint-state-controller \
     ros-$ROS_DISTRO-joint-state-publisher \
     ros-$ROS_DISTRO-joint-state-publisher-gui \
-    ros-$ROS_DISTRO-joint-limits-interface \
+    ros-$ROS_DISTRO-joint-limits \
     ros-$ROS_DISTRO-hardware-interface \
     ros-$ROS_DISTRO-transmission-interface \
     ros-$ROS_DISTRO-controller-interface \
@@ -61,14 +63,10 @@ sudo apt-get install -y \
     ros-$ROS_DISTRO-sensor-msgs \
     ros-$ROS_DISTRO-trajectory-msgs \
     ros-$ROS_DISTRO-geometry-msgs \
-    ros-$ROS_DISTRO-joy
-    
-    # refer to sobit_light
+    ros-$ROS_DISTRO-joy \
     ros-$ROS_DISTRO-ros2-control \
     ros-$ROS_DISTRO-ros2-controllers \
     ros-$ROS_DISTRO-control-toolbox \
-    ros-$ROS_DISTRO-controller-interface \
-    ros-$ROS_DISTRO-controller-manager \
     ros-$ROS_DISTRO-position-controllers \
     ros-$ROS_DISTRO-velocity-controllers \
     ros-$ROS_DISTRO-effort-controllers \
@@ -77,12 +75,8 @@ sudo apt-get install -y \
     ros-$ROS_DISTRO-joint-state-publisher \
     ros-$ROS_DISTRO-joint-state-publisher-gui \
     ros-$ROS_DISTRO-joint-state-broadcaster \
-    ros-$ROS_DISTRO-joint-limits \
     ros-$ROS_DISTRO-robot-controllers \
     ros-$ROS_DISTRO-robot-controllers-interface \
-    ros-$ROS_DISTRO-robot-state-publisher \
-    ros-$ROS_DISTRO-hardware-interface \
-    ros-$ROS_DISTRO-transmission-interface \
     ros-$ROS_DISTRO-urdf \
     ros-$ROS_DISTRO-urdf-launch \
     ros-$ROS_DISTRO-xacro \
@@ -93,9 +87,9 @@ sudo apt-get install -y \
 
     # Install Gazebo Fortress with binaries
     sudo apt-get install -y \
-        ros-${ROS_DISTRO}-ros-gz \
-        ros-${ROS_DISTRO}-ign-ros2-control \
-        ros-${ROS_DISTRO}-ign-ros2-control-demos
+        ros-$ROS_DISTRO-ros-gz \
+        ros-$ROS_DISTRO-ign-ros2-control \
+        ros-$ROS_DISTRO-ign-ros2-control-demos
 
     echo "╚══╣ Setup: SOBIT EDU (FINISHED) ╠══╝"
 
