@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -25,7 +26,21 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 
-import yaml
+
+from ament_index_python.packages import get_package_share_directory
+
+import yaml 
+import launch_ros
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+from launch_ros.actions import Node
+# import xacro
+# import yaml
+# import launch_ros
+# from launch.actions import IncludeLaunchDescription,SetLaunchConfiguration,DeclareLaunchArgument,LogInfo
+
+
 
 
 def generate_launch_description():
@@ -42,16 +57,13 @@ def generate_launch_description():
         output="screen",
     )
 
-    params_file = os.path.join(get_package_share_directory(bringup_pkg), 'config', 'kobuki_node_params.yaml')
-    with open(params_file, 'r') as f:
-        kobuki_params = yaml.safe_load(f)['kobuki_ros_node']['ros__parameters']
-
     return LaunchDescription([
+        # robot_state_publisher_node,
         rviz2_node,
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 PathJoinSubstitution([
-                    get_package_share_directory(bringup_pkg),
+                    FindPackageShare('sobit_edu_bringup'),
                     'launch',
                     'robot.launch.py'
                 ])
@@ -64,22 +76,34 @@ def generate_launch_description():
                 'robot_coords_Y': '0', # yaw
             }.items()
         ),
-        Node(
-                package='kobuki_node',
-                executable='kobuki_ros_node',
-                output='both',
-                parameters=[kobuki_params]
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                PathJoinSubstitution([
+                    FindPackageShare('kobuki_node'),
+                    'launch',
+                    'kobuki_node-launch.py'
+                ])
+
+            ]),
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 PathJoinSubstitution([
-                    get_package_share_directory("urg_node"),
+                    FindPackageShare('azure_kinect_ros_driver'),
                     'launch',
-                    'urg.launch.py'
+                    'driver.launch.py'
                 ])
+
             ]),
-            launch_arguments={
-                "config_file": os.path.join(get_package_share_directory(bringup_pkg), 'config', 'urg_node_params.yaml')
-            }.items()
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                PathJoinSubstitution([
+                    FindPackageShare('urg_node2'),
+                    'launch',
+                    'urg_node2.launch.py'
+                ])
+
+            ]),
         )
     ])
