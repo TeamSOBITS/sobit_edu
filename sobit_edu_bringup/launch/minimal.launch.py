@@ -26,9 +26,6 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 
-
-from ament_index_python.packages import get_package_share_directory
-
 import yaml 
 import launch_ros
 from launch import LaunchDescription
@@ -46,20 +43,26 @@ from launch_ros.actions import Node
 def generate_launch_description():
     robot_name = "sobit_edu"
     bringup_pkg = robot_name + "_bringup"
+
     rviz_config = os.path.join(get_package_share_directory(
         bringup_pkg), "rviz", "real.rviz")
+
+    urg_config = os.path.join(get_package_share_directory(
+        bringup_pkg), "config", "urg_node_params.yaml")
     
-    rviz2_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        arguments=["-d", rviz_config],
-        output="screen",
-    )
+    kobuki_param_file = os.path.join(get_package_share_directory("sobit_edu_bringup"), "config", "kobuki_node_params.yaml")
+    with open(kobuki_param_file, "r") as f:
+        kobuki_params = yaml.safe_load(f)["kobuki_ros_node"]["ros__parameters"]
 
     return LaunchDescription([
         # robot_state_publisher_node,
-        rviz2_node,
+        Node(
+            package="rviz2",
+            executable="rviz2",
+            name="rviz2",
+            arguments=["-d", rviz_config],
+            output="screen",
+        ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 PathJoinSubstitution([
@@ -76,15 +79,11 @@ def generate_launch_description():
                 'robot_coords_Y': '0', # yaw
             }.items()
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([
-                PathJoinSubstitution([
-                    FindPackageShare('kobuki_node'),
-                    'launch',
-                    'kobuki_node-launch.py'
-                ])
-
-            ]),
+        Node(
+            package="kobuki_node",
+            executable="kobuki_ros_node",
+            output="both",
+            parameters=[kobuki_params]
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
@@ -99,11 +98,13 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 PathJoinSubstitution([
-                    FindPackageShare('urg_node2'),
+                    FindPackageShare('urg_node'),
                     'launch',
-                    'urg_node2.launch.py'
+                    'urg.launch.py'
                 ])
-
             ]),
+            launch_arguments={
+                "config_file" : urg_config
+            }.items()
         )
     ])
