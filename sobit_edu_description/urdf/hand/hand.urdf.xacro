@@ -1,224 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <robot name="hand" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find sobit_edu_description)/urdf/hand/hand.transmission.xacro" />
-  <xacro:include filename="$(find sobit_edu_description)/urdf/hand/hand.gazebo.xacro" />
-  
   <xacro:macro name="hand" params="prefix_hand prefix_finger parent">
 
-    <joint name="${prefix_hand}_base_joint" type="fixed">
-      <parent link="${parent}" />
-      <child link="${prefix_hand}_base_link" />
-      <origin xyz="-0.02812 0.04061 0.05724" rpy="0.0 0.0 0.0" />
+    <!--  Joint: Hand left sub -->
+    <joint name="${prefix_hand}_sub_l_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix_hand}_sub_l_link"/>
+      <origin xyz="0.009 0.015 0.0" rpy="0 0 0"/>
     </joint>
 
-    <link name="${prefix_hand}_base_link">
+    <!--  Link: Hand left sub -->
+    <link name="${prefix_hand}_sub_l_link">
       <visual>
-        <origin xyz="0.02812 -0.04061 -0.05724" rpy="0.0 0.0 ${M_PI/2.0}" />
+        <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_back.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link9-10_hand.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="black" />
+        <material name="black"/>
       </visual>
+
       <collision>
-        <origin xyz="0.02812 -0.04061 -0.05724" rpy="0.0 0.0 ${M_PI/2.0}" />
+        <origin xyz="${0.0035/2} ${0.04/2} 0.0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_back.stl" scale="0.001 0.001 0.001" />
+          <box size="0.0035 0.0520 0.0120"/>
         </geometry>
       </collision>
+
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="${0.0035/2} ${0.04/2} 0.0" rpy="0 0 0"/>
+        <mass value="0.002" />
+        <inertia  ixx="${1/12*0.002*(0.0035**2+0.0120**2)}" ixy="0.0" ixz="0.0"
+                  iyy="${1/12*0.002*(0.0520**2+0.0120**2)}" iyz="0.0"
+                  izz="${1/12*0.002*(0.0035**2+0.0520**2)}" />
       </inertial>
     </link>
 
-    <joint name="${prefix_hand}_joint" type="revolute">
-      <parent link="${prefix_hand}_base_link" />
-      <child link="${prefix_hand}_inner_r_link" />
-      <origin xyz="0 -0.05666 0.02054" rpy="0.0 0.0 0.0" />
-      <axis xyz="-1 0 0" />
-      <limit lower="${-M_PI/2.0}" upper="0" effort="1" velocity="1" />
+    <!--  Joint: Hand right sub -->
+    <joint name="${prefix_hand}_sub_r_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix_hand}_sub_r_link"/>
+      <origin xyz="0.009 -0.015 0.0" rpy="0 0 0"/>
     </joint>
 
-    <link name="${prefix_hand}_inner_r_link">
+    <!--  Link: Hand right sub -->
+    <link name="${prefix_hand}_sub_r_link">
       <visual>
-        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="0 0 0" rpy="0 ${M_PI} ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_r.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link9-10_hand.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="black" />
+        <material name="black"/>
       </visual>
+
       <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="${0.0035/2} -${0.04/2} 0.0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_r.stl" scale="0.001 0.001 0.001" />
+          <box size="0.0035 0.0520 0.0120"/>
         </geometry>
       </collision>
+
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="${0.0035/2} -${0.04/2} 0.0" rpy="0 0 0"/>
+        <mass value="0.002" />
+        <inertia  ixx="${1/12*0.002*(0.0035**2+0.0120**2)}" ixy="0.0" ixz="0.0"
+                  iyy="${1/12*0.002*(0.0520**2+0.0120**2)}" iyz="0.0"
+                  izz="${1/12*0.002*(0.0035**2+0.0520**2)}" />
       </inertial>
     </link>
 
-    <joint name="${prefix_hand}_inner_l_joint" type="continuous">
-      <parent link="${prefix_hand}_base_link" />
-      <child link="${prefix_hand}_inner_l_link" />
-      <origin xyz="0 -0.02456 0.02054" rpy="0.0 0.0 0.0" />
-      <axis xyz="1 0 0" />
-      <mimic joint="${prefix_hand}_joint" multiplier="1.0" offset="0" />
+    <!--  Act 8: Hand Finger (left) -->
+    <joint name="${prefix_hand}_joint" type="prismatic">
+      <parent link="${prefix_hand}_sub_l_link"/>
+      <child link="${prefix_hand}_link"/>
+      <origin xyz="0.0 0.04 0.0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit velocity="4.8" effort="1" lower="0.0" upper="${0.02675-0.055}" />
     </joint>
-    <link name="${prefix_hand}_inner_l_link">
+
+    <!--  Act 8: Hand Finger (left) -->
+    <link name="${prefix_hand}_link">
       <visual>
-        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="0.0 0.0 0" rpy="0 0 ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link11-12_finger.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="black" />
+        <material name="black"/>
       </visual>
+
       <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="${0.0056+0.068/2} -${0.009+0.008/2} 0.0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_inner_l.stl" scale="0.001 0.001 0.001" />
+          <box size="0.068 0.008 0.034"/>
         </geometry>
       </collision>
+
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="${0.0056+0.068/2} -${0.009+0.008/2} 0.0" rpy="0 0 0"/>
+        <mass value="0.032" />
+        <inertia  ixx="${1/12*0.032*(0.068**2+0.034**2)}" ixy="0.0" ixz="0.0"
+                  iyy="${1/12*0.032*(0.008**2+0.034**2)}" iyz="0.0"
+                  izz="${1/12*0.032*(0.068**2+0.008**2)}" />
       </inertial>
     </link>
 
-    <joint name="${prefix_hand}_${prefix_finger}_l_joint" type="continuous">
-      <parent link="${prefix_hand}_inner_l_link" />
-      <child link="${prefix_hand}_${prefix_finger}_l_link" />
-      <origin xyz="0.019 0 0.08" rpy="0.0 0.0 0.0" />
-      <axis xyz="1 0 0" />
-      <mimic joint="${prefix_hand}_joint" multiplier="-1.0" offset="0" />
+    <!--  Act 8: Hand Finger (right) -->
+    <joint name="${prefix_hand}_sub_joint" type="prismatic">
+      <parent link="${prefix_hand}_sub_r_link"/>
+      <child link="${prefix_hand}_sub_link"/>
+      <origin xyz="0.0 -0.04 0.0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit velocity="4.8" effort="1" lower="-1.57" upper="1.57"/>
+      <mimic joint="${prefix_hand}_joint" multiplier="-1"/>
     </joint>
 
-    <link name="${prefix_hand}_${prefix_finger}_l_link">
+    <!--  Act 8: Hand Finger (right) -->
+    <link name="${prefix_hand}_sub_link">
       <visual>
-        <origin xyz="0.0 0.025 -0.03" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="0.0 -0.0 0" rpy="0 ${M_PI} ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_finger_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link11-12_finger.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="black" />
+        <material name="black"/>
       </visual>
+
       <collision>
-        <origin xyz="0.0 0.025 -0.03" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="${0.0056+0.068/2} ${0.009+0.008/2} 0.0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_finger_l.stl" scale="0.001 0.001 0.001" />
+          <box size="0.068 0.008 0.034"/>
         </geometry>
       </collision>
+
       <inertial>
-        <origin xyz="0.0 0.025 -0.03" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="${0.0056+0.068/2} ${0.009+0.008/2} 0.0" rpy="0 0 0"/>
+        <mass value="0.032" />
+        <inertia  ixx="${1/12*0.032*(0.068**2+0.034**2)}" ixy="0.0" ixz="0.0"
+                  iyy="${1/12*0.032*(0.008**2+0.034**2)}" iyz="0.0"
+                  izz="${1/12*0.032*(0.068**2+0.008**2)}" />
       </inertial>
     </link>
 
-    <joint name="${prefix_hand}_${prefix_finger}_r_joint" type="continuous">
-      <parent link="${prefix_hand}_inner_r_link" />
-      <child link="${prefix_hand}_${prefix_finger}_r_link" />
-      <origin xyz="0.019 0 0.08" rpy="0.0 0.0 0.0" />
-      <axis xyz="-1 0 0" />
-      <mimic joint="${prefix_hand}_joint" multiplier="-1.0" offset="0" />
+    <!--  Joint: Hand Tip Left -->
+    <joint name="${prefix_hand}_${prefix_finger}_tip_l_joint" type="fixed">
+      <parent link="${prefix_hand}_link"/>
+      <child link="${prefix_hand}_${prefix_finger}_tip_l_link"/>
+      <origin xyz="${0.0345+0.0375/2} -0.0145 0.0" rpy="0 0 0"/>
     </joint>
 
-    <link name="${prefix_hand}_${prefix_finger}_r_link">
+    <!--  Link: Hand Tip Left -->
+    <link name="${prefix_hand}_${prefix_finger}_tip_l_link">
       <visual>
-        <origin xyz="0.0 -0.025 -0.03" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="0.0 -0.0 0" rpy="0 0 ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_finger_r.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link13-14_finger.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="black" />
+        <material name="black"/>
       </visual>
+
       <collision>
-        <origin xyz="0.0 -0.025 -0.03" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="0.0 -${0.0031/2} 0.0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_finger_r.stl" scale="0.001 0.001 0.001" />
+          <box size="0.0370 0.0031 0.015"/>
         </geometry>
       </collision>
+
       <inertial>
-        <origin xyz="0.0 -0.025 -0.03" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0.0 -${0.0031/2} 0.0" rpy="0 0 0"/>
+        <mass value="0.002" />
+        <inertia  ixx="${1/12*0.002*(0.0370**2+0.015**2)}" ixy="0.0" ixz="0.0"
+                  iyy="${1/12*0.002*(0.0031**2+0.015**2)}" iyz="0.0"
+                  izz="${1/12*0.002*(0.0370**2+0.0031**2)}" />
       </inertial>
     </link>
 
-    <joint name="${prefix_hand}_outer_l_joint" type="continuous">
-      <parent link="${prefix_hand}_${prefix_finger}_l_link" />
-      <child link="${prefix_hand}_outer_l_link" />
-      <origin xyz="-0.015 0.025 -0.03" rpy="0.0 0.0 0.0" />
-      <axis xyz="1 0 0" />
-      <mimic joint="${prefix_hand}_inner_l_joint" multiplier="1.0" offset="0" />
+    <!--  Joint: Hand Tip Right -->
+    <joint name="${prefix_hand}_${prefix_finger}_tip_r_joint" type="fixed">
+      <parent link="${prefix_hand}_sub_link"/>
+      <child link="${prefix_hand}_${prefix_finger}_tip_r_link"/>
+      <origin xyz="${0.0345+0.0375/2} 0.0145 0.0" rpy="0 0 0"/>
     </joint>
 
-    <link name="${prefix_hand}_outer_l_link">
+    <!--  Link: Hand Tip Right -->
+    <link name="${prefix_hand}_${prefix_finger}_tip_r_link">
       <visual>
-        <origin xyz="-0.004 0.0 -0.07" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="0.0 -0.0 0" rpy="0 ${M_PI} ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_l.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link13-14_finger.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="black" />
+        <material name="black"/>
       </visual>
+
       <collision>
-        <origin xyz="-0.004 0.0 -0.07" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="0.0 ${0.0031/2} 0.0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_l.stl" scale="0.001 0.001 0.001" />
+          <box size="0.0370 0.0031 0.015"/>
         </geometry>
       </collision>
+
       <inertial>
-        <origin xyz="-0.004 0.0 -0.07" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0.0 ${0.0031/2} 0.0" rpy="0 0 0"/>
+        <mass value="0.002" />
+        <inertia  ixx="${1/12*0.002*(0.0370**2+0.015**2)}" ixy="0.0" ixz="0.0"
+                  iyy="${1/12*0.002*(0.0031**2+0.015**2)}" iyz="0.0"
+                  izz="${1/12*0.002*(0.0370**2+0.0031**2)}" />
       </inertial>
     </link>
 
-    <joint name="${prefix_hand}_outer_r_joint" type="continuous">
-      <parent link="${prefix_hand}_${prefix_finger}_r_link" />
-      <child link="${prefix_hand}_outer_r_link" />
-      <origin xyz="-0.015 -0.025 -0.03" rpy="0.0 0.0 0.0" />
-      <axis xyz="-1 0 0" />
-      <mimic joint="${prefix_hand}_joint" multiplier="1.0" offset="0" />
+    <!-- Joint: End Effector -->
+    <joint name="end_effector_joint" type="fixed">
+      <origin xyz="${0.0935+0.0375/2} 0.0 0.0" rpy="0 0 0"/>
+      <parent link="arm_wrist_roll_link"/>
+      <child link="${prefix_hand}_end_effector_link"/>
     </joint>
 
-    <link name="${prefix_hand}_outer_r_link">
+    <!-- Link: End Effector -->
+    <link name="${prefix_hand}_end_effector_link">
       <visual>
-        <origin xyz="-0.004 0.0 -0.07" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_r.stl" scale="0.001 0.001 0.001" />
+          <box size="0.01 0.01 0.01" />
         </geometry>
-        <material name="black" />
+        <material name="red"/>
       </visual>
-      <collision>
-        <origin xyz="-0.004 0.0 -0.07" rpy="${M_PI/2.0} 0.0 ${M_PI/2.0}" />
-        <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/hand_outer_r.stl" scale="0.001 0.001 0.001" />
-        </geometry>
-      </collision>
+
       <inertial>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-        <mass value="0.01" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                 iyy="0.001" iyz="0.0"
-                 izz="0.001" />
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        <mass value="0.0001" />
+        <inertia  ixx="${1/12*0.0001*(0.01**2+0.01**2)}" ixy="0.0" ixz="0.0"
+                  iyy="${1/12*0.0001*(0.01**2+0.01**2)}" iyz="0.0"
+                  izz="${1/12*0.0001*(0.01**2+0.01**2)}" />
       </inertial>
     </link>
 
-    <xacro:hand_transmission prefix_hand="${prefix_hand}" prefix_finger="${prefix_finger}" />
+
+    <xacro:hand_transmission prefix_hand="${prefix_hand}" prefix_finger="${prefix_finger}_" />
 
   </xacro:macro>
 </robot>
