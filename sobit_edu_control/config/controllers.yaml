@@ -15,12 +15,13 @@
 /**/velocity_controller:
   ros__parameters:
     joints:
-      - arm_shoulder_pan_joint
-      - arm_shoulder_1_tilt_joint
-      - arm_shoulder_2_tilt_joint
-      - arm_elbow_1_tilt_joint
-      - arm_elbow_2_tilt_joint
-      - arm_wrist_tilt_joint
+      - arm_shoulder_roll_joint
+      - arm_shoulder_pitch_joint
+      - arm_shoulder_pitch_sub_joint
+      - arm_elbow_pitch_joint
+      - arm_forearm_roll_joint
+      - arm_wrist_pitch_joint
+      - arm_wrist_roll_joint
       - hand_joint
       - head_camera_pan_joint
       - head_camera_tilt_joint
@@ -30,12 +31,13 @@
 /**/joint_trajectory_controller:
   ros__parameters:
     joints:
-      - arm_shoulder_pan_joint
-      - arm_shoulder_1_tilt_joint
-      - arm_shoulder_2_tilt_joint
-      - arm_elbow_1_tilt_joint
-      - arm_elbow_2_tilt_joint
-      - arm_wrist_tilt_joint
+      - arm_shoulder_roll_joint
+      - arm_shoulder_pitch_joint
+      - arm_shoulder_pitch_sub_joint
+      - arm_elbow_pitch_joint
+      - arm_forearm_roll_joint
+      - arm_wrist_pitch_joint
+      - arm_wrist_roll_joint
       - hand_joint
       - head_camera_pan_joint
       - head_camera_tilt_joint
