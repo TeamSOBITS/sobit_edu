@@ -18,7 +18,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 
-from launch_ros.substitutions import FindPackageShare
+# from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 
 from launch import LaunchDescription
@@ -43,6 +43,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     robot_name = "sobit_edu"
     bringup_pkg = robot_name + "_bringup"
+    library_pkg = robot_name  + "_library"
 
     rviz_config = os.path.join(get_package_share_directory(
         bringup_pkg), "rviz", "real.rviz")
@@ -55,7 +56,6 @@ def generate_launch_description():
         kobuki_params = yaml.safe_load(f)["kobuki_ros_node"]["ros__parameters"]
 
     return LaunchDescription([
-        # robot_state_publisher_node,
         Node(
             package="rviz2",
             executable="rviz2",
@@ -65,10 +65,10 @@ def generate_launch_description():
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                PathJoinSubstitution([
-                    FindPackageShare('sobit_edu_bringup'),
+                PathJoinSubstitution([os.path.join(
+                    get_package_share_directory(bringup_pkg),
                     'launch',
-                    'robot.launch.py'
+                    'robot.launch.py')
                 ])
 
             ]),
@@ -87,24 +87,33 @@ def generate_launch_description():
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                PathJoinSubstitution([
-                    FindPackageShare('azure_kinect_ros_driver'),
+                PathJoinSubstitution([os.path.join(
+                    get_package_share_directory('azure_kinect_ros_driver'),
                     'launch',
-                    'driver.launch.py'
+                    'driver.launch.py')
                 ])
 
             ]),
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                PathJoinSubstitution([
-                    FindPackageShare('urg_node'),
+                PathJoinSubstitution([os.path.join(
+                    get_package_share_directory('urg_node'),
                     'launch',
-                    'urg.launch.py'
+                    'urg.launch.py')
                 ])
             ]),
             launch_arguments={
                 "config_file" : urg_config
             }.items()
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                PathJoinSubstitution([os.path.join(
+                    get_package_share_directory(library_pkg),
+                    'launch',
+                    'library_server.launch.py')
+                ])
+            ]),
         )
     ])
