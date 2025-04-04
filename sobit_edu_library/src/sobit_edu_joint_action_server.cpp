@@ -1,6 +1,5 @@
 #include "sobit_edu_library/sobit_edu_joint_action_server.hpp"
-#include <array>
-#include <Eigen/Dense>
+
 
 namespace sobit_edu{
 
@@ -626,31 +625,160 @@ geometry_msgs::msg::TransformStamped JointActionServer::forward_kinematics(
   const std::vector<double> &target_joint_rad,
   const double target_yaw)
 {
+  geometry_msgs::msg::TransformStamped final_coord;
 
+  // hand_pt <=> final_coord
+  geometry_msgs::msg::Point shoulder_pt, elbow_pt, wrist_pt/*, hand_pt*/;
+
+  // Calculate the coordinates of the shoulder. This coordinate is static one.
+  shoulder_pt.x = base_to_shoulder_x;
+  shoulder_pt.y = 0.;
+  shoulder_pt.z = base_to_shoulder_z;
+
+  // Calculate the coordinates of the elbow.
+  elbow_pt.x = shoulder_pt.x + arm_upper_link*std::sin(target_joint_rad[0]);
+  elbow_pt.y = shoulder_pt.y;
+  elbow_pt.z = shoulder_pt.z + arm_upper_link*std::cos(target_joint_rad[0]);
+
+  // Calculate the coordinates of the wrist.
+  wrist_pt.x = elbow_pt.x + arm_lower_link*std::cos(-target_joint_rad[1]-target_joint_rad[0]);
+  wrist_pt.y = elbow_pt.y;
+  wrist_pt.z = elbow_pt.z + arm_lower_link*std::sin(-target_joint_rad[1]-target_joint_rad[0]);
+
+  // Calculate the coordinates of the grasp position. // TODO : Calculate the orientation from posture of elbow2wrist.
+  final_coord.transform.translation.x = wrist_pt.x + arm_gripper_link*std::cos(-target_joint_rad[2]-target_joint_rad[1]-target_joint_rad[0]);
+  final_coord.transform.translation.y = wrist_pt.y;
+  final_coord.transform.translation.z = wrist_pt.z + arm_gripper_link*std::sin(-target_joint_rad[2]-target_joint_rad[1]-target_joint_rad[0]);
+  final_coord.transform.rotation.w = 1.;
+  final_coord.transform.rotation.x = 0.;
+  final_coord.transform.rotation.y = 0.;
+  final_coord.transform.rotation.z = 0.;
+
+  // Consider target_yaw
+  double temp_x, temp_y;
+  temp_x = final_coord.transform.translation.x;
+  temp_y = final_coord.transform.translation.y;
+  final_coord.transform.translation.x = temp_x*std::cos(target_yaw) - temp_y*std::sin(target_yaw);
+  final_coord.transform.translation.y = temp_y*std::cos(target_yaw) + temp_x*std::sin(target_yaw);
+
+  return final_coord;
 }
 
 std::vector<double> JointActionServer::inverse_kinematics(
   const geometry_msgs::msg::TransformStamped &goal_coord,  // 'goal_coord' is the coordinates of robot base.
   const double target_yaw)
+// 三角関数
+// {
+
+//   (void)target_yaw;
+
+//   // "arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_wrist_pitch_joint"
+//   // return msg
+//   std::vector<double> target_joint_rad = {0.0, 0.0, 0.0};
+
+//   if (goal_coord.transform.translation.z < (base_to_shoulder_z + arm_upper_link*std::cos(3*M_PI/4)-arm_lower_link)) {
+//     RCLCPP_WARN(this->get_logger(), "The target position is too low (%.2f[m] < min:%.2f[m])", goal_coord.transform.translation.z, (base_to_shoulder_z + arm_upper_link*std::cos(3*M_PI/4)-arm_lower_link));
+//     target_joint_rad.clear();
+//     return target_joint_rad;
+//   }
+//   if ((base_to_shoulder_z + arm_upper_link + arm_lower_link*std::cos(M_PI/12)) < goal_coord.transform.translation.z) {
+//     RCLCPP_WARN(this->get_logger(), "The target position is too tall (max:%.2f[m] < %.2f[m])", (base_to_shoulder_z + arm_upper_link + arm_lower_link*std::cos(M_PI/12)), goal_coord.transform.translation.z);
+//     target_joint_rad.clear();
+//     return target_joint_rad;
+//   }
+
+//   double target_z = goal_coord.transform.translation.z - base_to_shoulder_z;
+
+//   if (target_z < -(arm_upper_link+arm_lower_link)*std::cos(M_PI/4.)) {
+//     target_joint_rad[0] = 3*M_PI/4.;
+
+//   } else if (target_z < -arm_lower_link) {
+//     target_joint_rad[0] = std::atan2(std::sqrt(std::pow(arm_upper_link+arm_lower_link, 2) - std::pow(target_z, 2)), target_z);
+
+//   } else if (target_z <= 0.) {
+//     target_joint_rad[0] = M_PI/2.;
+
+//   } else if (target_z < arm_upper_link*std::cos(M_PI/4.)) {
+//     target_joint_rad[0] = M_PI/4.;
+
+//   } else {
+//     target_joint_rad[0] = 0.0;
+
+//   }
+
+//   geometry_msgs::msg::Point elbow_pt, wrist_pt;
+//   elbow_pt.x = arm_upper_link*std::sin(target_joint_rad[0]);
+//   elbow_pt.z = arm_upper_link*std::cos(target_joint_rad[0]);
+//   wrist_pt.x = elbow_pt.x + std::sqrt(std::pow(arm_lower_link, 2) - std::pow(target_z-elbow_pt.z, 2));
+//   wrist_pt.z = target_z;
+//   target_joint_rad[1] = std::atan2(wrist_pt.x-elbow_pt.x, wrist_pt.z-elbow_pt.z) - M_PI/2. - target_joint_rad[0];
+
+//   target_joint_rad[2] = -target_joint_rad[0] -target_joint_rad[1];
+//   return target_joint_rad;
+
+// }
+
+// ヤコビ行列
 {
-  // // std::array<double, 2
-  // Eigen::Matrix2d jacobi;
-  // // return msg
-  // // リストの構成＜arm_shoulder_pitch_joint, arm_elbow_pitch_joint, arm_wrist_pitch_joint＞
-  // std::vector<double> target_joint_rad = {0.0, 0.0, 0.0};
-  
-  // // Z座標はgoal_coord.transform.translation.z
+  (void)target_yaw;
 
-  // jacobi << - arm_upper_link * sin(q[0,0] + radians(-90)) - arm_lower_link * sin(q[0,0]+ q[1,0]), - arm_lower_link * sin(q[0,0]+q[1,0]),  arm_upper_link * cos(q[0,0] + radians(-90)) - arm_lower_link * cos(q[0,0]+q[1,0]), - arm_lower_link * cos(q[0,0]+q[1,0]);
+  double dt = 0.001;
+  geometry_msgs::msg::Point initial_wrist_pt;
+  initial_wrist_pt.x = -arm_upper_link;
+  initial_wrist_pt.y = 0.;
+  initial_wrist_pt.z = arm_lower_link;
 
-  
+  // "arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_wrist_pitch_joint"
+  // return msg
+  std::vector<double> target_joint_rad = {-M_PI/2., 0.0, 0.0};
 
-  
-  // //gool_coord
+  if (goal_coord.transform.translation.z < (base_to_shoulder_z + arm_upper_link*std::cos(3*M_PI/4)-arm_lower_link)) {
+    RCLCPP_WARN(this->get_logger(), "The target position is too low (%.2f[m] < min:%.2f[m])", goal_coord.transform.translation.z, (base_to_shoulder_z + arm_upper_link*std::cos(3*M_PI/4)-arm_lower_link));
+    target_joint_rad.clear();
+    return target_joint_rad;
+  }
+  if ((base_to_shoulder_z + (arm_upper_link+arm_lower_link)*std::cos(M_PI/4)) < goal_coord.transform.translation.z) {
+    RCLCPP_WARN(this->get_logger(), "The target position is too tall (max:%.2f[m] < %.2f[m])", (base_to_shoulder_z + (arm_upper_link+arm_lower_link)*std::cos(M_PI/4)), goal_coord.transform.translation.z);
+    target_joint_rad.clear();
+    return target_joint_rad;
+  }
 
-  // const yacobi 
-  // target_joint_rad[0] = M_PI; // example
-  // return target_joint_rad;
+  double r = std::sqrt(std::pow(arm_upper_link*std::cos(M_PI/4), 2) + std::pow(arm_upper_link*std::sin(M_PI/4)+arm_lower_link, 2));
+  double target_x = std::sqrt(std::pow(r, 2) - std::pow(goal_coord.transform.translation.z-base_to_shoulder_z, 2))*1.1;
+  double target_z = goal_coord.transform.translation.z - base_to_shoulder_z;
+
+
+  for (int i=0; i<(int)(1./dt); i++) {
+    double j_[2][2] = {
+      {
+        arm_upper_link*std::cos(target_joint_rad[0]) + arm_lower_link*std::sin(-target_joint_rad[0]-target_joint_rad[1]),
+        arm_lower_link*std::sin(-target_joint_rad[0]-target_joint_rad[1])
+      }, {
+        -arm_upper_link*std::sin(target_joint_rad[0]) - arm_lower_link*std::cos(-target_joint_rad[0]-target_joint_rad[1]),
+        -arm_lower_link*std::cos(-target_joint_rad[0]-target_joint_rad[1])
+      }
+    };
+    double norm = j_[0][0]*j_[1][1] - j_[0][1]*j_[1][0];
+
+    if (norm == 0.) return {};
+
+    double j__[2][2] = {{j_[1][1]/norm, -j_[0][1]/norm},
+                        {-j_[1][0]/norm, j_[0][0]/norm}};
+
+    target_joint_rad[0] += (target_x-initial_wrist_pt.x)*dt*j__[0][0] + (target_z-initial_wrist_pt.z)*dt*j__[0][1];
+    target_joint_rad[1] += (target_x-initial_wrist_pt.x)*dt*j__[1][0] + (target_z-initial_wrist_pt.z)*dt*j__[1][1];
+  }
+
+  if (std::abs(target_joint_rad[0]) >= 2*M_PI) target_joint_rad[0] -= 2*M_PI * (int)(target_joint_rad[0] / 2*M_PI);
+  if (std::abs(target_joint_rad[1]) >= 2*M_PI) target_joint_rad[1] -= 2*M_PI * (int)(target_joint_rad[1] / 2*M_PI);
+  if (std::abs(target_joint_rad[0]) >= M_PI) target_joint_rad[0] -= 2*M_PI * (target_joint_rad[0] / std::abs(target_joint_rad[0]));
+  if (std::abs(target_joint_rad[1]) >= M_PI) target_joint_rad[1] -= 2*M_PI * (target_joint_rad[1] / std::abs(target_joint_rad[1]));
+
+  target_joint_rad[2] = -target_joint_rad[0] -target_joint_rad[1];
+
+
+  return target_joint_rad;
 }
-
 } // namespace sobit_edu
+
+

@@ -113,7 +113,7 @@
       <child link="${prefix}_shoulder_pitch_link"/>
       <origin xyz="0.0 0.0 0.05095" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
-      <limit velocity="4.8" effort="25" lower="${-M_PI/2}" upper="${M_PI/2}" />
+      <limit velocity="4.8" effort="25" lower="${-M_PI/2}" upper="${3*M_PI/4}" />
     </joint>
 
     <!--  Act 2: Shoulder Pitch (right) -->
@@ -148,7 +148,7 @@
       <child link="${prefix}_shoulder_pitch_sub_link"/>
       <origin xyz="0.0 0.0 0.05095" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
-      <limit velocity="4.8" effort="25" lower="${-M_PI/2}" upper="${M_PI/2}" />
+      <limit velocity="4.8" effort="25" lower="${-3*M_PI/4}" upper="${M_PI/2}" />
       <!-- <mimic joint="${prefix}_shoulder_pitch_joint" multiplier="-1" offset="0"/> -->
     </joint>
 

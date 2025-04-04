@@ -168,3 +168,5 @@ inline geometry_msgs::msg::Quaternion JointActionServer::get_quat_from_euler(
 } // namespace sobit_edu
 
 RCLCPP_COMPONENTS_REGISTER_NODE(sobit_edu::JointActionServer)
+
+

@@ -43,7 +43,7 @@
         <param name="multiplier">-1</param> -->
         <!-- <command_interface name="position"/> -->
         <command_interface name="position">
-          <param name="min">-1.570796327</param>
+          <param name="min">-2.356194490192345</param>
           <param name="max">1.570796327</param>
         </command_interface>
         <command_interface name="velocity"/>
@@ -60,7 +60,7 @@
         </xacro:unless>
         <command_interface name="position">
           <param name="min">-1.570796327</param>
-          <param name="max">1.570796327</param>
+          <param name="max">2.356194490192345</param>
         </command_interface>
         <command_interface name="velocity"/>
         <state_interface name="position">
