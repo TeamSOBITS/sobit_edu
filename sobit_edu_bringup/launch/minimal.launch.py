@@ -88,9 +88,9 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 PathJoinSubstitution([os.path.join(
-                    get_package_share_directory('azure_kinect_ros_driver'),
+                    get_package_share_directory(bringup_pkg),
                     'launch',
-                    'driver.launch.py')
+                    'gemini_bringup.launch.py')
                 ])
 
             ]),
