@@ -59,7 +59,7 @@ def generate_launch_description():
         Node(
             package="rviz2",
             executable="rviz2",
-            name="rviz2",
+            name=robot_name+"_rviz2",
             arguments=["-d", rviz_config],
             output="screen",
         ),
@@ -82,6 +82,7 @@ def generate_launch_description():
         Node(
             package="kobuki_node",
             executable="kobuki_ros_node",
+            namespace=robot_name,
             output="both",
             parameters=[kobuki_params]
         ),
@@ -104,7 +105,9 @@ def generate_launch_description():
                 ])
             ]),
             launch_arguments={
-                "config_file" : urg_config
+                "config_file" : urg_config,
+                "use_namespace" : "true",
+                "namespace" : robot_name,
             }.items()
         ),
         IncludeLaunchDescription(
