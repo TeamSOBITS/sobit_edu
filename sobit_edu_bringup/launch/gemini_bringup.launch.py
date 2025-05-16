@@ -51,7 +51,8 @@ def load_parameters(context, args):
 
 def generate_launch_description():
     args = [
-        DeclareLaunchArgument('camera_name', default_value='sobit_edu'),
+        DeclareLaunchArgument('namespace', default_value='sobit_edu'),
+        DeclareLaunchArgument('camera_name', default_value='head_camera'),
         DeclareLaunchArgument('depth_registration', default_value='true'),
         DeclareLaunchArgument('serial_number', default_value=''),
         DeclareLaunchArgument('usb_port', default_value=''),
@@ -212,7 +213,7 @@ def generate_launch_description():
         else:
             return [
                 GroupAction([
-                    PushRosNamespace(LaunchConfiguration("camera_name")),
+                    PushRosNamespace(LaunchConfiguration("namespace")),
                     ComposableNodeContainer(
                         name="camera_container",
                         namespace="",
