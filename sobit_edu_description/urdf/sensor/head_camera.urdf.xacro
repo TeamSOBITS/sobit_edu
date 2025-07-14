@@ -12,9 +12,12 @@
 
     <link name="${prefix}_link"/>
 
-    <xacro:azure_kinect parent="${prefix}_link" tf_prefix="${prefix}_" add_cover="false">
+    <!-- <xacro:azure_kinect parent="${prefix}_link" tf_prefix="${prefix}_" add_cover="false">
       <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
-    </xacro:azure_kinect>
+    </xacro:azure_kinect> -->
+    <xacro:gemini_336 parent="${prefix}_link" tf_prefix="${prefix}_">
+      <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
+    </xacro:gemini_336>
 
   </xacro:macro>
 </robot>

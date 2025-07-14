@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /RobotModel1
       Splitter Ratio: 0.5
     Tree Height: 561
   - Class: rviz_common/Selection
@@ -71,33 +70,50 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        arm_elbow_1_tilt_link:
+        arm_elbow_pitch_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        arm_elbow_2_tilt_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        arm_shoulder_1_tilt_link:
+        arm_forearm_roll_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        arm_shoulder_2_tilt_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        arm_shoulder_pan_link:
+        arm_hand_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        arm_wrist_tilt_link:
+        arm_platform_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
+        arm_shoulder_pitch_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_shoulder_pitch_sub_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        arm_shoulder_roll_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_wrist_pitch_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_wrist_roll_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         back_base_link:
           Alpha: 1
           Show Axes: false
@@ -143,37 +159,37 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        hand_base_link:
+        hand_end_effector_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        hand_finger_l_link:
+        hand_finger_tip_l_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        hand_finger_r_link:
+        hand_finger_tip_r_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        hand_inner_l_link:
+        hand_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        hand_inner_r_link:
+        hand_sub_l_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        hand_outer_l_link:
+        hand_sub_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        hand_outer_r_link:
+        hand_sub_r_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -183,11 +199,61 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        head_camera_camera_bottom_screw_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_camera_color_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_camera_color_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_camera_depth_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_camera_depth_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_camera_infra2_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_camera_infra2_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_camera_infra_1_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_camera_infra_1_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         head_camera_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
         head_camera_pan_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_camera_plug_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -400,7 +466,41 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /scan
+        Value: /sobit_edu/scan
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: RGB8
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Flat Squares
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /sobit_edu/depth_registered/points
       Use Fixed Frame: true
       Use rainbow: true
       Value: true

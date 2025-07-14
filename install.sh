@@ -14,7 +14,8 @@ ros_packages=(
     "realsense_ros" \
     "urg_node" \
     "kobuki_ros" \
-    "turtlebot2_description"
+    "turtlebot2_description" \
+    "orbbecsdk_ros2"
 )
 
 #Clone all packages
