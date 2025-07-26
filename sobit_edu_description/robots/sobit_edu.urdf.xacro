@@ -3,7 +3,7 @@
 <robot name="sobit_edu" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- Add Common Xacro: transmissions, colors -->
-  <xacro:include filename="$(find sobit_edu_description)/urdf/common.xacro" />
+  <xacro:include filename="$(find sobit_edu_description)/urdf/values.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/materials.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/transmission.urdf.xacro" />
   <xacro:include filename="$(find sobit_edu_description)/urdf/controllers.urdf.xacro" />
