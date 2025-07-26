@@ -1,9 +1,10 @@
 <?xml version="1.0" ?>
-<robot name="sobit_pro"
+<robot name="hand_transmission"
        xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="hand_transmission" params="prefix_hand prefix_finger">
 
-    <xacro:position_joint_transmission joint="${prefix_hand}_joint"         reduction="1" />
+    <effort_joint_transmission joint="${prefix_hand}_joint"         reduction="1" />
+    <effort_joint_transmission joint="${prefix_hand}_sub_joint"     reduction="1" />
     <!-- <xacro:position_joint_transmission joint="${prefix_hand}_inner_l_joint" reduction="1" />
     <xacro:position_joint_transmission joint="${prefix_hand}_outer_l_joint" reduction="1" />
     <xacro:position_joint_transmission joint="${prefix_hand}_outer_r_joint" reduction="1" />

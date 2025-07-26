@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="head_transmission" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="head_transmission" params="prefix">
-    <xacro:position_joint_transmission joint="${prefix}_camera_pan_joint"  reduction="1" />
-    <xacro:position_joint_transmission joint="${prefix}_camera_tilt_joint" reduction="1" />
+    <position_joint_transmission joint="${prefix}_camera_pan_joint"  reduction="1" />
+    <position_joint_transmission joint="${prefix}_camera_tilt_joint" reduction="1" />
   </xacro:macro>
 </robot>
