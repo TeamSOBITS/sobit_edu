@@ -9,7 +9,7 @@ cd ..
 
 # Dowload required packages for SOBIT EDU
 ros_packages=(
-    "sobits_msgs" \
+    "sobits_interfaces" \
     "dynamixel_hardware" \
     "realsense_ros" \
     "urg_node" \
@@ -127,4 +127,4 @@ sudo udevadm trigger
 cd ${DIR}
 
 
-echo "╚══╣ Setup: SOBIT LIGHT (FINISHED) ╠══╝"
+echo "╚══╣ Setup: SOBIT EDU (FINISHED) ╠══╝"
