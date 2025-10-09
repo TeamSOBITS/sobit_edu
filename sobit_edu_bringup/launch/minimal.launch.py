@@ -15,38 +15,31 @@
 
 
 import os
-
 from ament_index_python.packages import get_package_share_directory
-
-# from launch_ros.substitutions import FindPackageShare
-from launch_ros.actions import Node
 
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
+from launch_ros.actions import Node
 
 import yaml 
 import launch_ros
-from launch import LaunchDescription
-from launch_ros.actions import Node
 
-from launch_ros.actions import Node
-# import xacro
 # import yaml
 # import launch_ros
 # from launch.actions import IncludeLaunchDescription,SetLaunchConfiguration,DeclareLaunchArgument,LogInfo
 
-
-
-
 def generate_launch_description():
     robot_name = "sobit_edu"
     bringup_pkg = robot_name + "_bringup"
-    library_pkg = robot_name  + "_library"
 
-    rviz_config = os.path.join(get_package_share_directory(
-        bringup_pkg), "rviz", "real.rviz")
+    rviz_config = PathJoinSubstitution([
+        FindPackageShare(bringup_pkg),
+        "rviz",
+        "real.rviz"
+    ])
 
     urg_config = os.path.join(get_package_share_directory(
         bringup_pkg), "config", "urg_node_params.yaml")
@@ -65,18 +58,16 @@ def generate_launch_description():
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                PathJoinSubstitution([os.path.join(
-                    get_package_share_directory(bringup_pkg),
+                PathJoinSubstitution([
+                    FindPackageShare(bringup_pkg),
                     'launch',
-                    'robot.launch.py')
+                    'robot.launch.py'
                 ])
 
             ]),
             launch_arguments={
-                'robot_name': 'sobit_edu',
-                'robot_coords_x': '0', # x 
-                'robot_coords_y': '0', # y
-                'robot_coords_Y': '0', # yaw
+                'robot_name': robot_name,
+                'enable_gz': 'False',
             }.items()
         ),
         Node(
@@ -88,20 +79,20 @@ def generate_launch_description():
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                PathJoinSubstitution([os.path.join(
-                    get_package_share_directory(bringup_pkg),
+                PathJoinSubstitution([
+                    FindPackageShare(bringup_pkg),
                     'launch',
-                    'gemini_bringup.launch.py')
+                    'gemini_bringup.launch.py'
                 ])
 
             ]),
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                PathJoinSubstitution([os.path.join(
-                    get_package_share_directory('urg_node'),
+                PathJoinSubstitution([
+                    FindPackageShare('urg_node'),
                     'launch',
-                    'urg.launch.py')
+                    'urg.launch.py'
                 ])
             ]),
             launch_arguments={
@@ -110,13 +101,13 @@ def generate_launch_description():
                 "namespace" : robot_name,
             }.items()
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([
-                PathJoinSubstitution([os.path.join(
-                    get_package_share_directory(library_pkg),
-                    'launch',
-                    'library_server.launch.py')
-                ])
-            ]),
-        )
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource([
+        #         PathJoinSubstitution([
+        #             FindPackageShare(library_pkg),
+        #             'launch',
+        #             'library_server.launch.py'
+        #         ])
+        #     ]),
+        # )
     ])
