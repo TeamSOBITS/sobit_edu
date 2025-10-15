@@ -52,7 +52,7 @@
         </command_interface>
         <!-- <command_interface name="velocity"/> -->
         <state_interface name="position">
-          <param name="initial_value">1.57</param>
+          <param name="initial_value">0.0</param>
         </state_interface>
         <!-- <state_interface name="position"/> -->
         <state_interface name="velocity"/>
@@ -70,7 +70,7 @@
         </command_interface>
         <!-- <command_interface name="velocity"/> -->
         <state_interface name="position">
-          <param name="initial_value">-1.57</param>
+          <param name="initial_value">0.0</param>
         </state_interface>
         <state_interface name="velocity"/>
         <state_interface name="effort"/>
@@ -176,9 +176,11 @@
 
       <!-- Position Drive: Head -->
       <joint name="head_camera_pan_joint">
-        <param name="id">21</param>
-        <param name="control_mode">0</param>
-        <param name="interface">rs</param>
+        <xacro:unless value="${$(arg enable_gz)}">
+          <param name="id">21</param>
+          <param name="control_mode">0</param>
+          <param name="interface">rs</param>
+        </xacro:unless>
         <command_interface name="position">
           <param name="min">-3.141592654</param>
           <param name="max">3.141592654</param>
@@ -192,9 +194,11 @@
       </joint>
 
       <joint name="head_camera_tilt_joint">
-        <param name="id">22</param>
-        <param name="control_mode">0</param>
-        <param name="interface">rs</param>
+        <xacro:unless value="${$(arg enable_gz)}">
+          <param name="id">22</param>
+          <param name="control_mode">0</param>
+          <param name="interface">rs</param>
+        </xacro:unless>
         <command_interface name="position">
           <param name="min">-1.570796327</param>
           <param name="max">1.570796327</param>

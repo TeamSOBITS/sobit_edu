@@ -1,22 +1,23 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 
-from launch_ros.substitutions import FindPackageShare
-from launch_ros.actions import Node
-
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    robot_name = 'sobit_edu'
+    robot_id = 0
     gz_bridge_node = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
                     "/clock" + "@rosgraph_msgs/msg/Clock" + "[ignition.msgs.Clock",
-                    "/tf" + "@tf2_msgs/msg/TFMessage" + "[ignition.msgs.TFMessage",
+                    "/tf" + "@tf2_msgs/msg/TFMessage" + "[ignition.msgs.Pose_V",
                    ],
         output='screen'
     )
@@ -26,6 +27,7 @@ def generate_launch_description():
             'rviz',
             'gazebo.rviz'
     ])
+
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -33,13 +35,13 @@ def generate_launch_description():
         arguments=['-d', rviz_config],
     )
 
-    ##### SOBIT LIGHT参照しにいっているので今後注意！！ #####
+    ##### sobits_gazebo_worldを参照しているので注意！！ #####
     world_file = os.path.join(get_package_share_directory(
-        'sobit_light_description'), 
+        'sobits_gazebo_worlds'), 
         'worlds',
-        'empty_w_physics.sdf'
+        'rcjo2025_arena.world.xacro'
     )
-    ##### SOBIT LIGHT参照しにいっているので今後注意！！ #####
+    ##### sobits_gazebo_worldを参照しているので注意！！ #####
 
     return LaunchDescription([
         # Launch gazebo environment
@@ -62,14 +64,15 @@ def generate_launch_description():
                 PathJoinSubstitution([
                     FindPackageShare('sobit_edu_bringup'),
                     'launch',
-                    'gz_robot.launch.py'
+                    'robot.launch.py'
                 ])
             ]),
             launch_arguments={
-                'robot_name': 'sobit_edu',
-                'robot_coords_x': '0', # x 
-                'robot_coords_y': '0', # y
+                'robot_name': robot_name if robot_id == 0 else robot_name + '_' + str(robot_id),
+                'robot_coords_x': '-5.5', # x 
+                'robot_coords_y': '1.5', # y
                 'robot_coords_Y': '0', # yaw
+                'enable_gz' : 'True',
                 'enable_gz_lidar' : 'True',
                 'enable_gz_imu' : 'True',
             }.items()
@@ -80,7 +83,7 @@ def generate_launch_description():
         #         PathJoinSubstitution([
         #             FindPackageShare('sobit_light_bringup'),
         #             'launch',
-        #             'gz_robot.launch.py'
+        #             'robot.launch.py'
         #         ])
         #     ]),
         #     launch_arguments={
@@ -98,5 +101,5 @@ def generate_launch_description():
         #         'enable_gz_imu' : 'True',
         #     }.items()
         # ),
-        rviz_node
+        rviz_node,
     ])

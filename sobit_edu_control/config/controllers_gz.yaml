@@ -4,47 +4,43 @@
     use_sim_time: True
 
     velocity_controller:
-      type: "velocity_controllers/JointGroupVelocityController"
+      type: velocity_controllers/JointGroupVelocityController
 
     joint_trajectory_controller:
-      type: "joint_trajectory_controller/JointTrajectoryController"
+      type: joint_trajectory_controller/JointTrajectoryController
 
     diff_controller:
-      type: "diff_drive_controller/DiffDriveController"
+      type: diff_drive_controller/DiffDriveController
 
     joint_state_broadcaster:
-      type: "joint_state_broadcaster/JointStateBroadcaster"
+      type: joint_state_broadcaster/JointStateBroadcaster
 
 
 /**/velocity_controller:
   ros__parameters:
     joints:
-      - arm_shoulder_pan_joint
-      - arm_shoulder_1_tilt_joint
-      - arm_elbow_1_tilt_joint
-      - arm_wrist_tilt_joint
+      - arm_shoulder_roll_joint
+      - arm_shoulder_pitch_joint
+      - arm_shoulder_pitch_sub_joint
+      - arm_elbow_pitch_joint
+      - arm_forearm_roll_joint
+      - arm_wrist_pitch_joint
+      - arm_wrist_roll_joint
       - hand_joint
-      - hand_inner_l_joint
-      - hand_outer_l_joint
-      - hand_outer_r_joint
-      - hand_finger_l_joint
-      - hand_finger_r_joint
       - head_camera_pan_joint
       - head_camera_tilt_joint
 
 /**/joint_trajectory_controller:
   ros__parameters:
     joints:
-      - arm_shoulder_pan_joint
-      - arm_shoulder_1_tilt_joint
-      - arm_elbow_1_tilt_joint
-      - arm_wrist_tilt_joint
+      - arm_shoulder_roll_joint
+      - arm_shoulder_pitch_joint
+      - arm_shoulder_pitch_sub_joint
+      - arm_elbow_pitch_joint
+      - arm_forearm_roll_joint
+      - arm_wrist_pitch_joint
+      - arm_wrist_roll_joint
       - hand_joint
-      - hand_inner_l_joint
-      - hand_outer_l_joint
-      - hand_outer_r_joint
-      - hand_finger_l_joint
-      - hand_finger_r_joint
       - head_camera_pan_joint
       - head_camera_tilt_joint
 
@@ -81,8 +77,8 @@
     enable_odom_tf: true
 
     cmd_vel_timeout: 0.5
-    #publish_limited_velocity: true
-    use_stamped_vel: true
+    publish_limited_velocity: true
+    use_stamped_vel: false
     #velocity_rolling_window_size: 10
 
     # Velocity and acceleration limits
