@@ -15,7 +15,8 @@ ros_packages=(
     "urg_node" \
     "kobuki_ros" \
     "turtlebot2_description" \
-    "orbbecsdk_ros2"
+    "orbbecsdk_ros2" \
+    "sobits_gazebo_worlds"
 )
 
 #Clone all packages

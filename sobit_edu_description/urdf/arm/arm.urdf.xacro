@@ -305,7 +305,7 @@
       <collision>
         <origin xyz="${0.0505/2} 0.0 ${0.03775-0.0495/2}" rpy="0 0 0"/>
         <geometry>
-          <box size="0.0505 0.0335 0.0495"/>
+          <box size="0.0505 0.1886 0.0495"/>
         </geometry>
       </collision>
 
