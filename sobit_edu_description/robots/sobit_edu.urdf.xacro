@@ -24,7 +24,6 @@
   <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/head_camera.urdf.xacro" />
   
   <xacro:include filename="$(find urg_node)/urdf/hokuyo_ust.urdf.xacro" />
-  <xacro:include filename="$(find orbbec_description)/urdf/gemini_336.urdf.xacro" />
   
   
   <!-- Add URDF: gazebo -->
@@ -34,30 +33,46 @@
   <xacro:arg name="enable_gz"                 default="False" />
   <xacro:arg name="enable_gz_lidar"           default="True" />
   <xacro:arg name="robot_name"                default="sobit_edu" />
-
-  <xacro:controllers name="joints_control" enable_gz="$(arg enable_gz)" robot_name="$(arg robot_name)" />
+  <xacro:arg name="head_camera_name"          default="gemini_336" />
 
 
   <!-- Connect the previous Links and Joints -->
   <xacro:base/>
   <xacro:stack_hexagons parent="base_link" />
   <xacro:cover  prefix="cover"  parent="plate_top_link" />
+  <xacro:lidar  prefix="lidar"  parent="plate_bottom_link" />
   <xacro:arm    prefix="arm"    parent="plate_top_link" />
   <xacro:hand   prefix_hand="hand" prefix_finger="finger" parent="arm_hand_link" />
   <xacro:back   prefix="back"   parent="plate_top_link" />
   <xacro:head   prefix="head"   parent="back_base_link" />
-  <xacro:head_camera prefix="head_camera" parent="head_camera_tilt_link" />
+  <!-- <xacro:head_camera prefix="head_camera" parent="head_camera_tilt_link" /> -->
   <xacro:mic    prefix="mic"    parent="back_base_link" />
   <xacro:matrix prefix="matrix" parent="back_base_link" />
-  <xacro:lidar  prefix="lidar"  parent="plate_bottom_link" />
 
+
+  <!-- Xtion -->
+  <xacro:if value="$(eval head_camera_name == 'xtion')">
+  <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/xtion.urdf.xacro" />
+  <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/xtion_fixed.urdf.xacro" />
+    <xacro:xtion_fixed prefix="head_camera" parent="head_camera_tilt_link"/>
+  </xacro:if>
+  <!-- AzureKinect -->
+  <xacro:if value="$(eval head_camera_name == 'azure_kinect')">
+    <xacro:include filename="$(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" />
+    <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/azure_camera.urdf.xacro" />
+    <xacro:azure_camera prefix="head_camera" parent="head_camera_tilt_link" />
+  </xacro:if>
+  <!-- Gemini336L -->
+  <xacro:if value="$(eval head_camera_name == 'gemini_336')">
+    <xacro:include filename="$(find orbbec_description)/urdf/gemini_336.urdf.xacro" />
+    <xacro:head_camera prefix="head_camera" parent="head_camera_tilt_link" />
+  </xacro:if>
+
+  <!-- Add Dynamixel plugins -->
+  <xacro:controllers name="joints_control" enable_gz="$(arg enable_gz)" robot_name="$(arg robot_name)" />
 
   <!-- Add Gazebo: plugins -->
   <xacro:if value="${$(arg enable_gz)}">
-    <xacro:gazebo_sensors robot_name="$(arg robot_name)"
-
-      enable_gz_lidar="$(arg enable_gz_lidar)"
-      enable_gz_imu="$(arg enable_gz_imu)"
-    />
+    <xacro:gazebo_sensors robot_name="$(arg robot_name)" />
   </xacro:if>
 </robot>

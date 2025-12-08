@@ -13,7 +13,7 @@
 
           <ignition_frame_id>${robot_name}/sim_laser_frame</ignition_frame_id>
           <!-- <gz_frame_id>${robot_name}/sim_laser_frame</gz_frame_id> -->
-          <topic>${robot_name}/lidar/scan</topic>
+          <topic>${robot_name}/scan</topic>
 
           <always_on>1</always_on>
           <visualize>true</visualize>
