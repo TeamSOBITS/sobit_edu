@@ -315,7 +315,7 @@ def launch_gz(context, *args, **kwargs):
     )
 
     if enable_gz == 'False':
-        return {
+        return [
             ros2_control_node,
             joint_state_broadcaster,
             velocity_controller,
@@ -331,7 +331,7 @@ def launch_gz(context, *args, **kwargs):
             urg_node,
             camera_node,
             rviz_node,
-        }
+        ]
     
     else:
         return [
