@@ -48,7 +48,7 @@
         <origin xyz="-0.005 -0.003 0.0013" rpy="${M_PI/2.0} ${-M_PI/2.0} 0"/>
         <!-- <origin xyz="0.0025 0.0265 0.004" rpy="0 0 0"/> -->
         <geometry>
-          <mesh filename="file://$(find sobit_pro_description)/meshes/sensor/xtion/xtion_pro_camera.dae"/>
+          <mesh filename="file://$(find sobit_edu_description)/meshes/sensor/xtion/xtion_pro_camera.dae"/>
         </geometry>
       </visual>
       <collision>
