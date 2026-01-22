@@ -23,6 +23,8 @@ def generate_launch_description():
     arg_enable_gz = DeclareLaunchArgument('enable_gz', default_value='True')
     arg_enable_gz_lidar = DeclareLaunchArgument('enable_gz_lidar', default_value='True')
     arg_enable_gz_imu = DeclareLaunchArgument('enable_gz_imu', default_value='True')
+    arg_enable_gz_head_cam_color = DeclareLaunchArgument('enable_gz_head_cam_color', default_value='True')
+    arg_enable_gz_head_cam_depth = DeclareLaunchArgument('enable_gz_head_cam_depth', default_value='True')
 
     return LaunchDescription([
         arg_robot_name,
@@ -33,6 +35,8 @@ def generate_launch_description():
         arg_enable_gz,
         arg_enable_gz_lidar,
         arg_enable_gz_imu,
+        arg_enable_gz_head_cam_color,
+        arg_enable_gz_head_cam_depth,
         OpaqueFunction(function = launch_gz),
     ])
 
@@ -48,6 +52,8 @@ def launch_gz(context, *args, **kwargs):
     enable_gz = LaunchConfiguration('enable_gz').perform(context)
     enable_gz_lidar = LaunchConfiguration('enable_gz_lidar').perform(context)
     enable_gz_imu = LaunchConfiguration('enable_gz_imu').perform(context)
+    enable_gz_head_cam_color = LaunchConfiguration('enable_gz_head_cam_color').perform(context)
+    enable_gz_head_cam_depth = LaunchConfiguration('enable_gz_head_cam_depth').perform(context)
     robot_description = os.path.join(get_package_share_directory(
         'sobit_edu_description'), 
         'robots',
@@ -61,6 +67,8 @@ def launch_gz(context, *args, **kwargs):
             'enable_gz_lidar' : enable_gz_lidar,
             'enable_gz_imu' : enable_gz_imu,
             'head_camera_name': head_camera_name,
+            'enable_gz_head_cam_color' : enable_gz_head_cam_color,
+            'enable_gz_head_cam_depth' : enable_gz_head_cam_depth,
         })
 
 
@@ -235,27 +243,64 @@ def launch_gz(context, *args, **kwargs):
                         # "/" + robot_name + "/base_back_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[ignition.msgs.CameraInfo",
                         # "/" + robot_name + "/base_back_camera/color" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
                         # "/" + robot_name + "/base_back_camera/depth" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        # "/" + robot_name + "/head_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[ignition.msgs.CameraInfo",
-                        # "/" + robot_name + "/head_camera/color" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        # "/" + robot_name + "/head_camera/depth" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        # "/" + robot_name + "/head_camera/depth/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
+                        "/" + robot_name + "/head_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[ignition.msgs.CameraInfo",
+                        "/" + robot_name + "/head_camera/color" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
+                        "/" + robot_name + "/head_camera/depth" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
+                        "/" + robot_name + "/head_camera/depth/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
                         # "/" + robot_name + "/hand_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[ignition.msgs.CameraInfo",
                         # "/" + robot_name + "/hand_camera/color" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
                         # "/" + robot_name + "/hand_camera/depth" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
                         # "/" + robot_name + "/hand_camera/depth/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
                         "/" + robot_name + "/scan" + "@sensor_msgs/msg/LaserScan" + "[ignition.msgs.LaserScan",
 
-                        "/" + robot_name + "/scan/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
+                        # "/" + robot_name + "/scan/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
                         "/" + robot_name + "/imu" + "@sensor_msgs/msg/Imu" + "[ignition.msgs.IMU",
                     ],
             output='screen'
         )
+        if (head_camera_name == "xtion"):
+            gz_tf_head_cam_node = Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                arguments=['--frame-id', robot_name + '/head_camera_depth_optical_frame',
+                        '--child-frame-id', robot_name + '/head_camera_tilt_link/head_camera_depth',
+                        '--pitch', '-1.57',
+                        '--roll', '1.57'],
+                output='screen',
+            )
+        elif (head_camera_name == "azure_kinect"):
+            gz_tf_head_cam_node = Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                arguments=['--frame-id', robot_name + '/head_camera_depth_optical_link',
+                        '--child-frame-id', robot_name + '/head_camera_tilt_link/head_camera_depth',
+                        '--pitch', '-1.57',
+                        '--roll', '1.57'],
+                output='screen',
+            )
+        elif (head_camera_name == "gemini_336"):
+            gz_tf_head_cam_node = Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                arguments=['--frame-id', robot_name + '/head_camera_camera_depth_optical_frame',
+                        '--child-frame-id', robot_name + '/head_camera_tilt_link/head_camera_depth',
+                        '--pitch', '-1.57',
+                        '--roll', '1.57'],
+                output='screen',
+            )
+        else:
+            camera_node = None
+        rviz_config = PathJoinSubstitution([
+            FindPackageShare('sobit_edu_bringup'),
+            'rviz',
+            'real.rviz'
+        ])
 
         # gz_tf_head_cam_node = Node(
         #     package='tf2_ros',
         #     executable='static_transform_publisher',
-        #     arguments=['--frame-id', robot_name + '/head_camera_depth_optical_frame',
-        #                '--child-frame-id', robot_name + '/head_pitch_link/head_camera_depth',
+        #     arguments=['--frame-id', robot_name + '/head_camera_camera_depth_optical_frame',
+        #                '--child-frame-id', robot_name + '/head_camera_tilt_link/head_camera_depth',
         #                '--pitch', '-1.57',
         #                '--roll', '1.57'],
         #     output='screen',
@@ -337,7 +382,7 @@ def launch_gz(context, *args, **kwargs):
         return [
             gz_spawn_entity_node,
             gz_bridge_node,
-            # gz_tf_head_cam_node,
+            gz_tf_head_cam_node,
             RegisterEventHandler(
                 event_handler=OnProcessExit(
                     target_action=gz_spawn_entity_node,

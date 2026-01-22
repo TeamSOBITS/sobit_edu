@@ -63,6 +63,8 @@ def generate_launch_description():
                 'enable_gz' : 'True',
                 'enable_gz_lidar' : 'True',
                 'enable_gz_imu' : 'True',
+                'enable_gz_head_cam_color' : 'True',
+                'enable_gz_head_cam_depth' : 'True',
             }.items()
         ),
         # # Launch Robot No. 2
