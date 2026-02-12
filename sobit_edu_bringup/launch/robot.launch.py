@@ -54,6 +54,16 @@ def launch_gz(context, *args, **kwargs):
     enable_gz_imu = LaunchConfiguration('enable_gz_imu').perform(context)
     enable_gz_head_cam_color = LaunchConfiguration('enable_gz_head_cam_color').perform(context)
     enable_gz_head_cam_depth = LaunchConfiguration('enable_gz_head_cam_depth').perform(context)
+
+    # Find Dynamixel Port name and Kobuki Port name from DXL_SE_PORT/KOBUKI_SE_PORT environment variable
+    dxl_se_port = ''
+    kobuki_se_port = ''
+    if enable_gz == 'False':
+        dxl_se_port = str(os.environ.get('DXL_SE_PORT'))
+        print('Dynamixel SOBIT EDU Port : ' + dxl_se_port)
+        kobuki_se_port = str(os.environ.get('KOBUKI_SE_PORT'))
+        print('Kobuki SOBIT EDU Port : ' + kobuki_se_port)
+
     robot_description = os.path.join(get_package_share_directory(
         'sobit_edu_description'), 
         'robots',
@@ -69,6 +79,7 @@ def launch_gz(context, *args, **kwargs):
             'head_camera_name': head_camera_name,
             'enable_gz_head_cam_color' : enable_gz_head_cam_color,
             'enable_gz_head_cam_depth' : enable_gz_head_cam_depth,
+            'dxl_se_port' : dxl_se_port,
         })
 
 
@@ -77,6 +88,7 @@ def launch_gz(context, *args, **kwargs):
     kobuki_param_file = os.path.join(get_package_share_directory("sobit_edu_bringup"), "config", "kobuki_node_params.yaml")
     with open(kobuki_param_file, "r") as f:
         kobuki_params = yaml.safe_load(f)["kobuki_ros_node"]["ros__parameters"]
+    kobuki_params["device_port"] = kobuki_se_port
 
 
     if enable_gz == 'False':
@@ -90,9 +102,11 @@ def launch_gz(context, *args, **kwargs):
             package="controller_manager",
             executable="ros2_control_node",
             namespace=robot_name,
-            parameters=[
-                {"robot_description": robot_description_config.toxml()}, controller_config],
-            output="screen",
+            parameters=[controller_config],
+            remappings=[
+                ("controller_manager/robot_description", "robot_description"),
+            ],
+            output="both",
         )
         kobuki_node = Node(
             package="kobuki_node",
@@ -115,15 +129,7 @@ def launch_gz(context, *args, **kwargs):
                 "namespace" : robot_name,
             }.items()
         )
-        # camera_node = IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([
-        #         PathJoinSubstitution([
-        #             FindPackageShare("sobit_edu_bringup"),
-        #             'launch',
-        #             'gemini_bringup.launch.py'
-        #         ])
-        #     ]),
-        # )
+
         if (head_camera_name == "xtion"):
             camera_node = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
@@ -172,34 +178,26 @@ def launch_gz(context, *args, **kwargs):
             'real.rviz'
         ])
 
-    joint_state_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller',
-             '--set-state', 'active',
-             '--controller-manager', robot_name+'/controller_manager',
-            #  '--use-sim-time',
-             'joint_state_broadcaster'
-        ],
-        output='screen'
+    joint_state_broadcaster = Node(
+        package='controller_manager',
+        executable='spawner',
+        name='joint_state_broadcaster',
+        namespace=robot_name,
+        arguments=[
+            'joint_state_broadcaster',
+            '-c', 'controller_manager',
+            ],
     )
 
-    joint_trajectory_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller',
-             '--set-state', 'active',
-             '--controller-manager', robot_name+'/controller_manager',
-            #  '--use-sim-time',
-             'joint_trajectory_controller'
-        ],
-        output='screen'
-    )
-
-    velocity_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller',
-             '--set-state', 'configured',
-             '--controller-manager', robot_name+'/controller_manager',
-            #  '--use-sim-time',
-             'velocity_controller'
-        ],
-        output='screen'
+    joint_trajectory_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        name='joint_trajectory_controller',
+        namespace=robot_name,
+        arguments=[
+            'joint_trajectory_controller',
+            '-c', 'controller_manager', '--activate'
+            ],
     )
 
     robot_state_publisher_node = Node(
@@ -306,14 +304,15 @@ def launch_gz(context, *args, **kwargs):
         #     output='screen',
         # )
 
-        diff_controller = ExecuteProcess(
-            cmd=['ros2', 'control', 'load_controller',
-                '--set-state', 'active',
-                '--controller-manager', robot_name+'/controller_manager',
-                #  '--use-sim-time',
-                'diff_controller'
-            ],
-            output='screen'
+        diff_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            name='diff_controller',
+            namespace=robot_name,
+            arguments=[
+                'diff_controller',
+                '-c', 'controller_manager', '--activate'
+                ],
         )
 
         vel_remap_node = Node(
@@ -363,7 +362,6 @@ def launch_gz(context, *args, **kwargs):
         return [
             ros2_control_node,
             joint_state_broadcaster,
-            velocity_controller,
             joint_trajectory_controller,
             robot_state_publisher_node,
             RegisterEventHandler(
@@ -393,12 +391,6 @@ def launch_gz(context, *args, **kwargs):
                 event_handler=OnProcessExit(
                     target_action=joint_state_broadcaster,
                     on_exit=[joint_trajectory_controller],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=joint_state_broadcaster,
-                    on_exit=[velocity_controller],
                 )
             ),
             RegisterEventHandler(
