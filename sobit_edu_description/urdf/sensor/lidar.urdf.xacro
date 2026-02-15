@@ -34,7 +34,7 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}_sim_joint" type="fixed">
+    <!-- <joint name="${prefix}_sim_joint" type="fixed">
       <parent link="${prefix}_base_link" />
       <child link="sim_laser_frame" />
       <origin xyz="0.3 0 0.0" rpy="0 0 0" />
@@ -47,7 +47,7 @@
                  iyy="0.001" iyz="0"
                  izz="0.001" />
       </inertial>
-    </link>
+    </link> -->
 
 
     <xacro:hokuyo_ust_mount prefix="${prefix}" parent="${prefix}_base_link" topic="scan" >

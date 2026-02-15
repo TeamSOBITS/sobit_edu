@@ -11,7 +11,9 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     robot_name = 'sobit_edu'
+    head_camera_name = "gemini_336" # 'xtion' or 'azure_kinect' or 'gemini_336'
     robot_id = 0
+
     gz_bridge_node = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -22,26 +24,11 @@ def generate_launch_description():
         output='screen'
     )
 
-    rviz_config = PathJoinSubstitution([
-            FindPackageShare('sobit_edu_bringup'),
-            'rviz',
-            'gazebo.rviz'
-    ])
-
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        output='screen',
-        arguments=['-d', rviz_config],
-    )
-
-    ##### sobits_gazebo_worldを参照しているので注意！！ #####
     world_file = os.path.join(get_package_share_directory(
         'sobits_gazebo_worlds'), 
         'worlds',
         'rcjo2025_arena.world.xacro'
     )
-    ##### sobits_gazebo_worldを参照しているので注意！！ #####
 
     return LaunchDescription([
         # Launch gazebo environment
@@ -69,37 +56,35 @@ def generate_launch_description():
             ]),
             launch_arguments={
                 'robot_name': robot_name if robot_id == 0 else robot_name + '_' + str(robot_id),
+                'head_camera_name': head_camera_name,
                 'robot_coords_x': '-5.5', # x 
                 'robot_coords_y': '1.5', # y
                 'robot_coords_Y': '0', # yaw
                 'enable_gz' : 'True',
                 'enable_gz_lidar' : 'True',
                 'enable_gz_imu' : 'True',
+                'enable_gz_head_cam_color' : 'True',
+                'enable_gz_head_cam_depth' : 'True',
             }.items()
         ),
-        # Launch Robot No. 2
+        # # Launch Robot No. 2
         # IncludeLaunchDescription(
         #     PythonLaunchDescriptionSource([
         #         PathJoinSubstitution([
-        #             FindPackageShare('sobit_light_bringup'),
+        #             FindPackageShare('sobit_edu_bringup'),
         #             'launch',
         #             'robot.launch.py'
         #         ])
         #     ]),
         #     launch_arguments={
-        #         'robot_name': 'sobit_light_2',
+        #         'robot_name': robot_name if (robot_id+1) == 0 else robot_name + '_' + str(robot_id+1),
+        #         'head_camera_name': head_camera_name,
         #         'robot_coords_x': '0', # x 
-        #         'robot_coords_y': '2', # y
+        #         'robot_coords_y': '0', # y
         #         'robot_coords_Y': '0', # yaw
-        #         'enable_gz_front_cam_color' : 'True',
-        #         'enable_gz_back_cam_color' : 'True',
-        #         'enable_gz_head_cam_color' : 'True',
-        #         'enable_gz_head_cam_depth' : 'True',
-        #         'enable_gz_hand_cam_color' : 'True',
-        #         'enable_gz_hand_cam_depth' : 'True',
+        #         'enable_gz': 'True',
         #         'enable_gz_lidar' : 'True',
         #         'enable_gz_imu' : 'True',
         #     }.items()
         # ),
-        rviz_node,
     ])
