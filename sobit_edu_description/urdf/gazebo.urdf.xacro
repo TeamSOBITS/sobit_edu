@@ -11,8 +11,7 @@
         <sensor name="lidar" type="gpu_lidar">
           <pose>0 0 0 0 0 0</pose>
 
-          <ignition_frame_id>${robot_name}/lidar_laser</ignition_frame_id>
-          <!-- <gz_frame_id>${robot_name}/lidar_laser</gz_frame_id> -->
+          <gz_frame_id>${robot_name}/lidar_laser</gz_frame_id>
           <topic>${robot_name}/scan</topic>
 
           <always_on>1</always_on>
@@ -53,8 +52,7 @@
         <sensor name="head_camera_color" type="camera">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <ignition_frame_id>${robot_name}/head_camera_rgb_optical_frame</ignition_frame_id>
-          <!-- <gz_frame_id>${robot_name}/head_camera_rgb_optical_frame</gz_frame_id> -->
+          <gz_frame_id>${robot_name}/head_camera_optical_frame</gz_frame_id>
           <topic>${robot_name}/head_camera/color</topic>
 
           <always_on>1</always_on>
@@ -83,14 +81,49 @@
       </gazebo>
       </xacro:if>
 
+    <!-- Sensor - Head Camera (Depth) -->
+    <xacro:if value="${enable_gz_head_cam_depth}">
+      <!-- Xtion -->
+      <xacro:if value="$(eval head_camera_name == 'xtion')">
+      <gazebo reference="head_camera_depth_optical_frame">
+        <sensor name="head_camera_depth" type="depth">
+          <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
+          
+          <gz_frame_id>${robot_name}/head_camera_optical_frame</gz_frame_id>
+          <topic>${robot_name}/head_camera/depth</topic>
+
+          <always_on>1</always_on>
+          <visualize>true</visualize>
+          <update_rate>1</update_rate>
+
+          <camera name="head_camera_depth">
+            <horizontal_fov>1.48702</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>10</far>
+            </clip>
+            <!-- TODO - adjust noise -->
+            <!-- <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>0.1</stddev>
+            </noise> -->
+          </camera>
+        </sensor>
+      </gazebo>
+      </xacro:if>
+
       <!-- AzureKinect -->
       <xacro:if value="$(eval head_camera_name == 'azure_kinect')">
       <gazebo reference="head_camera_rgb_optical_link">
         <sensor name="head_camera_color" type="camera">
           <pose>0 0 ${0.0175/2} 0 -${M_PI/2} 0 </pose>
           
-          <ignition_frame_id>${robot_name}/head_camera_rgb_optical_link</ignition_frame_id>
-          <!-- <gz_frame_id>${robot_name}/head_camera_rgb_optical_link</gz_frame_id> -->
+          <gz_frame_id>${robot_name}/head_camera_rgb_optical_link</gz_frame_id>
           <topic>${robot_name}/head_camera/color</topic>
 
           <always_on>1</always_on>
@@ -125,8 +158,7 @@
         <sensor name="head_camera_color" type="camera">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <ignition_frame_id>${robot_name}/head_camera_camera_color_optical_frame</ignition_frame_id>
-          <!-- <gz_frame_id>${robot_name}/head_camera_camera_color_optical_frame</gz_frame_id> -->
+          <gz_frame_id>${robot_name}/head_camera_camera_color_optical_frame</gz_frame_id>
           <topic>${robot_name}/head_camera/color</topic>
 
           <always_on>1</always_on>
@@ -157,51 +189,13 @@
 
     </xacro:if>
 
-    <!-- Sensor - Head Camera (Depth) -->
-    <xacro:if value="${enable_gz_head_cam_depth}">
-      <!-- Xtion -->
-      <xacro:if value="$(eval head_camera_name == 'xtion')">
-      <gazebo reference="head_camera_depth_optical_frame">
-        <sensor name="head_camera_depth" type="depth">
-          <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
-          
-          <ignition_frame_id>${robot_name}/head_camera_depth_optical_frame</ignition_frame_id>
-          <!-- <gz_frame_id>${robot_name}/head_camera_depth_optical_frame</gz_frame_id> -->
-          <topic>${robot_name}/head_camera/depth</topic>
-
-          <always_on>1</always_on>
-          <visualize>true</visualize>
-          <update_rate>1</update_rate>
-
-          <camera name="head_camera_depth">
-            <horizontal_fov>1.48702</horizontal_fov>
-            <image>
-              <width>640</width>
-              <height>480</height>
-            </image>
-            <clip>
-              <near>0.1</near>
-              <far>10</far>
-            </clip>
-            <!-- TODO - adjust noise -->
-            <!-- <noise>
-              <type>gaussian</type>
-              <mean>0</mean>
-              <stddev>0.1</stddev>
-            </noise> -->
-          </camera>
-        </sensor>
-      </gazebo>
-      </xacro:if>
-
       <!-- AzureKinect -->
       <xacro:if value="$(eval head_camera_name == 'azure_kinect')">
       <gazebo reference="head_camera_depth_optical_link">
         <sensor name="head_camera_depth" type="depth">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <ignition_frame_id>${robot_name}/head_camera_depth_optical_link</ignition_frame_id>
-          <!-- <gz_frame_id>${robot_name}/head_camera_depth_optical_link</gz_frame_id> -->
+          <gz_frame_id>${robot_name}/head_camera_depth_optical_link</gz_frame_id>
           <topic>${robot_name}/head_camera/depth</topic>
 
           <always_on>1</always_on>
@@ -235,8 +229,7 @@
         <sensor name="head_camera_depth" type="depth">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <ignition_frame_id>${robot_name}/head_camera_camera_depth_optical_frame</ignition_frame_id>
-          <!-- <gz_frame_id>${robot_name}/head_camera_depth_optical_frame</gz_frame_id> -->
+          <gz_frame_id>${robot_name}/head_camera_depth_optical_frame</gz_frame_id>
           <topic>${robot_name}/head_camera/depth</topic>
 
           <always_on>1</always_on>
@@ -282,7 +275,6 @@
 
     <!-- Publish Joint States -->
     <gazebo>
-      <!-- <plugin filename="ignition-gazebo-joint-state-publisher-system" name="ignition::gazebo::systems::JointStatePublisher"> -->
       <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
         <topic>${robot_name}/joint_states</topic>
       </plugin>

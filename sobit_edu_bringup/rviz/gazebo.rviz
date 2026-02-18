@@ -24,7 +24,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -413,10 +413,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        sim_laser_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         wheel_l_link:
           Alpha: 1
           Show Axes: false
@@ -496,7 +492,6 @@ Visualization Manager:
       Topic:
         Depth: 5
         Durability Policy: Volatile
-        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /rgb/depth/topic_name
@@ -585,5 +580,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1920
-  X: 0
-  Y: 0
+  X: 848
+  Y: 791
