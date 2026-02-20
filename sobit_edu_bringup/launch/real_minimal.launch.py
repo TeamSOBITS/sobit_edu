@@ -19,9 +19,13 @@ def generate_launch_description():
                 ])
             ]),
             launch_arguments={
-                'robot_name': robot_name,
-                'head_camera_name': head_camera_name,
-                'enable_gz': 'False',
+                'robot_name'           : robot_name,
+                'head_camera_name'     : head_camera_name,
+                'enable_gz'            : 'False',
+                'enable_mobile_base'   : 'True',
+                'enable_head'          : 'True',
+                'enable_arm'           : 'True',
+                'enable_hand'          : 'True',
             }.items()
         ),
     ])

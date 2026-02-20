@@ -6,7 +6,7 @@
 
 
     <!-- Sensor: LiDAR -->
-    <xacro:if value="${enable_gz_lidar}">
+    <xacro:if value="${$(arg enable_gz_lidar) and $(arg enable_mobile_base)}">
       <gazebo reference="lidar_laser">
         <sensor name="lidar" type="gpu_lidar">
           <pose>0 0 0 0 0 0</pose>
@@ -46,7 +46,7 @@
 
 
     <!-- Sensor - Head Camera (Color) -->
-    <xacro:if value="${enable_gz_head_cam_color}">
+    <xacro:if value="${$(arg enable_gz_head_cam_color) and $(arg enable_head)}">
       <!-- Xtion -->
       <xacro:if value="$(eval head_camera_name == 'xtion')">
       <gazebo reference="head_camera_rgb_optical_frame">
@@ -158,7 +158,7 @@
     </xacro:if>
 
     <!-- Sensor - Head Camera (Depth) -->
-    <xacro:if value="${enable_gz_head_cam_depth}">
+    <xacro:if value="${$(arg enable_gz_head_cam_depth) and $(arg enable_head)}">
       <!-- Xtion -->
       <xacro:if value="$(eval head_camera_name == 'xtion')">
       <gazebo reference="head_camera_depth_optical_frame">
