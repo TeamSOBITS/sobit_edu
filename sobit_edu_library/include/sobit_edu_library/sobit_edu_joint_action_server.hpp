@@ -62,15 +62,11 @@ class JointActionServer : public rclcpp::Node
 public:
   using MoveJoint = sobits_interfaces::action::MoveJoint;
   using MoveToPose = sobits_interfaces::action::MoveToPose;
-  // using MoveHandToTargetCoord = sobits_interfaces::action::MoveHandToTargetCoord;
-  // using MoveHandToTargetTF = sobits_interfaces::action::MoveHandToTargetTF;
   using GetHandToTargetCoord = sobits_interfaces::srv::GetHandToTargetCoord;
   using GetHandToTargetTF = sobits_interfaces::srv::GetHandToTargetTF;
 
   using GoalHandleMoveJoints = rclcpp_action::ServerGoalHandle<sobits_interfaces::action::MoveJoint>;
   using GoalHandleMoveToPose = rclcpp_action::ServerGoalHandle<sobits_interfaces::action::MoveToPose>;
-  // using GoalHandleMoveHandToCoord = rclcpp_action::ServerGoalHandle<sobits_interfaces::action::MoveHandToTargetCoord>;
-  // using GoalHandleMoveHandToTf = rclcpp_action::ServerGoalHandle<sobits_interfaces::action::MoveHandToTargetTF>;
 
 
   explicit JointActionServer(const rclcpp::NodeOptions & options);
@@ -89,10 +85,27 @@ public:
   trajectory_msgs::msg::JointTrajectory set_joints(
     const std::vector<std::string> &target_joint_names,
     const std::vector<double> &target_joint_rad,
-    const builtin_interfaces::msg::Duration &time_allowance);
+    const builtin_interfaces::msg::Duration &time_allowance,
+    const std::string &pose_name);
 
 private:
-  const std::vector<std::string> JointNames = {
+  const std::vector<std::string> kArmJointNames = {
+    "arm_shoulder_roll_joint",
+    "arm_shoulder_pitch_joint",
+    "arm_elbow_pitch_joint",
+    "arm_forearm_roll_joint",
+    "arm_wrist_pitch_joint",
+    "arm_wrist_roll_joint",
+  };
+  const std::vector<std::string> kHandJointNames = {
+    "hand_joint"
+  };
+  const std::vector<std::string> kHeadJointNames = {
+    "head_camera_pan_joint",
+    "head_camera_tilt_joint"
+  };
+
+  const std::vector<std::string> kJointNames = {
     "arm_shoulder_roll_joint",
     "arm_shoulder_pitch_joint",
     "arm_elbow_pitch_joint",
@@ -133,7 +146,9 @@ private:
   void serve_get_hand_to_coord(const std::shared_ptr<GetHandToTargetCoord::Request> request, std::shared_ptr<GetHandToTargetCoord::Response> response);
   void serve_get_hand_to_tf(const std::shared_ptr<GetHandToTargetTF::Request> request, std::shared_ptr<GetHandToTargetTF::Response> response);
 
-  rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr pub_joint_control_;
+  rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr pub_arm_joint_control_;
+  rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr pub_hand_joint_control_;
+  rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr pub_head_joint_control_;
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr sub_joint_state_;
 
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
