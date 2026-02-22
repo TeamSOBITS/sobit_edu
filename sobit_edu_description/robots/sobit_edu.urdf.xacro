@@ -43,6 +43,9 @@
   <xacro:arg name="enable_head"         default="True" />
   <xacro:arg name="enable_arm"          default="True" />
   <xacro:arg name="enable_hand"         default="True" />
+  
+  <!-- DXL Ports -->
+  <xacro:arg name="dxl_se_port"  default="/dev/ttyUSB1" />
 
   <!-- Connect the previous Links and Joints -->
   <xacro:base/>

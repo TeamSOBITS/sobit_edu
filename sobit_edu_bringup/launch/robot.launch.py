@@ -69,6 +69,15 @@ def launch_gz(context, *args, **kwargs):
     enable_gz_head_cam_color = LaunchConfiguration('enable_gz_head_cam_color').perform(context)
     enable_gz_head_cam_depth = LaunchConfiguration('enable_gz_head_cam_depth').perform(context)
 
+    # Find Dynamixel Port name and Kobuki Port name from DXL_SE_PORT/KOBUKI_SE_PORT environment variable
+    dxl_se_port = ''
+    kobuki_se_port = ''
+    if enable_gz == 'False':
+        dxl_se_port = str(os.environ.get('DXL_SE_PORT'))
+        print('Dynamixel SOBIT EDU Port : ' + dxl_se_port)
+        kobuki_se_port = str(os.environ.get('KOBUKI_SE_PORT'))
+        print('Kobuki SOBIT EDU Port : ' + kobuki_se_port)
+
     robot_description = os.path.join(get_package_share_directory(
         'sobit_edu_description'), 
         'robots',
@@ -89,6 +98,7 @@ def launch_gz(context, *args, **kwargs):
             'head_camera_name'         : head_camera_name,
             'enable_gz_head_cam_color' : enable_gz_head_cam_color,
             'enable_gz_head_cam_depth' : enable_gz_head_cam_depth,
+            'dxl_se_port' : dxl_se_port,
         })
 
 
@@ -97,6 +107,7 @@ def launch_gz(context, *args, **kwargs):
     kobuki_param_file = os.path.join(get_package_share_directory("sobit_edu_bringup"), "config", "kobuki_node_params.yaml")
     with open(kobuki_param_file, "r") as f:
         kobuki_params = yaml.safe_load(f)["kobuki_ros_node"]["ros__parameters"]
+    kobuki_params["device_port"] = kobuki_se_port
 
 
     if enable_gz == 'False':
@@ -106,14 +117,18 @@ def launch_gz(context, *args, **kwargs):
                 "config", 
                 "controllers.yaml"
         )
+        
         ros2_control_node = Node(
             package="controller_manager",
             executable="ros2_control_node",
             namespace=robot_name,
-            parameters=[
-                {"robot_description": robot_description_config.toxml()}, controller_config],
-            output="screen",
+            parameters=[controller_config],
+            remappings=[
+                ("controller_manager/robot_description", "robot_description"),
+            ],
+            output="both",
         )
+        
         kobuki_node = Node(
             package="kobuki_node",
             executable="kobuki_ros_node",
@@ -121,6 +136,7 @@ def launch_gz(context, *args, **kwargs):
             output="both",
             parameters=[kobuki_params]
         )
+        
         urg_node = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 PathJoinSubstitution([
@@ -285,29 +301,26 @@ def launch_gz(context, *args, **kwargs):
             executable='parameter_bridge',
             namespace=robot_name,
             arguments=[
-                        "/" + robot_name + "/joint_states" + "@sensor_msgs/msg/JointState" + "[ignition.msgs.Model",
-                        # "/model/" + robot_name + "/pose" + "@geometry_msgs/msg/Pose" + "[ignition.msgs.Pose",
-                        # "/" + robot_name + "/base_front_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[ignition.msgs.CameraInfo",
-                        # "/" + robot_name + "/base_front_camera/color" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        # "/" + robot_name + "/base_front_camera/depth" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        # "/" + robot_name + "/base_back_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[ignition.msgs.CameraInfo",
-                        # "/" + robot_name + "/base_back_camera/color" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        # "/" + robot_name + "/base_back_camera/depth" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        "/" + robot_name + "/head_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[ignition.msgs.CameraInfo",
-                        "/" + robot_name + "/head_camera/color" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        "/" + robot_name + "/head_camera/depth" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        "/" + robot_name + "/head_camera/depth/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
-                        # "/" + robot_name + "/hand_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[ignition.msgs.CameraInfo",
-                        # "/" + robot_name + "/hand_camera/color" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        # "/" + robot_name + "/hand_camera/depth" + "@sensor_msgs/msg/Image" + "[ignition.msgs.Image",
-                        # "/" + robot_name + "/hand_camera/depth/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
-                        "/" + robot_name + "/scan" + "@sensor_msgs/msg/LaserScan" + "[ignition.msgs.LaserScan",
+                        "/" + robot_name + "/joint_states" + "@sensor_msgs/msg/JointState" + "[gz.msgs.Model",
+                        # "/model/" + robot_name + "/pose" + "@geometry_msgs/msg/Pose" + "[gz.msgs.Pose",
+                        # "/" + robot_name + "/base_front_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[gz.msgs.CameraInfo",
+                        # "/" + robot_name + "/base_front_camera/color" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
+                        # "/" + robot_name + "/base_front_camera/depth" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
+                        # "/" + robot_name + "/base_back_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[gz.msgs.CameraInfo",
+                        # "/" + robot_name + "/base_back_camera/color" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
+                        # "/" + robot_name + "/base_back_camera/depth" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
+                        "/" + robot_name + "/head_camera_base/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[gz.msgs.CameraInfo",
+                        "/" + robot_name + "/head_camera_base/color" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
+                        "/" + robot_name + "/head_camera_base/depth" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
+                        "/" + robot_name + "/head_camera_base/depth/points" + "@sensor_msgs/msg/PointCloud2" + "[gz.msgs.PointCloudPacked",
+                        "/" + robot_name + "/scan" + "@sensor_msgs/msg/LaserScan" + "[gz.msgs.LaserScan",
 
-                        # "/" + robot_name + "/scan/points" + "@sensor_msgs/msg/PointCloud2" + "[ignition.msgs.PointCloudPacked",
-                        "/" + robot_name + "/imu" + "@sensor_msgs/msg/Imu" + "[ignition.msgs.IMU",
+                        # "/" + robot_name + "/scan/points" + "@sensor_msgs/msg/PointCloud2" + "[gz.msgs.PointCloudPacked",
+                        "/" + robot_name + "/imu" + "@sensor_msgs/msg/Imu" + "[gz.msgs.IMU",
                     ],
             output='screen'
         )
+        
         if (head_camera_name == "xtion"):
             gz_tf_head_cam_node = Node(
                 package='tf2_ros',
