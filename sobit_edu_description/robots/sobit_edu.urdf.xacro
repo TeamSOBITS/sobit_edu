@@ -32,11 +32,18 @@
   <!-- Add variables -->
   <xacro:arg name="enable_gz"                 default="False" />
   <xacro:arg name="enable_gz_lidar"           default="True" />
+  <xacro:arg name="enable_gz_imu"             default="True" />
   <xacro:arg name="robot_name"                default="sobit_edu" />
   <xacro:arg name="head_camera_name"          default="gemini_336" />
   <xacro:arg name="enable_gz_head_cam_color"  default="True" />
   <xacro:arg name="enable_gz_head_cam_depth"  default="True" />
 
+  <!-- Activate Components -->
+  <xacro:arg name="enable_mobile_base"  default="True" />
+  <xacro:arg name="enable_head"         default="True" />
+  <xacro:arg name="enable_arm"          default="True" />
+  <xacro:arg name="enable_hand"         default="True" />
+  
   <!-- DXL Ports -->
   <xacro:arg name="dxl_se_port"  default="/dev/ttyUSB1" />
 
@@ -44,33 +51,40 @@
   <xacro:base/>
   <xacro:stack_hexagons parent="base_link" />
   <xacro:cover  prefix="cover"  parent="plate_top_link" />
-  <xacro:lidar  prefix="lidar"  parent="plate_bottom_link" />
-  <xacro:arm    prefix="arm"    parent="plate_top_link" />
-  <xacro:hand   prefix_hand="hand" prefix_finger="finger" parent="arm_hand_link" />
   <xacro:back   prefix="back"   parent="plate_top_link" />
-  <xacro:head   prefix="head"   parent="back_base_link" />
-  <!-- <xacro:head_camera prefix="head_camera" parent="head_camera_tilt_link" /> -->
+
+  <xacro:if value="${$(arg enable_arm)}">
+    <xacro:arm    prefix="arm"    parent="plate_top_link" />
+  </xacro:if>
+
+  <xacro:if value="${$(arg enable_hand)}">
+    <xacro:hand   prefix_hand="hand" prefix_finger="finger" parent="arm_hand_link" />
+  </xacro:if>
+
+  <xacro:if value="${$(arg enable_head)}">
+    <xacro:head   prefix="head"   parent="back_base_link" />
+    <!-- Xtion -->
+    <xacro:if value="$(eval head_camera_name == 'xtion')">
+    <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/xtion.urdf.xacro" />
+    <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/xtion_fixed.urdf.xacro" />
+      <xacro:xtion_fixed prefix="head_camera" parent="head_camera_tilt_link"/>
+    </xacro:if>
+    <!-- AzureKinect -->
+    <xacro:if value="$(eval head_camera_name == 'azure_kinect')">
+      <xacro:include filename="$(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" />
+      <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/azure_camera.urdf.xacro" />
+      <xacro:azure_camera prefix="head_camera" parent="head_camera_tilt_link" />
+    </xacro:if>
+    <!-- Gemini336L -->
+    <xacro:if value="$(eval head_camera_name == 'gemini_336')">
+      <xacro:include filename="$(find orbbec_description)/urdf/gemini_336.urdf.xacro" />
+      <xacro:head_camera prefix="head_camera" parent="head_camera_tilt_link" />
+    </xacro:if>
+  </xacro:if>
+
   <xacro:mic    prefix="mic"    parent="back_base_link" />
   <xacro:matrix prefix="matrix" parent="back_base_link" />
-
-
-  <!-- Xtion -->
-  <xacro:if value="$(eval head_camera_name == 'xtion')">
-  <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/xtion.urdf.xacro" />
-  <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/xtion_fixed.urdf.xacro" />
-    <xacro:xtion_fixed prefix="head_camera" parent="head_camera_tilt_link"/>
-  </xacro:if>
-  <!-- AzureKinect -->
-  <xacro:if value="$(eval head_camera_name == 'azure_kinect')">
-    <xacro:include filename="$(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" />
-    <xacro:include filename="$(find sobit_edu_description)/urdf/sensor/azure_camera.urdf.xacro" />
-    <xacro:azure_camera prefix="head_camera" parent="head_camera_tilt_link" />
-  </xacro:if>
-  <!-- Gemini336L -->
-  <xacro:if value="$(eval head_camera_name == 'gemini_336')">
-    <xacro:include filename="$(find orbbec_description)/urdf/gemini_336.urdf.xacro" />
-    <xacro:head_camera prefix="head_camera" parent="head_camera_tilt_link" />
-  </xacro:if>
+  <xacro:lidar  prefix="lidar"  parent="plate_bottom_link" />
 
   <!-- Add Dynamixel plugins -->
   <xacro:controllers name="joints_control" enable_gz="$(arg enable_gz)" robot_name="$(arg robot_name)" />

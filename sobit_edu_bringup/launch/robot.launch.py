@@ -19,10 +19,15 @@ def generate_launch_description():
     arg_robot_coords_x = DeclareLaunchArgument('robot_coords_x', default_value='0')
     arg_robot_coords_y = DeclareLaunchArgument('robot_coords_y', default_value='0')
     arg_robot_coords_Y = DeclareLaunchArgument('robot_coords_Y', default_value='0')
-    
-    arg_enable_gz = DeclareLaunchArgument('enable_gz', default_value='True')
-    arg_enable_gz_lidar = DeclareLaunchArgument('enable_gz_lidar', default_value='True')
-    arg_enable_gz_imu = DeclareLaunchArgument('enable_gz_imu', default_value='True')
+
+    arg_enable_mobile_base = DeclareLaunchArgument('enable_mobile_base', default_value='True')
+    arg_enable_head        = DeclareLaunchArgument('enable_head', default_value='True')
+    arg_enable_arm         = DeclareLaunchArgument('enable_arm', default_value='True')
+    arg_enable_hand        = DeclareLaunchArgument('enable_hand', default_value='True')
+
+    arg_enable_gz                = DeclareLaunchArgument('enable_gz', default_value='True')
+    arg_enable_gz_lidar          = DeclareLaunchArgument('enable_gz_lidar', default_value='True')
+    arg_enable_gz_imu            = DeclareLaunchArgument('enable_gz_imu', default_value='True')
     arg_enable_gz_head_cam_color = DeclareLaunchArgument('enable_gz_head_cam_color', default_value='True')
     arg_enable_gz_head_cam_depth = DeclareLaunchArgument('enable_gz_head_cam_depth', default_value='True')
 
@@ -32,6 +37,10 @@ def generate_launch_description():
         arg_robot_coords_x,
         arg_robot_coords_y,
         arg_robot_coords_Y,
+        arg_enable_mobile_base,
+        arg_enable_head,
+        arg_enable_arm,
+        arg_enable_hand,
         arg_enable_gz,
         arg_enable_gz_lidar,
         arg_enable_gz_imu,
@@ -49,9 +58,14 @@ def launch_gz(context, *args, **kwargs):
     robot_coords_y = LaunchConfiguration('robot_coords_y').perform(context)
     robot_coords_Y = LaunchConfiguration('robot_coords_Y').perform(context)
 
-    enable_gz = LaunchConfiguration('enable_gz').perform(context)
-    enable_gz_lidar = LaunchConfiguration('enable_gz_lidar').perform(context)
-    enable_gz_imu = LaunchConfiguration('enable_gz_imu').perform(context)
+    enable_mobile_base = LaunchConfiguration('enable_mobile_base').perform(context)
+    enable_head        = LaunchConfiguration('enable_head').perform(context)
+    enable_arm         = LaunchConfiguration('enable_arm').perform(context)
+    enable_hand        = LaunchConfiguration('enable_hand').perform(context)
+
+    enable_gz                = LaunchConfiguration('enable_gz').perform(context)
+    enable_gz_lidar          = LaunchConfiguration('enable_gz_lidar').perform(context)
+    enable_gz_imu            = LaunchConfiguration('enable_gz_imu').perform(context)
     enable_gz_head_cam_color = LaunchConfiguration('enable_gz_head_cam_color').perform(context)
     enable_gz_head_cam_depth = LaunchConfiguration('enable_gz_head_cam_depth').perform(context)
 
@@ -69,14 +83,19 @@ def launch_gz(context, *args, **kwargs):
         'robots',
         'sobit_edu.urdf.xacro'
     )
+
     robot_description_config = xacro.process_file(
         robot_description,
         mappings={
-            'enable_gz' : enable_gz,
-            'robot_name' : robot_name,
-            'enable_gz_lidar' : enable_gz_lidar,
-            'enable_gz_imu' : enable_gz_imu,
-            'head_camera_name': head_camera_name,
+            'enable_mobile_base'       : enable_mobile_base,
+            'enable_head'              : enable_head,
+            'enable_arm'               : enable_arm,
+            'enable_hand'              : enable_hand,
+            'enable_gz'                : enable_gz,
+            'robot_name'               : robot_name,
+            'enable_gz_lidar'          : enable_gz_lidar,
+            'enable_gz_imu'            : enable_gz_imu,
+            'head_camera_name'         : head_camera_name,
             'enable_gz_head_cam_color' : enable_gz_head_cam_color,
             'enable_gz_head_cam_depth' : enable_gz_head_cam_depth,
             'dxl_se_port' : dxl_se_port,
@@ -98,6 +117,7 @@ def launch_gz(context, *args, **kwargs):
                 "config", 
                 "controllers.yaml"
         )
+        
         ros2_control_node = Node(
             package="controller_manager",
             executable="ros2_control_node",
@@ -108,6 +128,7 @@ def launch_gz(context, *args, **kwargs):
             ],
             output="both",
         )
+        
         kobuki_node = Node(
             package="kobuki_node",
             executable="kobuki_ros_node",
@@ -115,6 +136,7 @@ def launch_gz(context, *args, **kwargs):
             output="both",
             parameters=[kobuki_params]
         )
+        
         urg_node = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 PathJoinSubstitution([
@@ -172,31 +194,77 @@ def launch_gz(context, *args, **kwargs):
             )
         else:
             camera_node = None
+
         rviz_config = PathJoinSubstitution([
             FindPackageShare('sobit_edu_bringup'),
             'rviz',
             'real.rviz'
         ])
 
+    controllers = []
+    nodes = []
+
+    if enable_head == 'True':
+        head_position_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            # name='head_position_controller',
+            namespace=robot_name,
+            arguments=[
+                'head_position_controller',
+                '-c', 'controller_manager', '--activate'
+                ],
+        )
+        controllers.append(head_position_controller)
+
+    if enable_arm == 'True':
+        arm_position_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            # name='arm_position_controller',
+            namespace=robot_name,
+            arguments=[
+                'arm_position_controller',
+                '-c', 'controller_manager', '--activate'
+                ],
+        )
+        controllers.append(arm_position_controller)
+
+    if enable_hand == 'True':
+        hand_position_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            # name='hand_position_controller',
+            namespace=robot_name,
+            arguments=[
+                'hand_position_controller',
+                '-c', 'controller_manager', '--activate'
+                ],
+        )
+        controllers.append(hand_position_controller)
+
+
+    if enable_mobile_base == 'True' and enable_gz == 'True':
+        wheel_controller = Node(
+            package='controller_manager',
+            executable='spawner',
+            # name='wheel_controller',
+            namespace=robot_name,
+            arguments=[
+                'wheel_controller',
+                '-c', 'controller_manager', '--activate'
+                ],
+        )
+        controllers.append(wheel_controller)
+
     joint_state_broadcaster = Node(
         package='controller_manager',
         executable='spawner',
-        name='joint_state_broadcaster',
+        # name='joint_state_broadcaster',
         namespace=robot_name,
         arguments=[
             'joint_state_broadcaster',
             '-c', 'controller_manager',
-            ],
-    )
-
-    joint_trajectory_controller = Node(
-        package='controller_manager',
-        executable='spawner',
-        name='joint_trajectory_controller',
-        namespace=robot_name,
-        arguments=[
-            'joint_trajectory_controller',
-            '-c', 'controller_manager', '--activate'
             ],
     )
 
@@ -252,6 +320,7 @@ def launch_gz(context, *args, **kwargs):
                     ],
             output='screen'
         )
+        
         if (head_camera_name == "xtion"):
             gz_tf_head_cam_node = Node(
                 package='tf2_ros',
@@ -283,46 +352,54 @@ def launch_gz(context, *args, **kwargs):
                 output='screen',
             )
         else:
-            camera_node = None
+            gz_tf_head_cam_node = None
+
         rviz_config = PathJoinSubstitution([
             FindPackageShare('sobit_edu_bringup'),
             'rviz',
             'real.rviz'
         ])
 
-        # gz_tf_head_cam_node = Node(
-        #     package='tf2_ros',
-        #     executable='static_transform_publisher',
-        #     arguments=['--frame-id', robot_name + '/head_camera_camera_depth_optical_frame',
-        #                '--child-frame-id', robot_name + '/head_camera_tilt_link/head_camera_depth',
-        #                '--pitch', '-1.57',
-        #                '--roll', '1.57'],
-        #     output='screen',
-        # )
+        delayed_joint_state_broadcaster = RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=gz_spawn_entity_node,
+                on_exit=joint_state_broadcaster,
+            )
+        )
 
-        diff_controller = Node(
-            package='controller_manager',
-            executable='spawner',
-            name='diff_controller',
-            namespace=robot_name,
-            arguments=[
-                'diff_controller',
-                '-c', 'controller_manager', '--activate'
-                ],
+        delayed_controllers = RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=joint_state_broadcaster,
+                on_exit=controllers,
+            )
         )
 
         vel_remap_node = Node(
             package="topic_tools",
             executable="relay",
             name="vel_remap",
-            arguments=[f"/{robot_name}/commands/velocity", f"/{robot_name}/diff_controller/cmd_vel_unstamped"]
+            arguments=[f"/{robot_name}/commands/velocity", f"/{robot_name}/wheel_controller/cmd_vel_unstamped"]
+        )
+
+        delayed_vel_remap_node = RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=joint_state_broadcaster,
+                on_exit=[vel_remap_node],
+            )
         )
 
         odom_remap_node = Node(
             package="topic_tools",
             executable="relay",
             name="odom_remap",
-            arguments=[f"/{robot_name}/diff_controller/odom", f"/{robot_name}/odom"]
+            arguments=[f"/{robot_name}/wheel_controller/odom", f"/{robot_name}/odom"]
+        )
+
+        delayed_odom_remap_node = RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=joint_state_broadcaster,
+                on_exit=[odom_remap_node],
+            )
         )
 
         rviz_config = PathJoinSubstitution([
@@ -330,7 +407,6 @@ def launch_gz(context, *args, **kwargs):
             'rviz',
             'gazebo.rviz'
         ])
-
 
     action_server_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
@@ -346,6 +422,13 @@ def launch_gz(context, *args, **kwargs):
         }.items(),
     )
 
+    delayed_action_server_launch = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster,
+            on_exit=[action_server_launch],
+        )
+    )
+
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -354,65 +437,24 @@ def launch_gz(context, *args, **kwargs):
         arguments=['-d', rviz_config],
     )
 
-    if enable_gz == 'False':
-        return [
-            ros2_control_node,
-            joint_state_broadcaster,
-            joint_trajectory_controller,
-            robot_state_publisher_node,
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=joint_state_broadcaster,
-                    on_exit=[action_server_launch],
-                )
-            ),
-            kobuki_node,
-            urg_node,
-            camera_node,
-            rviz_node,
-        ]
-    
+    if enable_gz == 'True':
+        nodes.append(gz_bridge_node)
+        nodes.append(gz_spawn_entity_node)
+        nodes.append(delayed_joint_state_broadcaster)
+        nodes.append(delayed_vel_remap_node)
+        nodes.append(delayed_odom_remap_node)
+        nodes.append(delayed_controllers)
+        nodes.append(gz_tf_head_cam_node)
     else:
-        return [
-            gz_spawn_entity_node,
-            gz_bridge_node,
-            gz_tf_head_cam_node,
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=gz_spawn_entity_node,
-                    on_exit=[joint_state_broadcaster],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=joint_state_broadcaster,
-                    on_exit=[joint_trajectory_controller],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=joint_state_broadcaster,
-                    on_exit=[diff_controller],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=joint_state_broadcaster,
-                    on_exit=[vel_remap_node],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=joint_state_broadcaster,
-                    on_exit=[odom_remap_node],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=joint_state_broadcaster,
-                    on_exit=[action_server_launch],
-                )
-            ),
-            robot_state_publisher_node,
-            rviz_node,
-        ]
+        nodes.append(ros2_control_node)
+        nodes.append(joint_state_broadcaster)
+        nodes.extend(controllers)
+        nodes.append(kobuki_node)
+        nodes.append(urg_node)
+        nodes.append(camera_node)
+
+    nodes.append(robot_state_publisher_node)
+    nodes.append(delayed_action_server_launch)
+    nodes.append(rviz_node)
+
+    return nodes

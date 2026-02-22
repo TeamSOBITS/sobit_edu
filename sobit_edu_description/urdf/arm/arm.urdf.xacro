@@ -157,7 +157,7 @@
       <!-- <visual>
         <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_light_description)/meshes/arm/omx1_link3.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="file://$(find sobit_edu_description)/meshes/arm/omx1_link3.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="black"/>
       </visual> -->
