@@ -15,7 +15,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link9-10_hand.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link9_10_hand.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -48,7 +48,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${M_PI} ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link9-10_hand.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link9_10_hand.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -83,7 +83,7 @@
       <visual>
         <origin xyz="0.0 0.0 0" rpy="0 0 ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link11-12_finger.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link11_12_finger.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -119,7 +119,7 @@
       <visual>
         <origin xyz="0.0 -0.0 0" rpy="0 ${M_PI} ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link11-12_finger.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link11_12_finger.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -152,7 +152,7 @@
       <visual>
         <origin xyz="0.0 -0.0 0" rpy="0 0 ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link13-14_finger.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link13_14_finger.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -185,7 +185,7 @@
       <visual>
         <origin xyz="0.0 -0.0 0" rpy="0 ${M_PI} ${M_PI/2}"/>
         <geometry>
-          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link13-14_finger.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="file://$(find sobit_edu_description)/meshes/hand/omx1_link13_14_finger.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="black"/>
       </visual>

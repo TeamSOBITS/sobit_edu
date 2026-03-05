@@ -55,14 +55,18 @@ def generate_launch_description():
                 ])
             ]),
             launch_arguments={
-                'robot_name': robot_name if robot_id == 0 else robot_name + '_' + str(robot_id),
-                'head_camera_name': head_camera_name,
-                'robot_coords_x': '-5.5', # x 
-                'robot_coords_y': '1.5', # y
-                'robot_coords_Y': '0', # yaw
-                'enable_gz' : 'True',
-                'enable_gz_lidar' : 'True',
-                'enable_gz_imu' : 'True',
+                'robot_name'               : robot_name if robot_id == 0 else robot_name + '_' + str(robot_id),
+                'head_camera_name'         : head_camera_name,
+                'robot_coords_x'           : '-5.5', # x 
+                'robot_coords_y'           : '1.5', # y
+                'robot_coords_Y'           : '0', # yaw
+                'enable_gz'                : 'True',
+                'enable_mobile_base'       : 'True',
+                'enable_head'              : 'True',
+                'enable_arm'               : 'True',
+                'enable_hand'              : 'True',
+                'enable_gz_lidar'          : 'True',
+                'enable_gz_imu'            : 'True',
                 'enable_gz_head_cam_color' : 'True',
                 'enable_gz_head_cam_depth' : 'True',
             }.items()
@@ -77,14 +81,20 @@ def generate_launch_description():
         #         ])
         #     ]),
         #     launch_arguments={
-        #         'robot_name': robot_name if (robot_id+1) == 0 else robot_name + '_' + str(robot_id+1),
-        #         'head_camera_name': head_camera_name,
-        #         'robot_coords_x': '0', # x 
-        #         'robot_coords_y': '0', # y
-        #         'robot_coords_Y': '0', # yaw
-        #         'enable_gz': 'True',
-        #         'enable_gz_lidar' : 'True',
-        #         'enable_gz_imu' : 'True',
+        #         'robot_name'               : robot_name if robot_id == 0 else robot_name + '_' + str(robot_id),
+        #         'head_camera_name'         : head_camera_name,
+        #         'robot_coords_x'           : '-5.5', # x 
+        #         'robot_coords_y'           : '1.5', # y
+        #         'robot_coords_Y'           : '0', # yaw
+        #         'enable_gz'                : 'True',
+        #         'enable_mobile_base'       : 'True',
+        #         'enable_head'              : 'True',
+        #         'enable_arm'               : 'True',
+        #         'enable_hand'              : 'True',
+        #         'enable_gz_lidar'          : 'True',
+        #         'enable_gz_imu'            : 'True',
+        #         'enable_gz_head_cam_color' : 'True',
+        #         'enable_gz_head_cam_depth' : 'True',
         #     }.items()
         # ),
     ])
