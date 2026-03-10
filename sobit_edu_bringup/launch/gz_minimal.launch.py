@@ -13,6 +13,7 @@ def generate_launch_description():
     robot_name = 'sobit_edu'
     head_camera_name = "gemini_336" # 'xtion' or 'azure_kinect' or 'gemini_336'
     robot_id = 0
+    world_model = 'small_house' # empty, wrs, small_house, rcjo2025
 
     gz_bridge_node = Node(
         package='ros_gz_bridge',
@@ -24,10 +25,42 @@ def generate_launch_description():
         output='screen'
     )
 
-    world_file = os.path.join(get_package_share_directory(
-        'sobit_edu_description'), 
-        'worlds',
-        'empty_w_physics.sdf'
+    world_file = ''
+    if world_model == 'empty':
+        world_file = os.path.join(get_package_share_directory(
+            'sobit_edu_description'), 
+            'worlds',
+            'empty_w_physics.sdf'
+        )
+    elif world_model == 'wrs':
+        world_file = os.path.join(get_package_share_directory(
+            'tmc_wrs_gz_worlds'), 
+            'worlds',
+            'wrs2020.world.xacro'
+        )
+    elif world_model == 'small_house':
+        world_file = os.path.join(get_package_share_directory(
+            'aws_small_house_world'), 
+            'worlds',
+            'small_house.world'
+        )
+    elif world_model == 'rcjo2025':
+        world_file = os.path.join(get_package_share_directory(
+            'sobits_gazebo_worlds'), 
+            'worlds',
+            'rcjo2025_arena.world.xacro'
+        )
+
+    rviz_config = PathJoinSubstitution([
+            FindPackageShare('sobit_edu_bringup'),
+            'rviz',
+            'gazebo.rviz'
+    ])
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config],
     )
 
     return LaunchDescription([
@@ -97,4 +130,5 @@ def generate_launch_description():
         #         'enable_gz_head_cam_depth' : 'True',
         #     }.items()
         # ),
+        rviz_node,
     ])

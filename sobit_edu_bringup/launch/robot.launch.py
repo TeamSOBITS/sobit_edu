@@ -195,12 +195,6 @@ def launch_gz(context, *args, **kwargs):
         else:
             camera_node = None
 
-        rviz_config = PathJoinSubstitution([
-            FindPackageShare('sobit_edu_bringup'),
-            'rviz',
-            'real.rviz'
-        ])
-
     controllers = []
     nodes = []
 
@@ -354,12 +348,6 @@ def launch_gz(context, *args, **kwargs):
         else:
             gz_tf_head_cam_node = None
 
-        rviz_config = PathJoinSubstitution([
-            FindPackageShare('sobit_edu_bringup'),
-            'rviz',
-            'real.rviz'
-        ])
-
         delayed_joint_state_broadcaster = RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=gz_spawn_entity_node,
@@ -375,10 +363,11 @@ def launch_gz(context, *args, **kwargs):
         )
 
         vel_remap_node = Node(
-            package="topic_tools",
-            executable="relay",
+            package="twist_stamper",
+            executable="twist_stamper",
+            namespace=robot_name,
             name="vel_remap",
-            arguments=[f"/{robot_name}/commands/velocity", f"/{robot_name}/wheel_controller/cmd_vel_unstamped"]
+            arguments=["-r", f"cmd_vel_in:=/{robot_name}/commands/velocity", "-r", f"cmd_vel_out:=/{robot_name}/wheel_controller/cmd_vel", "-p", f"frame_id:={robot_name}/base_footprint"]
         )
 
         delayed_vel_remap_node = RegisterEventHandler(
@@ -402,12 +391,6 @@ def launch_gz(context, *args, **kwargs):
             )
         )
 
-        rviz_config = PathJoinSubstitution([
-            FindPackageShare('sobit_edu_bringup'),
-            'rviz',
-            'gazebo.rviz'
-        ])
-
     action_server_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
@@ -429,14 +412,6 @@ def launch_gz(context, *args, **kwargs):
         )
     )
 
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name=robot_name+'_rviz2',
-        output='screen',
-        arguments=['-d', rviz_config],
-    )
-
     if enable_gz == 'True':
         nodes.append(gz_bridge_node)
         nodes.append(gz_spawn_entity_node)
@@ -455,6 +430,5 @@ def launch_gz(context, *args, **kwargs):
 
     nodes.append(robot_state_publisher_node)
     nodes.append(delayed_action_server_launch)
-    nodes.append(rviz_node)
 
     return nodes
