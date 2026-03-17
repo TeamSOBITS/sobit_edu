@@ -19,6 +19,7 @@ find_package(trajectory_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 # Find libraries
 include_directories(include)
@@ -50,7 +51,9 @@ ament_target_dependencies(${PROJECT_NAME}
   "trajectory_msgs"
   "tf2_geometry_msgs"
   "tf2_ros"
-  "tf2")
+  "tf2"
+  "Eigen3"
+  )
 
 
 install(TARGETS ${PROJECT_NAME}
@@ -58,6 +61,12 @@ install(TARGETS ${PROJECT_NAME}
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
+# インクルードパスにEigenを追加
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${EIGEN3_INCLUDE_DIRS}
+)
 
 #############
 ## Install ##

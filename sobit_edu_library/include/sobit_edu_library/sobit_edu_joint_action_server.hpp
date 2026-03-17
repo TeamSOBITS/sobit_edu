@@ -24,10 +24,13 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+#include <Eigen/Dense>
 
 
 namespace sobit_edu
 {
+
+using namespace Eigen;
 
 struct PoseParams 
 {
@@ -57,6 +60,22 @@ enum JointIds
   JointNum
 };
 
+//修正DHパラメータ
+struct DH_modified
+{
+  double A;
+  double Alpha;
+  double D;
+  double Theta;
+  Matrix4d trans_coord;
+
+  DH_modified(double a, double alpha, double d, double zero) : A(a), Alpha(alpha), D(d), Theta(zero), trans_coord(( Eigen::Matrix4d()<< 
+    std::cos(Theta), -std::sin(Theta), 0.0, A, 
+    std::cos(Alpha)*std::sin(Theta), std::cos(Alpha)*std::cos(Theta), -std::sin(Alpha), -std::sin(Alpha)*D,
+    std::sin(Alpha)*std::sin(Theta), std::sin(Alpha)*std::cos(Theta), std::cos(Alpha), std::cos(Alpha)*D,
+    0.0, 0.0, 0.0, 1.0).finished()){}
+};
+
 class JointActionServer : public rclcpp::Node
 {
 public:
@@ -77,11 +96,10 @@ public:
   geometry_msgs::msg::Quaternion get_quat_from_euler(
     const geometry_msgs::msg::Vector3& rpy);
   geometry_msgs::msg::TransformStamped forward_kinematics(
-    const std::vector<double> &target_joint_rad,
-    const double target_yaw);  // target_yaw should be eliminated in the future.
+    const VectorXd &target_joint_rad_eigen);  // target_yaw should be eliminated in the future.
   std::vector<double> inverse_kinematics(
     const geometry_msgs::msg::TransformStamped &goal_coord,
-    const double target_yaw);  // target_yaw should be eliminated in the future.
+    const std::vector<double> &current_joint_rad);  // target_yaw should be eliminated in the future.
   trajectory_msgs::msg::JointTrajectory set_joints(
     const std::vector<std::string> &target_joint_names,
     const std::vector<double> &target_joint_rad,
@@ -122,6 +140,8 @@ private:
   static constexpr double arm_upper_link = 0.128;
   static constexpr double arm_lower_link = 0.146;
   static constexpr double arm_gripper_link = 0.1834;
+  static constexpr double arm_shoulder_derr = 0.022;
+  static constexpr double arm_elbow_to_lower = arm_lower_link - arm_shoulder_derr;
 
   std::vector<PoseParams> poses_;
   std::map<std::string, double> init_joint_state_;
@@ -155,6 +175,37 @@ private:
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
   void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg);
+
+  //基礎ヤコビ行列を計算する関数
+  Matrix<double, 6,6> cal_Jv(const VectorXd &current_joint_rad);
+  //重み行列の対角要素
+  VectorXd b{{1.0/arm_upper_link, 1.0/arm_upper_link, 1.0/arm_upper_link, 1.0/(2*M_PI), 1.0/(2*M_PI), 1.0/(2*M_PI)}};///(2*M_PI)
+
+  //
+  MatrixXd W_E;
+  MatrixXd W_N_bar;
+
+  // eの収束条件
+  double threshold_e = 1e-10; 
+  // qの収束条件
+  double threshold_q = 1e-10; 
+  // 最大反復回数
+  int maxIterations = 15000;
+  // 反復回数
+  int iteration = 0;
+
+  //誤差を計算
+  void cal_e(VectorXd& e, VectorXd& q, const geometry_msgs::msg::TransformStamped &goal_coord);
+
+  // 勾配kを計算する関数
+  void cal_k(VectorXd& k, const MatrixXd& J, const VectorXd& e);
+
+  // 減衰因子行列を計算する関数
+  void cal_W_N(MatrixXd& W_N, const VectorXd& e);
+
+  // 疑似ヤコビ行列を計算する関数
+  void cal_H(MatrixXd &H, const MatrixXd &J, const MatrixXd &W_N);
+
 }; // class JointActionServer
 
 inline geometry_msgs::msg::Vector3 JointActionServer::get_euler_from_quat(
