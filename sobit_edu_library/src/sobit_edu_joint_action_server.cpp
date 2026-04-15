@@ -11,7 +11,7 @@ JointActionServer::JointActionServer(const rclcpp::NodeOptions & options = rclcp
   //誤差重み行列
   W_E (b.asDiagonal()),//bを対角行列として誤差重み行列とする
   //減衰因子行列
-  W_N_bar (MatrixXd::Identity(6, 6)*0.001*arm_upper_link*arm_upper_link)
+  W_N_bar (b_bar.asDiagonal())//(MatrixXd::Identity(8, 8)*0.001*arm_upper_link*arm_upper_link)
 {
   // Configure the QoS profile
   rclcpp::QoS qos_profile(1); // depth = 1
@@ -440,23 +440,23 @@ void JointActionServer::serve_get_hand_to_coord(
 
   // target_yawにロボットの回転角度を代入
   // calculate the target_yaw to move base of grasping object 
-  double target_linear, target_yaw;
+  // double target_linear, target_yaw;
   
-  target_yaw = std::atan2(goal_coord.transform.translation.y,goal_coord.transform.translation.x);
+  // target_yaw = std::atan2(goal_coord.transform.translation.y,goal_coord.transform.translation.x);
 
 
-  // 3次元の逆運動学が完成したらtarget_yawはある一定の条件で0(=回転する必要なし)になる
+  // // 3次元の逆運動学が完成したらtarget_yawはある一定の条件で0(=回転する必要なし)になる
 
-  geometry_msgs::msg::TransformStamped hand_coord;
-  hand_coord.header = goal_coord.header;
-  hand_coord.transform.translation.x = goal_coord.transform.translation.x*std::cos(-target_yaw) - goal_coord.transform.translation.y*std::sin(-target_yaw);
-  hand_coord.transform.translation.y = goal_coord.transform.translation.y*std::cos(-target_yaw) + goal_coord.transform.translation.x*std::sin(-target_yaw);
-  hand_coord.transform.translation.z = goal_coord.transform.translation.z;
+  // geometry_msgs::msg::TransformStamped hand_coord;
+  // hand_coord.header = goal_coord.header;
+  // hand_coord.transform.translation.x = goal_coord.transform.translation.x*std::cos(-target_yaw) - goal_coord.transform.translation.y*std::sin(-target_yaw);
+  // hand_coord.transform.translation.y = goal_coord.transform.translation.y*std::cos(-target_yaw) + goal_coord.transform.translation.x*std::sin(-target_yaw);
+  // hand_coord.transform.translation.z = goal_coord.transform.translation.z;
 
-  geometry_msgs::msg::Vector3 euler_target_yaw;
-  euler_target_yaw = get_euler_from_quat(hand_coord.transform.rotation);
-  euler_target_yaw.z -= target_yaw;
-  hand_coord.transform.rotation = get_quat_from_euler(euler_target_yaw);
+  // geometry_msgs::msg::Vector3 euler_target_yaw;
+  // euler_target_yaw = get_euler_from_quat(hand_coord.transform.rotation);
+  // euler_target_yaw.z -= target_yaw;
+  // hand_coord.transform.rotation = get_quat_from_euler(euler_target_yaw);
   // Inverse kinematics to get the target joint rad
   std::vector<std::string> target_joint_names = {"arm_shoulder_roll_joint", "arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_forearm_roll_joint", "arm_wrist_pitch_joint", "arm_wrist_roll_joint"};
 
@@ -465,9 +465,11 @@ void JointActionServer::serve_get_hand_to_coord(
   for (size_t i = 0; i < target_joint_names.size(); i++) {
     auto it = std::find(kJointNames.begin(), kJointNames.end(), target_joint_names[i]);
     if (it == kJointNames.end()) return;
-    current_joint_rad.push_back(this->curt_joint_state_[kJointNames[i]]);
+    // current_joint_rad.push_back(this->curt_joint_state_[kJointNames[i]]);
+    current_joint_rad.push_back(0.0);
   }
-  std::vector<double> target_joint_rad = inverse_kinematics(hand_coord, current_joint_rad);
+
+  std::vector<double> target_joint_rad = inverse_kinematics(goal_coord, current_joint_rad);
 
   // If inverse kinematics is outside the range of possible
   // もし逆運動学可能範囲外ならば・・・
@@ -481,15 +483,12 @@ void JointActionServer::serve_get_hand_to_coord(
 
     return;
   }
+  double target_yaw = target_joint_rad[6];
+  double target_linear = target_joint_rad[7];
 
+  std::vector<double>  target_arm_rad(target_joint_rad.begin(), target_joint_rad.begin() + std::min<size_t>(6, target_joint_rad.size()));
   Map<VectorXd> target_joint_rad_eigen(target_joint_rad.data(), target_joint_rad.size());
-  geometry_msgs::msg::TransformStamped hand_pose = forward_kinematics(target_joint_rad_eigen);
-
-  if (std::sqrt(std::pow(hand_pose.transform.translation.x,2)+std::pow(hand_pose.transform.translation.y,2)) < std::sqrt(std::pow(goal_coord.transform.translation.x,2)+std::pow(goal_coord.transform.translation.y,2))) {
-    target_linear =  std::sqrt(std::pow(hand_pose.transform.translation.x - goal_coord.transform.translation.x,2) + std::pow(hand_pose.transform.translation.y - goal_coord.transform.translation.y,2));
-  } else {
-    target_linear = -std::sqrt(std::pow(hand_pose.transform.translation.x - goal_coord.transform.translation.x,2) + std::pow(hand_pose.transform.translation.y - goal_coord.transform.translation.y,2));
-  }
+  // geometry_msgs::msg::TransformStamped hand_pose = forward_kinematics(target_joint_rad_eigen);
 
   response->move_pose.position.x = target_linear;
   response->move_pose.position.y = 0.0;
@@ -504,7 +503,7 @@ void JointActionServer::serve_get_hand_to_coord(
   response->success = true;
   response->message = "[SUCCESS] The coord is grasp able.";
   response->target_joint_names = target_joint_names;
-  response->target_joint_rad = target_joint_rad;
+  response->target_joint_rad = target_arm_rad;
 
   return;
 }
@@ -568,15 +567,15 @@ void JointActionServer::serve_get_hand_to_tf(
 
   // target_yawにロボットの回転角度を代入
   // calculate the target_yaw to move base of grasping object 
-  double target_linear, target_yaw;
-  target_yaw = std::atan2(goal_coord.transform.translation.y,goal_coord.transform.translation.x);
+  // double target_linear, target_yaw;
+  // target_yaw = std::atan2(goal_coord.transform.translation.y,goal_coord.transform.translation.x);
 
-  // 3次元の逆運動学が完成したらtarget_yawはある一定の条件で0(=回転する必要なし)になる
-  if (std::sqrt(std::pow(goal_coord.transform.translation.x,2)+std::pow(goal_coord.transform.translation.y,2)) > std::sqrt(std::pow(0.5, 2)+std::pow(0.0, 2))) {
-    target_linear =  std::sqrt(std::pow(goal_coord.transform.translation.x - 0.5,2) + std::pow(goal_coord.transform.translation.y,2));
-  } else {
-    target_linear = -std::sqrt(std::pow(goal_coord.transform.translation.x - 0.5,2) + std::pow(goal_coord.transform.translation.y,2));
-  }
+  // // 3次元の逆運動学が完成したらtarget_yawはある一定の条件で0(=回転する必要なし)になる
+  // if (std::sqrt(std::pow(goal_coord.transform.translation.x,2)+std::pow(goal_coord.transform.translation.y,2)) > std::sqrt(std::pow(0.5, 2)+std::pow(0.0, 2))) {
+  //   target_linear =  std::sqrt(std::pow(goal_coord.transform.translation.x - 0.5,2) + std::pow(goal_coord.transform.translation.y,2));
+  // } else {
+  //   target_linear = -std::sqrt(std::pow(goal_coord.transform.translation.x - 0.5,2) + std::pow(goal_coord.transform.translation.y,2));
+  // }
 
   // Inverse kinematics to get the target joint rad
   std::vector<std::string> target_joint_names = {"arm_shoulder_roll_joint", "arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_forearm_roll_joint", "arm_wrist_pitch_joint", "arm_wrist_roll_joint"};
@@ -584,7 +583,9 @@ void JointActionServer::serve_get_hand_to_tf(
   for (size_t i = 0; i < target_joint_names.size(); i++) {
     auto it = std::find(kJointNames.begin(), kJointNames.end(), target_joint_names[i]);
     if (it == kJointNames.end()) return;
-    current_joint_rad.push_back(this->curt_joint_state_[kJointNames[i]]);
+    // current_joint_rad.push_back(this->curt_joint_state_[kJointNames[i]]);
+    current_joint_rad.push_back(0.0);
+
   }
   std::vector<double> target_joint_rad = inverse_kinematics(goal_coord, current_joint_rad);
 
@@ -601,8 +602,12 @@ void JointActionServer::serve_get_hand_to_tf(
     return;
   }
 
-  Map<VectorXd> target_joint_rad_eigen(target_joint_rad.data(), target_joint_rad.size());
-  geometry_msgs::msg::TransformStamped hand_pose = forward_kinematics(target_joint_rad_eigen);
+  double target_yaw = target_joint_rad[6];
+  double target_linear = target_joint_rad[7];
+
+  std::vector<double>  target_arm_rad(target_joint_rad.begin(), target_joint_rad.begin() + std::min<size_t>(6, target_joint_rad.size()));
+  Map<VectorXd> target_joint_rad_eigen(target_joint_rad_eigen.data(), target_joint_rad_eigen.size());
+  // geometry_msgs::msg::TransformStamped hand_pose = forward_kinematics(target_arm_rad_eigen);
 
   // if (std::sqrt(std::pow(hand_pose.transform.translation.x,2)+std::pow(hand_pose.transform.translation.y,2)) < std::sqrt(std::pow(goal_coord.transform.translation.x,2)+std::pow(goal_coord.transform.translation.y,2))) {
   //   target_linear =  std::sqrt(std::pow(hand_pose.transform.translation.x - goal_coord.transform.translation.x,2) + std::pow(hand_pose.transform.translation.y - goal_coord.transform.translation.y,2));
@@ -623,7 +628,7 @@ void JointActionServer::serve_get_hand_to_tf(
   response->success = true;
   response->message = "[SUCCESS] The coord is grasp able.";
   response->target_joint_names = target_joint_names;
-  response->target_joint_rad = target_joint_rad;
+  response->target_joint_rad = target_arm_rad;
 
   return;
 }
@@ -686,6 +691,10 @@ geometry_msgs::msg::TransformStamped JointActionServer::forward_kinematics(const
   geometry_msgs::msg::TransformStamped final_coord;
 
   //SOBIT_EDU
+  DH_modified Trans_base_Y(0.0, 0.0, 0.0, target_joint_rad_eigen(6));
+
+  DH_modified Trans_base_x((target_joint_rad_eigen(7) + base_to_shoulder_x), 0.0, base_to_shoulder_z, 0.0);
+
   DH_modified Trans_1(0.0, 0.0, 0.0, target_joint_rad_eigen(JointIds::ArmShoulderRollJoint));
   // std::cout <<"0T1"<< std::endl<< Trans_1.Trans << std::endl;
   DH_modified Trans_2(0.0, -M_PI_2, 0.0, target_joint_rad_eigen(JointIds::ArmShoulderPitchJoint));
@@ -707,7 +716,9 @@ geometry_msgs::msg::TransformStamped JointActionServer::forward_kinematics(const
   DH_modified Trans_9(0.0, -M_PI_2, 0.0, 0.0);
   // std::cout << "88"<< std::endl << Trans_8.Trans << std::endl;
 
-  Matrix4d result = Trans_1.trans_coord*Trans_2.trans_coord;
+  Matrix4d result = Trans_base_Y.trans_coord*Trans_base_x.trans_coord;
+  result = result*Trans_1.trans_coord;
+  result = result*Trans_2.trans_coord;
   result = result*Trans_2_1.trans_coord;
   result = result*Trans_3.trans_coord;
   result = result*Trans_4.trans_coord;
@@ -720,48 +731,41 @@ geometry_msgs::msg::TransformStamped JointActionServer::forward_kinematics(const
   final_coord.transform.translation.x = result(0,3);
   final_coord.transform.translation.y = result(1,3);
   final_coord.transform.translation.z = result(2,3);
-  final_coord.transform.translation.x += base_to_shoulder_x;
-  final_coord.transform.translation.z += base_to_shoulder_z;
 
   Quaterniond qua_result(result.block<3,3>(0,0));
-  std::cout << qua_result << std::endl;
+  // std::cout << qua_result << std::endl;
 
   final_coord.transform.rotation.w = qua_result.w();
   final_coord.transform.rotation.x = qua_result.x();
   final_coord.transform.rotation.y = qua_result.y();
   final_coord.transform.rotation.z = qua_result.z();
-
-  // Consider target_yaw
-  // double temp_x, temp_y;
-  // temp_x = final_coord.transform.translation.x;
-  // temp_y = final_coord.transform.translation.y;
-  // final_coord.transform.translation.x = temp_x*std::cos(target_yaw) - temp_y*std::sin(target_yaw);
-  // final_coord.transform.translation.y = temp_y*std::cos(target_yaw) + temp_x*std::sin(target_yaw);
   
   return final_coord;  
 }
 
-
 std::vector<double> JointActionServer::inverse_kinematics(
   const geometry_msgs::msg::TransformStamped &goal_coord,  // 'goal_coord' is the coordinates of robot base.
   const std::vector<double> &current_joint_rad)
-
 {
-  MatrixXd W_N(6, 6), H_arm(6, 6), dr(3,3), R(3,3);
-  VectorXd e(6), k_p(6), q(6), delta_q(6);
-  q << current_joint_rad[0], current_joint_rad[1], current_joint_rad[2], current_joint_rad[3], current_joint_rad[4], current_joint_rad[5];
-  // q << 0.0,0.0,0.0,0.0,0.0,0.0;
+  MatrixXd W_N(8, 8), P_arm(8, 8), H_arm(8, 8), dr(3,3), R(3,3);
+  MatrixXd I_p = MatrixXd::Identity(8,8);
+  VectorXd e(6), k_p(8), k_s(8), q(8), delta_q(8);
+
+  q << current_joint_rad[0], current_joint_rad[1], current_joint_rad[2], current_joint_rad[3], current_joint_rad[4], current_joint_rad[5], 0.0, 0.0;
 
   std::cout << "q" << std::endl << q.transpose() << std::endl;
 
   do{
   cal_e(e, q, goal_coord);//残差計算
-  Matrix<double, 6, 6> J_v = cal_Jv(q);
+  Matrix<double, 6, 8> J_v = cal_Jv(q);
+  cal_P(P_arm, I_p, J_v);
   cal_k(k_p, J_v, e);
+  cal_ks(k_s, q);
   cal_W_N(W_N, e);
   cal_H(H_arm, J_v, W_N);
+  // std::cout << "J" << std::endl << J_v*P_arm << std::endl;
 
-  delta_q = H_arm.inverse() * k_p;
+  delta_q = H_arm.inverse() * k_p + (P_arm * k_s) ;
   // std::cout << "delta_q" << std::endl << delta_q.transpose() << std::endl;
 
   q += delta_q;
@@ -777,10 +781,13 @@ std::vector<double> JointActionServer::inverse_kinematics(
   if (std::abs(q[5]) >= 2*M_PI) q[5] -= 2*M_PI * (int)(q[5] / 2*M_PI);
   if (std::abs(q[4]) >= M_PI) q[4] -= 2*M_PI * (q[4] / std::abs(q[4]));
   if (std::abs(q[5]) >= M_PI) q[5] -= 2*M_PI * (q[5] / std::abs(q[5]));
-  if (q[0] >= M_PI) q[0] = M_PI;
-  if (q[0] <= -M_PI) q[0] = -M_PI;
-  if (q[1] >= M_PI_2) q[1] = M_PI_2;
-  if (q[1] <= -M_PI_2*3) q[1] = -M_PI_2*3;
+  if (std::abs(q[6]) >= 2*M_PI) q[6] -= 2*M_PI * (int)(q[6] / 2*M_PI);
+  if (std::abs(q[6]) >= M_PI) q[6] -= 2*M_PI * (q[6] / std::abs(q[6]));
+
+  if (q[0] >= M_PI/4) q[0] = M_PI/4;
+  if (q[0] <= -M_PI/4) q[0] = -M_PI/4;
+  if (q[1] >= 3*M_PI/4) q[1] = 3*M_PI/4;
+  if (q[1] <= -M_PI_2) q[1] = -M_PI_2;
   if (q[2] >= M_PI_2) q[2] = M_PI_2;
   if (q[2] <= -M_PI_2) q[2] = -M_PI_2;
   if (q[3] >= M_PI) q[3] = M_PI;
@@ -789,11 +796,17 @@ std::vector<double> JointActionServer::inverse_kinematics(
   if (q[4] <= -M_PI_2) q[4] = -M_PI_2;
   if (q[5] >= M_PI) q[5] = M_PI;
   if (q[5] <= -M_PI) q[5] = -M_PI;
+  if (q[6] >= M_PI_2) q[6] = M_PI_2;
+  if (q[6] <= -M_PI_2) q[6] = -M_PI_2;
+
+  if (q[7] <= -0.5) q[7] = -0.5;
 
   iteration++;
   // std::cout << "iteration:" << iteration <<std::endl;
-  // std::cout << "eの値" << std::endl << e.transpose() << std::endl;
-  }while((fabs(e(0)) > threshold_e || fabs(e(1)) > threshold_e || fabs(e(2)) > threshold_e  || fabs(e(3)) > threshold_e  || fabs(e(4)) > threshold_e  || fabs(e(5)) > threshold_e) && (fabs(delta_q(0)) > threshold_q || fabs(delta_q(1)) > threshold_q || fabs(delta_q(2)) > threshold_q || fabs(delta_q(3)) > threshold_q || fabs(delta_q(4)) > threshold_q || fabs(delta_q(5)) > threshold_q) && iteration < maxIterations);
+  std::cout << "eの値" << std::endl << e.transpose() << std::endl;
+  std::cout << "J(I-P_arm)の値" << std::endl << (J_v* P_arm) << std::endl;
+
+  }while((fabs(e(0)) > threshold_e || fabs(e(1)) > threshold_e || fabs(e(2)) > threshold_e  || fabs(e(3)) > threshold_e  || fabs(e(4)) > threshold_e  || fabs(e(5)) > threshold_e) && (fabs(delta_q(0)) > threshold_q || fabs(delta_q(1)) > threshold_q || fabs(delta_q(2)) > threshold_q || fabs(delta_q(3)) > threshold_q || fabs(delta_q(4)) > threshold_q || fabs(delta_q(5)) > threshold_q || fabs(delta_q(6)) > threshold_q || fabs(delta_q(7)) > threshold_q) && iteration < maxIterations);
   // }while((fabs(e(0)) > threshold_e || fabs(e(1)) > threshold_e || fabs(e(2)) > threshold_e  || fabs(e(3)) > threshold_e  || fabs(e(4)) > threshold_e  || fabs(e(5)) > threshold_e) && iteration < maxIterations);
   // }while(iteration < maxIterations);
   iteration = 0;
@@ -820,7 +833,6 @@ void JointActionServer::cal_e(VectorXd& e, VectorXd& q_bar, const geometry_msgs:
   e(0) = goal_coord.transform.translation.x - fk.transform.translation.x;//(arm_shoulder_derr*std::cos(q_bar(0))*std::cos(q_bar(1))+arm_upper_link*std::cos(q_bar(0))*std::sin(q_bar(1))+arm_lower_link*std::cos(q_bar(0))*std::cos(q_bar(1)+q_bar(2)));
   e(1) = goal_coord.transform.translation.y - fk.transform.translation.y;//(arm_shoulder_derr*std::sin(q_bar(0))*std::cos(q_bar(1))+arm_upper_link*std::sin(q_bar(0))*std::sin(q_bar(1))+arm_lower_link*std::sin(q_bar(0))*std::cos(q_bar(1)+q_bar(2)));
   e(2) = goal_coord.transform.translation.z - fk.transform.translation.z;//(-arm_shoulder_derr*std::sin(q_bar(0))+arm_upper_link*std::cos(q_bar(1))-arm_lower_link*std::sin(q_bar(1)+q_bar(2)));
-  // std::cout << "位置誤差e:" << std::endl << e.transpose() << std::endl;
 // 姿勢誤差
   //目標位置と現在野市と差分を計算
   MatrixXd dR(3, 3), R(3, 3), rrq(3, 3);
@@ -840,24 +852,10 @@ void JointActionServer::cal_e(VectorXd& e, VectorXd& q_bar, const geometry_msgs:
   goal_coord.transform.rotation.z
   );
 
-
   dR = q_dR.toRotationMatrix();
 
   R = q_R.toRotationMatrix();
 
-  // dR<< qua_fk(0,0), qua_fk(0,1), qua_fk(0,2), qua_fk(1,0), qua_fk(1,1), qua_fk(1,2), qua_fk(2,0), qua_fk(2,1), qua_fk(2,2);
-  // std::cout << "dR" << std::endl << dR << std::endl;
-  //ZYXオイラー角
-  // R << std::cos(target_rot(2))*std::cos(target_rot(1)),
-  //      -std::sin(target_rot(2))*std::cos(target_rot(0))+std::cos(target_rot(2))*std::sin(target_rot(1))*std::sin(target_rot(0)),
-  //      std::sin(target_rot(2))*std::sin(target_rot(0))+std::cos(target_rot(2))*std::sin(target_rot(1))*std::cos(target_rot(0)),
-  //      std::sin(target_rot(2))*std::cos(target_rot(1)),
-  //      std::cos(target_rot(2))*std::cos(target_rot(0))+std::sin(target_rot(2))*std::sin(target_rot(1))*std::sin(target_rot(0)),
-  //      -std::cos(target_rot(2))*std::sin(target_rot(0))+std::sin(target_rot(2))*std::sin(target_rot(1))*std::cos(target_rot(0)),
-  //      -std::sin(target_rot(1)),
-  //      std::cos(target_rot(1))*std::sin(target_rot(2)),
-  //      std::cos(target_rot(1))*std::cos(target_rot(0));
-  // std::cout << "R" << std::endl << R << std::endl;
   rrq = R * dR.transpose();//姿勢行列
 
   // std::cout << "rrq" << std::endl << rrq << std::endl;
@@ -912,16 +910,17 @@ void JointActionServer::cal_e(VectorXd& e, VectorXd& q_bar, const geometry_msgs:
 }
 
 //基礎ヤコビ行列を計算する関数
-Matrix<double, 6,6> JointActionServer::cal_Jv(const VectorXd &current_joint_rad) {
-  Matrix<double, 6,6> J;
-  Vector3d e_z, p_6_E, p_3_E, p_2_1_E, p_2_E, p_4, p_5, p_6;
-  e_z << 0.0, 0.0, 1.0;
-  p_6_E << 0.0, 0.0, arm_gripper_link;
-  p_3_E << 0.0, arm_lower_link, 0.0;
-  p_2_E << arm_shoulder_derr, 0.0, 0.0;
-  p_2_1_E << arm_upper_link, 0.0, 0.0;
+Matrix<double, 6,8> JointActionServer::cal_Jv(const VectorXd &current_joint_rad) {
+  Matrix<double, 6,8> J;
 
+  Vector3d e_z;
+  e_z << 0.0, 0.0, 1.0;
+  
     //SOBIT_EDU 手先
+          DH_modified Trans_coord_base_Y(0.0, 0.0, 0.0, current_joint_rad(6));
+
+          DH_modified Trans_coord_base_x((current_joint_rad(7) + base_to_shoulder_x), 0.0, base_to_shoulder_z, 0.0);
+
           DH_modified Trans_coord_1(0.0, 0.0, 0.0, current_joint_rad(JointIds::ArmShoulderRollJoint));
           // std::cout <<"0T1"<< std::endl<< Trans_coord_1.trans_coord << std::endl;
           DH_modified Trans_coord_2(0.0, -M_PI_2, 0.0, current_joint_rad(JointIds::ArmShoulderPitchJoint));
@@ -943,57 +942,93 @@ Matrix<double, 6,6> JointActionServer::cal_Jv(const VectorXd &current_joint_rad)
           DH_modified Trans_coord_9(0.0, -M_PI_2, 0.0, 0.0);
           // std::cout << "88"<< std::endl << Trans_8.Trans << std::endl;
 
-          Vector3d z_1 = Trans_coord_1.trans_coord.block<3,3>(0,0) * e_z;
+          Matrix4d result_base_Y = Trans_coord_base_Y.trans_coord;
+          Matrix4d result_base_x = result_base_Y*Trans_coord_base_x.trans_coord;
+          Matrix4d result_1 = result_base_x*Trans_coord_1.trans_coord;
+          Matrix4d result_2 = result_1*Trans_coord_2.trans_coord;
+          Matrix4d result_2_1 = result_2*Trans_coord_2_1.trans_coord;
+          Matrix4d result_3 = result_2_1*Trans_coord_3.trans_coord;
+          Matrix4d result_4 = result_3*Trans_coord_4.trans_coord;
+          Matrix4d result_5 = result_4*Trans_coord_5.trans_coord;
+          Matrix4d result_6 = result_5*Trans_coord_6.trans_coord;
+          Matrix4d result_7 = result_6*Trans_coord_7.trans_coord;
+          Matrix4d result_8 = result_7*Trans_coord_8.trans_coord;
+          Matrix4d result_9 = result_8*Trans_coord_9.trans_coord;          
 
-          Vector3d z_2 = Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * e_z;
+          Vector3d p_6_E = result_9.block<3,1>(0,3) - result_6.block<3,1>(0,3);
+          Vector3d p_5_E = result_9.block<3,1>(0,3) - result_5.block<3,1>(0,3);
+          Vector3d p_4_E = result_9.block<3,1>(0,3) - result_4.block<3,1>(0,3);
+          Vector3d p_3_E = result_9.block<3,1>(0,3) - result_3.block<3,1>(0,3);
+          Vector3d p_2_E = result_9.block<3,1>(0,3) - result_2.block<3,1>(0,3);
+          Vector3d p_1_E = result_9.block<3,1>(0,3) - result_1.block<3,1>(0,3);
+          Vector3d p_base_Y_E = result_9.block<3,1>(0,3) - result_base_Y.block<3,1>(0,3);
 
-          Vector3d z_3 = Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * e_z;
 
-          Vector3d z_4 = Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * Trans_coord_4.trans_coord.block<3,3>(0,0) * e_z;
-
-          Vector3d z_5 = Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * Trans_coord_4.trans_coord.block<3,3>(0,0) * Trans_coord_5.trans_coord.block<3,3>(0,0) * e_z;
-
-          Vector3d z_6 = Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * Trans_coord_4.trans_coord.block<3,3>(0,0) * Trans_coord_5.trans_coord.block<3,3>(0,0) * Trans_coord_6.trans_coord.block<3,3>(0,0) * Trans_coord_8.trans_coord.block<3,3>(0,0) * Trans_coord_9.trans_coord.block<3,3>(0,0) * e_z;
-
-          Vector3d p_3 = Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * p_3_E + Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * Trans_coord_4.trans_coord.block<3,3>(0,0) * Trans_coord_5.trans_coord.block<3,3>(0,0) * Trans_coord_6.trans_coord.block<3,3>(0,0) * p_6_E;
-
-          Vector3d p_2 = p_3 + Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * p_2_1_E + Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * p_2_E;
-
-          Vector3d p_1 = p_2;
-
-          p_3 = z_3.cross(p_3);
-          p_2 = z_2.cross(p_2);
-          p_1 = z_1.cross(p_1);
           
-          p_4 << 0.0, 0.0, 0.0;
-          p_5 << 0.0, 0.0, 0.0;
-          p_6 << 0.0, 0.0, 0.0;
+          Vector3d z_base_Y = Trans_coord_base_Y.trans_coord.block<3,3>(0,0) * e_z;
 
-          Matrix<double, 3, 6> J_pos;
+          Vector3d z_base_x(std::cos(current_joint_rad(6)), std::sin(current_joint_rad(6)), 0.0);
+
+          Vector3d z_1 = Trans_coord_base_Y.trans_coord.block<3,3>(0,0) * Trans_coord_base_x.trans_coord.block<3,3>(0,0) * Trans_coord_1.trans_coord.block<3,3>(0,0) * e_z;
+
+          Vector3d z_2 = Trans_coord_base_Y.trans_coord.block<3,3>(0,0) * Trans_coord_base_x.trans_coord.block<3,3>(0,0) * Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * e_z;
+
+          Vector3d z_3 = Trans_coord_base_Y.trans_coord.block<3,3>(0,0) * Trans_coord_base_x.trans_coord.block<3,3>(0,0) * Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * e_z;
+
+          Vector3d z_4 = Trans_coord_base_Y.trans_coord.block<3,3>(0,0) * Trans_coord_base_x.trans_coord.block<3,3>(0,0) * Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * Trans_coord_4.trans_coord.block<3,3>(0,0) * e_z;
+
+          Vector3d z_5 = Trans_coord_base_Y.trans_coord.block<3,3>(0,0) * Trans_coord_base_x.trans_coord.block<3,3>(0,0) * Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * Trans_coord_4.trans_coord.block<3,3>(0,0) * Trans_coord_5.trans_coord.block<3,3>(0,0) * e_z;
+
+          Vector3d z_6 = Trans_coord_base_Y.trans_coord.block<3,3>(0,0) * Trans_coord_base_x.trans_coord.block<3,3>(0,0) * Trans_coord_1.trans_coord.block<3,3>(0,0) * Trans_coord_2.trans_coord.block<3,3>(0,0) * Trans_coord_2_1.trans_coord.block<3,3>(0,0) * Trans_coord_3.trans_coord.block<3,3>(0,0) * Trans_coord_4.trans_coord.block<3,3>(0,0) * Trans_coord_5.trans_coord.block<3,3>(0,0) * Trans_coord_6.trans_coord.block<3,3>(0,0) * Trans_coord_8.trans_coord.block<3,3>(0,0) * Trans_coord_9.trans_coord.block<3,3>(0,0) * e_z;
+
+          Vector3d p_base_Y = z_base_Y.cross(p_base_Y_E);
+
+          Vector3d p_base_x = z_base_x;
+
+          Vector3d p_1 = z_1.cross(p_1_E);
+
+          Vector3d p_2 = z_2.cross(p_2_E);
+
+          Vector3d p_3 = z_3.cross(p_3_E);
+
+          Vector3d p_4 = z_4.cross(p_4_E);
+
+          Vector3d p_5 = z_5.cross(p_5_E);
+
+          Vector3d p_6 = z_6.cross(p_6_E);
+
+          Matrix<double, 3, 8> J_pos;
           J_pos.col(0) = p_1;
           J_pos.col(1) = p_2;
           J_pos.col(2) = p_3; 
           J_pos.col(3) = p_4;
           J_pos.col(4) = p_5;
           J_pos.col(5) = p_6;
+          J_pos.col(6) = p_base_Y;
+          J_pos.col(7) = p_base_x;
 
-          Matrix<double, 3, 6> J_rot;
+
+          Matrix<double, 3, 8> J_rot;
           J_rot.col(0) = z_1;
           J_rot.col(1) = z_2;
           J_rot.col(2) = z_3;
           J_rot.col(3) = z_4;
           J_rot.col(4) = z_5;
           J_rot.col(5) = z_6;
+          J_rot.col(6) = z_base_Y;
+          J_rot.col(7) = Vector3d::Zero();
 
-          Matrix<double, 6, 6> J_prot;
+          Matrix<double, 6, 8> J_prot;
           J << J_pos, J_rot;
-
-          // std::cout << "------" << std::endl << "J_prot" <<std ::endl << J << std::endl;
-
 
     return J;
 }
 
+//ヌル空間射影オペレータを計算する関数
+void JointActionServer::cal_P(MatrixXd& P, const MatrixXd& I,const MatrixXd& J) {
+    P = I - (J.transpose() * (J * J.transpose()).inverse() * J);
+    return;
+}
 
 //勾配k(疑似行列の任意ベクトル)を計算する関数
 void JointActionServer::cal_k(VectorXd& k, const MatrixXd& J, const VectorXd& e) {
@@ -1001,9 +1036,14 @@ void JointActionServer::cal_k(VectorXd& k, const MatrixXd& J, const VectorXd& e)
     return;
 }
 
+//
+void JointActionServer::cal_ks(VectorXd& ks, VectorXd& q){
+    ks = 1.0 * (q_d - q);
+}
+
 //減衰因子行列を計算する関数
 void JointActionServer::cal_W_N(MatrixXd &W_N, const VectorXd &e) {
-    W_N = 0.5 * (e.transpose() * W_E * e)(0,0) * MatrixXd::Identity(6,6)+W_N_bar;
+    W_N = 0.5 * (e.transpose() * W_E * e)(0,0) * MatrixXd::Identity(8,8)+W_N_bar;
     return;
 }
 
@@ -1011,6 +1051,7 @@ void JointActionServer::cal_H(MatrixXd &H, const MatrixXd &J, const MatrixXd &W_
     H = J.transpose() * W_E * J + W_N;
     return;
 }
+
 } // namespace sobit_edu
 
 
