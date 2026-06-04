@@ -51,8 +51,8 @@
         <sensor name="head_camera_color" type="camera">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <gz_frame_id>${robot_name}/head_camera_optical_frame</gz_frame_id>
-          <topic>${robot_name}/head_camera/color</topic>
+          <!-- <gz_frame_id>${robot_name}/head_camera_optical_frame</gz_frame_id> -->
+          <topic>${robot_name}/head_camera_base/color</topic>
 
           <always_on>1</always_on>
           <visualize>true</visualize>
@@ -86,8 +86,8 @@
         <sensor name="head_camera_color" type="camera">
           <pose>0 0 ${0.0175/2} 0 -${M_PI/2} 0 </pose>
           
-          <gz_frame_id>${robot_name}/head_camera_rgb_optical_link</gz_frame_id>
-          <topic>${robot_name}/head_camera/color</topic>
+          <!-- <gz_frame_id>${robot_name}/head_camera_rgb_optical_link</gz_frame_id> -->
+          <topic>${robot_name}/head_camera_base/color</topic>
 
           <always_on>1</always_on>
           <visualize>true</visualize>
@@ -121,8 +121,8 @@
         <sensor name="head_camera_color" type="camera">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <gz_frame_id>${robot_name}/head_camera_camera_color_optical_frame</gz_frame_id>
-          <topic>${robot_name}/head_camera/color</topic>
+          <!-- <gz_frame_id>${robot_name}/head_camera_camera_color_optical_frame</gz_frame_id> -->
+          <topic>${robot_name}/head_camera_base/color</topic>
 
           <always_on>1</always_on>
           <visualize>true</visualize>
@@ -160,8 +160,8 @@
         <sensor name="head_camera_depth" type="depth">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <gz_frame_id>${robot_name}/head_camera_camera_color_optical_frame</gz_frame_id>
-          <topic>${robot_name}/head_camera/color</topic>
+          <!-- <gz_frame_id>${robot_name}/head_camera_camera_color_optical_frame</gz_frame_id> -->
+          <topic>${robot_name}/head_camera_base/depth</topic>
 
           <always_on>1</always_on>
           <visualize>true</visualize>
@@ -195,8 +195,8 @@
         <sensor name="head_camera_depth" type="depth">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <gz_frame_id>${robot_name}/head_camera_depth_optical_link</gz_frame_id>
-          <topic>${robot_name}/head_camera/depth</topic>
+          <!-- <gz_frame_id>${robot_name}/head_camera_depth_optical_link</gz_frame_id> -->
+          <topic>${robot_name}/head_camera_base/depth</topic>
 
           <always_on>1</always_on>
           <visualize>true</visualize>
@@ -229,8 +229,8 @@
         <sensor name="head_camera_depth" type="depth">
           <pose>0 0 ${0.0175/2} ${M_PI/2} -${M_PI/2} 0 </pose>
           
-          <gz_frame_id>${robot_name}/head_camera_depth_optical_frame</gz_frame_id>
-          <topic>${robot_name}/head_camera/depth</topic>
+          <!-- <gz_frame_id>${robot_name}/head_camera_depth_optical_frame</gz_frame_id> -->
+          <topic>${robot_name}/head_camera_base/depth</topic>
 
           <always_on>1</always_on>
           <visualize>true</visualize>
