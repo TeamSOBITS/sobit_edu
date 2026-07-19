@@ -32,8 +32,16 @@ def generate_launch_description():
     arg_enable_gz_head_cam_color = DeclareLaunchArgument('enable_gz_head_cam_color', default_value='True')
     arg_enable_gz_head_cam_depth = DeclareLaunchArgument('enable_gz_head_cam_depth', default_value='True')
 
+    # False re-attaches to a gz entity that already exists (GuiderRobotManager's
+    # 表示 after 非表示: the entity was never removed, only parked out of
+    # sight, so gz_ros2_control's plugin and its controller_manager never
+    # stopped -- see UnloadRobotControllers). Skips (re)spawning the model
+    # and goes straight to (re)starting the ROS-side nodes.
+    arg_spawn_entity = DeclareLaunchArgument('spawn_entity', default_value='True')
+
     return LaunchDescription([
         arg_robot_name,
+        arg_spawn_entity,
         arg_head_camera,
         arg_robot_coords_x,
         arg_robot_coords_y,
@@ -54,6 +62,7 @@ def generate_launch_description():
 
 def launch_gz(context, *args, **kwargs):
     robot_name = LaunchConfiguration('robot_name').perform(context)
+    spawn_entity = LaunchConfiguration('spawn_entity').perform(context)
     head_camera_name = LaunchConfiguration('head_camera_name').perform(context)
 
     robot_coords_x = LaunchConfiguration('robot_coords_x').perform(context)
@@ -426,8 +435,16 @@ def launch_gz(context, *args, **kwargs):
 
     if enable_gz == 'True':
         nodes.append(gz_bridge_node)
-        nodes.append(gz_spawn_entity_node)
-        nodes.append(delayed_joint_state_broadcaster)
+        if spawn_entity == 'True':
+            # Normal path: create the gz entity, then load controllers once
+            # it exists.
+            nodes.append(gz_spawn_entity_node)
+            nodes.append(delayed_joint_state_broadcaster)
+        else:
+            # Reattach path (see arg_spawn_entity above): the entity
+            # already exists, so load controllers straight away instead of
+            # waiting on a spawn that is not happening.
+            nodes.append(joint_state_broadcaster)
         nodes.append(delayed_vel_remap_node)
         nodes.append(delayed_odom_remap_node)
         nodes.append(delayed_controllers)
