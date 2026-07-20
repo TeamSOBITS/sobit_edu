@@ -303,6 +303,16 @@ def launch_gz(context, *args, **kwargs):
             output='screen',
         )
 
+        # NOTE: head_camera_base (color/depth/info) and the lidar scan are
+        # deliberately NOT bridged here. sobit_edu_gz_gui's EduRobotManager
+        # panel owns those -- its "センサー" checkboxes start/stop their own
+        # ros_gz_bridge parameter_bridge processes per sensor (see
+        # EduRobotManager::setSensor()), which is the actual runtime on/off
+        # switch. Bridging them here too would make the checkboxes cosmetic:
+        # the topic would keep flowing through this always-on bridge
+        # regardless of the checkbox state. cmd_vel/joint_states/imu stay
+        # here because they are always needed (teleop, TF, no checkbox
+        # exists for them) and are cheap to bridge continuously.
         gz_bridge_node = Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
@@ -312,20 +322,6 @@ def launch_gz(context, *args, **kwargs):
                         # Remapped below onto commands/velocity (the twist_stamper input).
                         "/" + robot_name + "/cmd_vel@geometry_msgs/msg/Twist[gz.msgs.Twist",
                         "/" + robot_name + "/joint_states" + "@sensor_msgs/msg/JointState" + "[gz.msgs.Model",
-                        # "/model/" + robot_name + "/pose" + "@geometry_msgs/msg/Pose" + "[gz.msgs.Pose",
-                        # "/" + robot_name + "/base_front_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[gz.msgs.CameraInfo",
-                        # "/" + robot_name + "/base_front_camera/color" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
-                        # "/" + robot_name + "/base_front_camera/depth" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
-                        # "/" + robot_name + "/base_back_camera/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[gz.msgs.CameraInfo",
-                        # "/" + robot_name + "/base_back_camera/color" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
-                        # "/" + robot_name + "/base_back_camera/depth" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
-                        "/" + robot_name + "/head_camera_base/camera_info" + "@sensor_msgs/msg/CameraInfo" + "[gz.msgs.CameraInfo",
-                        "/" + robot_name + "/head_camera_base/color" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
-                        "/" + robot_name + "/head_camera_base/depth" + "@sensor_msgs/msg/Image" + "[gz.msgs.Image",
-                        "/" + robot_name + "/head_camera_base/depth/points" + "@sensor_msgs/msg/PointCloud2" + "[gz.msgs.PointCloudPacked",
-                        "/" + robot_name + "/scan" + "@sensor_msgs/msg/LaserScan" + "[gz.msgs.LaserScan",
-
-                        # "/" + robot_name + "/scan/points" + "@sensor_msgs/msg/PointCloud2" + "[gz.msgs.PointCloudPacked",
                         "/" + robot_name + "/imu" + "@sensor_msgs/msg/Imu" + "[gz.msgs.IMU",
                     ],
                     remappings=[

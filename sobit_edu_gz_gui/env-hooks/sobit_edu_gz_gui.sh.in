@@ -1,0 +1,4 @@
+ament_prepend_unique_value GZ_SIM_SYSTEM_PLUGIN_PATH "$AMENT_CURRENT_PREFIX/lib/sobit_edu_gz_gui/gz-sim"
+ament_prepend_unique_value GZ_GUI_PLUGIN_PATH "$AMENT_CURRENT_PREFIX/lib/sobit_edu_gz_gui/gz-gui"
+ament_prepend_unique_value LD_LIBRARY_PATH "$AMENT_CURRENT_PREFIX/lib/sobit_edu_gz_gui/gz-sim"
+ament_prepend_unique_value LD_LIBRARY_PATH "$AMENT_CURRENT_PREFIX/lib/sobit_edu_gz_gui/gz-gui"

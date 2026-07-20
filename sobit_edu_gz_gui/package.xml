@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package format="3">
+  <name>sobit_edu_gz_gui</name>
+  <version>0.0.1</version>
+  <description>Gazebo GUI plugins for SOBIT EDU: spawn/show-hide/rviz2/delete/camera-follow/teleop robot manager panel, its operation log panel, and the world-side freeze system that backs the hide/show toggle. Self-contained (no dependency on guider_multifloor_builder).</description>
+  <maintainer email="sobits@example.com">SOBITS</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>gz_sim_vendor</depend>
+  <depend>gz_plugin_vendor</depend>
+  <depend>gz_transport_vendor</depend>
+  <depend>gz_msgs_vendor</depend>
+  <depend>gz_gui_vendor</depend>
+  <depend>gz_rendering_vendor</depend>
+  <depend>qtbase5-dev</depend>
+  <depend>qtdeclarative5-dev</depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <!-- NOT sobit_edu_bringup: EduRobotManager only shells out to
+       `ros2 launch sobit_edu_bringup robot.launch.py` at runtime (like
+       any other subprocess call), it does not link against or require it
+       at build/install time. Declaring it here would create a package.xml
+       cycle with sobit_edu_bringup's own exec_depend on this package. -->
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
