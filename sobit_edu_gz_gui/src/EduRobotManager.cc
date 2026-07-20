@@ -5,10 +5,12 @@
 #include <csignal>
 #include <iterator>
 #include <memory>
+#include <thread>
 
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QMetaObject>
 #include <QProcessEnvironment>
 #include <QPointer>
 #include <QTime>
@@ -271,49 +273,146 @@ void EduRobotManager::setRobotVisible(int _robotIndex, bool _visible)
 
     if (robot.process)
     {
-      this->TerminateProcessGroup(robot.process);
+      // Track robot.name in terminatingNames until the kill escalation
+      // has had time to actually finish it off (see
+      // TerminateProcessGroup's comment): setRobotVisible(true) below
+      // refuses to relaunch under this name until that clears, so a fast
+      // 非表示→表示 can't start a second launch overlapping the first
+      // one's still-dying nodes.
+      this->TerminateProcessGroup(robot.process, robot.name);
       robot.process = nullptr;
     }
     this->publishers.erase(robot.name);
 
-    // Best-effort and can block this thread for several seconds (it
-    // shells out to `ros2 control` up to 1 + 1 + N times); deliberately
-    // last, since the robot already flew away and its nodes are already
-    // dying above regardless of how long this takes or whether it times
-    // out. Needed so a later 再表示 doesn't fail to reconfigure
-    // controllers that are still loaded/active from this hide.
-    this->UnloadRobotControllers(robot);
-
     robot.visible = false;
     this->robotsChanged();
-    this->SetStatus(name + " を非表示にしました");
+    this->SetStatus(name + " を非表示にしました（コントローラ解放中…）");
     this->AppendLog(
         "OK",
         name + " を非表示にしました（ノード停止・場外へ退避。"
                "「表示」で復活します）");
+
+    // Runs in the background (does not block the Qt thread -- see
+    // UnloadRobotControllersAsync) since it shells out to `ros2 control`
+    // up to 1 + 1 + N times and each can take several seconds; the robot
+    // already flew away and its nodes are already dying above regardless
+    // of how long this takes or whether it times out. Needed so a later
+    // 再表示 doesn't fail to reconfigure controllers that are still
+    // loaded/active from this hide. unloadingNames blocks a hide/show for
+    // this name until it's done (see setRobotVisible(true)); the outcome
+    // is recorded on the robot (Robot::controllersDirty) by name, since
+    // _robotIndex may no longer point at this robot by the time it runs.
+    const std::string robotName = robot.name;
+    this->unloadingNames.insert(robotName);
+    this->UnloadRobotControllersAsync(robotName,
+        [this, robotName](bool _ok)
+    {
+      this->unloadingNames.erase(robotName);
+      const auto found = std::find_if(
+          this->robots.begin(), this->robots.end(),
+          [&robotName](const Robot &_r) { return _r.name == robotName; });
+      if (found == this->robots.end())
+        return;  // removed while the unload was in flight
+      found->controllersDirty = !_ok;
+      if (!_ok)
+      {
+        this->SetStatus(
+            QString::fromStdString(robotName) + " のコントローラ解放が未確認です");
+      }
+    });
     return;
   }
 
-  // The entity was parked below the world, not removed, while hidden:
-  // release it back to the remembered pose instead of spawning a new
-  // one (entityName is unchanged). The teleport rides inside the
-  // unfreeze message -- see UnfreezeEntity() for why it must not be a
-  // separate set_pose call.
-  this->UnfreezeEntity(
-      robot.entityName, robot.x, robot.y, robot.z, robot.yaw);
-
-  auto *process = this->StartLaunchProcess(
-      name, this->BuildSpawnArguments(robot, false));
-  if (!process)
+  if (this->terminatingNames.count(robot.name) ||
+      this->unloadingNames.count(robot.name))
+  {
+    this->AppendLog(
+        "WARN",
+        name + " はまだ前回の処理（ノード終了・コントローラ解放）が"
+               "完了していません。数秒待ってから再度「表示」を"
+               "押してください");
+    this->SetStatus(name + " の後片付け中…少し待ってから再度お試しください");
     return;
-  robot.process = process;
-  robot.visible = true;
-  this->robotsChanged();
-  this->SetStatus(name + " を再表示中…");
+  }
+
+  // The rest of showing this robot, factored out so it can run either
+  // immediately below or after the controllersDirty retry beneath it
+  // completes. Looks the robot back up by name rather than closing over
+  // `robot`/`_robotIndex`, since those may be stale by the time an async
+  // retry's callback runs.
+  const std::string robotName = robot.name;
+  auto doShow = [this, robotName]()
+  {
+    const auto found = std::find_if(
+        this->robots.begin(), this->robots.end(),
+        [&robotName](const Robot &_r) { return _r.name == robotName; });
+    if (found == this->robots.end())
+      return;
+    Robot &robot = *found;
+    const QString name = QString::fromStdString(robot.name);
+
+    // The entity was parked below the world, not removed, while hidden:
+    // release it back to the remembered pose instead of spawning a new
+    // one (entityName is unchanged). The teleport rides inside the
+    // unfreeze message -- see UnfreezeEntity() for why it must not be a
+    // separate set_pose call.
+    this->UnfreezeEntity(
+        robot.entityName, robot.x, robot.y, robot.z, robot.yaw);
+
+    auto *process = this->StartLaunchProcess(
+        name, this->BuildSpawnArguments(robot, false));
+    if (!process)
+      return;
+    robot.process = process;
+    robot.visible = true;
+    this->robotsChanged();
+    this->SetStatus(name + " を再表示中…");
+    this->AppendLog(
+        "OK",
+        QString("%1 を再表示しました（ノード再起動、位置 (%2, %3)）")
+            .arg(name).arg(robot.x).arg(robot.y));
+  };
+
+  if (!robot.controllersDirty)
+  {
+    doShow();
+    return;
+  }
+
+  // The hide that parked this robot could not confirm its controllers
+  // were deactivated/unloaded; relaunching the spawners now would very
+  // likely hit "can not be configured from 'active' state" against a
+  // controller_manager that still thinks they're active. Retry the
+  // unload here (controller_manager itself has had time to settle since
+  // the hide) instead of relaunching straight into a known failure mode.
   this->AppendLog(
-      "OK",
-      QString("%1 を再表示しました（ノード再起動、位置 (%2, %3)）")
-          .arg(name).arg(robot.x).arg(robot.y));
+      "INFO",
+      name + " は前回のコントローラ解放が未確認のため、再表示前に"
+             "再試行します");
+  this->SetStatus(name + " のコントローラ解放を再試行中…");
+  this->unloadingNames.insert(robotName);
+  this->UnloadRobotControllersAsync(robotName,
+      [this, robotName, doShow](bool _ok)
+  {
+    this->unloadingNames.erase(robotName);
+    const auto found = std::find_if(
+        this->robots.begin(), this->robots.end(),
+        [&robotName](const Robot &_r) { return _r.name == robotName; });
+    if (found == this->robots.end())
+      return;
+    found->controllersDirty = !_ok;
+    if (!_ok)
+    {
+      const QString qname = QString::fromStdString(robotName);
+      this->AppendLog(
+          "ERROR",
+          qname + " のコントローラを解放できないため再表示を中止しました。"
+                  "Gazeboの再起動が必要な場合があります");
+      this->SetStatus(qname + " の再表示に失敗しました（コントローラ解放不可）");
+      return;
+    }
+    doShow();
+  });
 }
 
 QStringList EduRobotManager::RobotList() const
@@ -377,10 +476,15 @@ QProcess *EduRobotManager::StartLaunchProcess(
   return process;
 }
 
-void EduRobotManager::TerminateProcessGroup(QProcess *_process)
+void EduRobotManager::TerminateProcessGroup(
+    QProcess *_process, const std::string &_trackName)
 {
   if (!_process)
     return;
+
+  if (!_trackName.empty())
+    this->terminatingNames.insert(_trackName);
+
   const qint64 pid = _process->processId();
   if (pid > 0)
   {
@@ -401,11 +505,16 @@ void EduRobotManager::TerminateProcessGroup(QProcess *_process)
     });
   }
   // Deleting a running QProcess kills only the direct child; delay it
-  // until the group signals above have done the real work.
-  QTimer::singleShot(9000, this, [guard = QPointer<QProcess>(_process)]()
+  // until the group signals above have done the real work. Release the
+  // name guard (if any) at the same point: by now SIGKILL has had ~1s to
+  // land even in the worst case, so the group is reliably gone.
+  QTimer::singleShot(9000, this,
+      [this, guard = QPointer<QProcess>(_process), _trackName]()
   {
     if (guard)
       guard->deleteLater();
+    if (!_trackName.empty())
+      this->terminatingNames.erase(_trackName);
   });
 }
 
@@ -443,6 +552,20 @@ void EduRobotManager::spawnRobot(
   {
     this->AppendLog(
         "ERROR", QString("%1 は既に存在します。別名にしてください").arg(name));
+    return;
+  }
+  if (this->terminatingNames.count(nameStd) ||
+      this->unloadingNames.count(nameStd))
+  {
+    // A robot removed under this same name is still shutting down (see
+    // TerminateProcessGroup) or still has an UnloadRobotControllersAsync
+    // chain running against its controller_manager namespace: spawning
+    // now would start a second robot.launch.py in the same namespace
+    // while the old one's nodes/controller cleanup are still in flight.
+    this->AppendLog(
+        "ERROR",
+        name + " は削除処理が完了していません。数秒待ってから"
+               "再度お試しください");
     return;
   }
 
@@ -1225,8 +1348,12 @@ void EduRobotManager::removeRobot(int _robotIndex)
   {
     // Group kill (see TerminateProcessGroup): takes the launch wrapper
     // AND every node it spawned down together, so no orphan topics
-    // survive the removal.
-    this->TerminateProcessGroup(robot.process);
+    // survive the removal. Track robot.name so spawnRobot() refuses to
+    // reuse it until the old process group is confirmed gone -- the
+    // robots list entry is erased below, so without this guard a
+    // same-named respawn right after removal would race the still-dying
+    // old nodes just like the setRobotVisible() hide/show case.
+    this->TerminateProcessGroup(robot.process, robot.name);
   }
 
   // Park below the world, don't remove: see setRobotVisible()'s comment
@@ -1234,13 +1361,18 @@ void EduRobotManager::removeRobot(int _robotIndex)
   // depth camera is rebuilt. A robot already hidden is parked already;
   // only a still-visible one needs parking now. The entity stays parked
   // forever after this -- there is no way to bring it back once its list
-  // entry is gone. FreezeEntity before UnloadRobotControllers, same
-  // reasoning as setRobotVisible(): the fly-away is one fast publish, so
-  // do it before the potentially multi-second `ros2 control` calls below.
+  // entry is gone. FreezeEntity before the (async, non-blocking --
+  // UnloadRobotControllersAsync) unload below, same reasoning as
+  // setRobotVisible(): the fly-away is one fast publish, so it happens
+  // before the potentially multi-second `ros2 control` calls.
   if (robot.visible)
   {
     this->FreezeEntity(robot.entityName);
-    this->UnloadRobotControllers(robot);
+    // Fire-and-forget: `robot` was copied by value above and the list
+    // entry is erased below, so there is no Robot state left to update
+    // by the time this finishes (unlike the hide/show case) -- just let
+    // it log its own outcome.
+    this->UnloadRobotControllersAsync(robot.name, [](bool) {});
   }
 
   this->publishers.erase(robot.name);
@@ -1330,30 +1462,37 @@ void EduRobotManager::UnfreezeEntity(
   this->freezePublisher.Publish(unfreezeMsg);
 }
 
-void EduRobotManager::UnloadRobotControllers(const Robot &_robot)
+bool EduRobotManager::UnloadRobotControllersBlocking(
+    const std::string &_robotName,
+    std::vector<std::pair<QString, QString>> &_log)
 {
+  // Runs on a worker thread (see UnloadRobotControllersAsync) -- must not
+  // touch `this` or call AppendLog() directly (Qt widget/QML state is
+  // main-thread-only). Log lines are appended to _log and replayed on the
+  // Qt thread once this returns.
   const QString controllerManager =
-    QString::fromStdString("/" + _robot.name + "/controller_manager");
-  const std::string &_name = _robot.name;
+      QString::fromStdString("/" + _robotName + "/controller_manager");
+  const QString qname = QString::fromStdString(_robotName);
 
   // Discover what is actually loaded rather than assuming a fixed set.
   // -s/--use-sim-time: this CLI's own short-lived node otherwise runs on
   // wall-clock time while controller_manager (spawned with
   // use_sim_time:=true) runs on sim time -- under a real_time_factor < 1
   // that skew makes wall-clock timeouts fire well before the sim-time
-  // equivalent has actually elapsed.
+  // equivalent has actually elapsed. QProcess's blocking start()+
+  // waitForFinished() API is safe to use off the Qt thread (no event
+  // loop required on this thread for it).
   QProcess list;
   list.start("ros2", {"control", "list_controllers",
       "-c", controllerManager, "--spin-time", "2", "-s"});
   if (!list.waitForFinished(6000))
   {
     list.kill();
-    this->AppendLog(
+    _log.emplace_back(
         "ERROR",
-        QString::fromStdString(_name) +
-            " のcontroller_managerに接続できず、コントローラを"
-            "アンロードできませんでした");
-    return;
+        qname + " のcontroller_managerに接続できず、コントローラを"
+                "アンロードできませんでした");
+    return false;
   }
 
   QStringList names;
@@ -1372,45 +1511,121 @@ void EduRobotManager::UnloadRobotControllers(const Robot &_robot)
       names << fields.first();
   }
   if (names.isEmpty())
-    return;
+    return true;
 
   // Deactivate everything in one call (controllers can depend on each
   // other's interfaces, so switching them all at once is safer than one
   // at a time), then unload each -- unload_controller refuses a
   // controller that is still active.
   //
-  // --switch-timeout: switch_controllers' OWN internal timeout for the
-  // switch to complete, separate from (and unrelated to) the
-  // QProcess::waitForFinished() wall-clock wait below -- that just bounds
-  // how long we wait for the CLI *process* to exit; this bounds how long
-  // controller_manager itself is allowed to take completing the switch
-  // before the CLI reports failure ("Switch controller timed out after N
-  // seconds!"). Defaults to 5s, which is not always enough time to
-  // deactivate every EDU controller (head/arm/hand/wheel/
-  // joint_state_broadcaster) in one strict switch, especially under a
-  // real_time_factor < 1. waitForFinished below must stay comfortably
-  // longer than this so the CLI process has time to actually report back.
-  QStringList deactivateArgs{
-      "control", "switch_controllers", "-c", controllerManager,
-      "--deactivate"};
-  deactivateArgs += names;
-  deactivateArgs << "--best-effort" << "-s";// << "--switch-timeout" << "6.0";
+  // Calls the switch_controller SERVICE directly with `ros2 service call`
+  // instead of `ros2 control switch_controllers`: that CLI verb's own
+  // --switch-timeout argument is defined without type=float in this ROS 2
+  // Jazzy install (ros2controlcli/verb/switch_controllers.py), so passing
+  // it crashes with "ValueError: Exceeds the limit ... for integer string
+  // conversion" (the string "20" hits `seconds * S_TO_NS`, i.e. Python
+  // string-repeats "20" a billion times instead of multiplying a float).
+  // That left switch_controllers stuck on its 5s *internal* default
+  // (unrelated to the waitForFinished() wall-clock wait below), which
+  // controller_manager's own log confirmed was too short for deactivating
+  // all 5 EDU controllers at once ("Switch controller timed out after 5
+  // seconds!") on a moderately loaded machine -- silently surfacing as
+  // "controller release unconfirmed" instead of being fixed. The service
+  // call has no such bug and lets a real 20s timeout be requested.
+  QString namesYaml;
+  for (const QString &controllerName : names)
+  {
+    if (!namesYaml.isEmpty())
+      namesYaml += ", ";
+    namesYaml += controllerName;
+  }
+  const QString switchService =
+      "/" + qname + "/controller_manager/switch_controller";
+  const QString switchRequest = QString(
+      "{deactivate_controllers: [%1], strictness: 1, "
+      "activate_asap: false, timeout: {sec: 20, nanosec: 0}}")
+      .arg(namesYaml);
   QProcess deactivate;
-  deactivate.start("ros2", deactivateArgs);
-  deactivate.waitForFinished(6000);
+  deactivate.start("ros2", {"service", "call", switchService,
+      "controller_manager_msgs/srv/SwitchController", switchRequest});
+  bool ok = deactivate.waitForFinished(25000);
+  if (!ok)
+    deactivate.kill();
+  // `ros2 service call` always exits 0 once the RPC round-trips, even if
+  // the response itself reports failure (SwitchController::Response::ok
+  // is a field in the reply, not the process exit code) -- the response
+  // is only visible in stdout, so that has to be scanned for "ok=True".
+  ok = ok && deactivate.exitStatus() == QProcess::NormalExit
+          && deactivate.exitCode() == 0
+          && QString::fromUtf8(deactivate.readAllStandardOutput())
+              .contains("ok=True");
+  if (!ok)
+  {
+    _log.emplace_back(
+        "ERROR",
+        qname + " のコントローラ非アクティブ化に失敗しました。"
+                "アンロードは試みます");
+  }
 
   for (const QString &controllerName : names)
   {
     QProcess unload;
     unload.start("ros2", {"control", "unload_controller",
         controllerName, "-c", controllerManager, "-s"});
-    unload.waitForFinished(4000);
+    const bool unloadFinished = unload.waitForFinished(4000);
+    if (!unloadFinished)
+      unload.kill();
+    const bool unloadOk = unloadFinished
+        && unload.exitStatus() == QProcess::NormalExit
+        && unload.exitCode() == 0;
+    if (!unloadOk)
+    {
+      ok = false;
+      _log.emplace_back(
+          "ERROR",
+          qname + " のコントローラ " + controllerName +
+              " をアンロードできませんでした");
+    }
   }
 
-  this->AppendLog(
-      "INFO",
-      QString("%1 のコントローラ%2件をアンロードしました")
-          .arg(QString::fromStdString(_name)).arg(names.size()));
+  if (ok)
+  {
+    _log.emplace_back(
+        "INFO", qname + " のコントローラをアンロードしました");
+  }
+  else
+  {
+    _log.emplace_back(
+        "WARN",
+        qname + " のコントローラを一部アンロードできませんでした。"
+                "「表示」で再表示に失敗する場合があります");
+  }
+  return ok;
+}
+
+void EduRobotManager::UnloadRobotControllersAsync(
+    const std::string &_robotName, std::function<void(bool)> _onDone)
+{
+  // Runs the actual `ros2 control` sequence on a detached worker thread
+  // so it can block freely (waitForFinished()) without freezing the Qt
+  // GUI thread -- see the .hh comment for why this replaced an earlier
+  // hand-rolled QProcess/QTimer async chain. QMetaObject::invokeMethod
+  // with a context object hops back onto the Qt thread and is a no-op if
+  // `this` was destroyed in the meantime (e.g. the panel was unloaded),
+  // so no dangling-`this` risk here despite the detached thread outliving
+  // this call.
+  std::thread([this, _robotName, onDone = std::move(_onDone)]() mutable
+  {
+    auto log = std::make_shared<std::vector<std::pair<QString, QString>>>();
+    const bool ok = UnloadRobotControllersBlocking(_robotName, *log);
+    QMetaObject::invokeMethod(this,
+        [this, ok, log, onDone = std::move(onDone)]() mutable
+    {
+      for (const auto &[level, message] : *log)
+        this->AppendLog(level, message);
+      onDone(ok);
+    }, Qt::QueuedConnection);
+  }).detach();
 }
 
 void EduRobotManager::teleopMove(

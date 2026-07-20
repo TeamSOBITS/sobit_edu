@@ -2,9 +2,12 @@
 #define SOBIT_EDU_GZ_GUI_EDUROBOTMANAGER_HH_
 
 #include <chrono>
+#include <functional>
 #include <map>
 #include <mutex>
+#include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <QObject>
@@ -165,6 +168,14 @@ class EduRobotManager : public gz::gui::Plugin
     /// False while hidden (nodes stopped, model parked, entry kept).
     bool visible{true};
 
+    /// True when the last UnloadRobotControllers() call for this robot
+    /// did not confirm every controller was actually deactivated/unloaded
+    /// (timeout, or `ros2 control` reporting failure). A 再表示 while this
+    /// is set would relaunch spawners against a controller_manager that
+    /// may still hold stale active controllers and fail with "can not be
+    /// configured from 'active' state" -- see setRobotVisible(true).
+    bool controllersDirty{false};
+
     /// Spawn pose; refreshed with the last live pose when hiding so a
     /// re-show puts the robot back where it stood.
     double x{0.0};
@@ -209,7 +220,17 @@ class EduRobotManager : public gz::gui::Plugin
   /// \brief Signal a setsid-started child's whole process group
   /// (SIGINT -> SIGTERM -> SIGKILL) so every node it spawned dies with it
   /// and no orphan topics survive. Used for launches and bridges.
-  private: void TerminateProcessGroup(QProcess *_process);
+  ///
+  /// _trackName, when non-empty, registers _robot.name in
+  /// `terminatingNames` until the kill escalation above has had time to
+  /// finish (mirrors the delay before the QProcess itself is
+  /// deleteLater()'d): spawnRobot() and setRobotVisible(true) refuse to
+  /// start a new `ros2 launch` under the same name while it is set, since
+  /// doing so before the old process group has actually exited starts a
+  /// second robot_state_publisher/bridge set in the same namespace
+  /// alongside the still-dying first one.
+  private: void TerminateProcessGroup(
+      QProcess *_process, const std::string &_trackName = {});
 
   /// \brief `ros2 launch` argument list to (re)spawn EDU from its stored
   /// pose; shared by spawnRobot() and setRobotVisible(true). _spawnEntity
@@ -262,17 +283,50 @@ class EduRobotManager : public gz::gui::Plugin
       double _x, double _y, double _z, double _yaw);
 
   /// \brief Deactivate and unload every controller currently loaded in
-  /// _robot's controller_manager, blocking until done (a few seconds:
-  /// this shells out to `ros2 control` three times in sequence). Called
-  /// before FreezeEntity() when hiding/removing: the entity (and its
-  /// gz_ros2_control plugin) is parked, not removed (see FreezeEntity),
-  /// so its controllers stay loaded and *active* unless explicitly
-  /// unloaded here -- otherwise 表示 relaunching robot.launch.py's
-  /// controller spawners fails ("can not be configured from 'active'
-  /// state") and every controller topic/service stays alive for as long
-  /// as the entity is parked, even though the ROS launch side was fully
-  /// torn down.
-  private: void UnloadRobotControllers(const Robot &_robot);
+  /// _robotName's controller_manager. Called after hiding/removing: the
+  /// entity (and its gz_ros2_control plugin) is parked, not removed (see
+  /// FreezeEntity), so its controllers stay loaded and *active* unless
+  /// explicitly unloaded here -- otherwise 表示 relaunching
+  /// robot.launch.py's controller spawners fails ("can not be configured
+  /// from 'active' state") and every controller topic/service stays
+  /// alive for as long as the entity is parked, even though the ROS
+  /// launch side was fully torn down.
+  ///
+  /// Fully asynchronous (chains through RunControlCommand): this shells
+  /// out to `ros2 control` up to 1 + 1 + N times, each of which can take
+  /// several seconds, and running that on the Qt thread via
+  /// QProcess::waitForFinished() used to freeze the whole GUI (the window
+  /// manager would offer to force-quit it) for as long as it took --
+  /// especially bad on a machine already busy with something like a
+  /// colcon build. _onDone(false) means at least one step could not be
+  /// confirmed to have succeeded (connection timeout, or `ros2 control`
+  /// reporting a non-zero exit); callers use this to set
+  /// Robot::controllersDirty rather than assuming the controller_manager
+  /// is actually clean. Callers must not assume _robotName is still in
+  /// `robots` by the time _onDone runs (the robot may have been removed,
+  /// or the vector reallocated) -- re-find it by name if needed.
+  ///
+  /// Implementation: runs UnloadRobotControllersBlocking() (the actual
+  /// `ros2 control` sequence) on a detached std::thread, then hops back
+  /// to the Qt thread via QMetaObject::invokeMethod to replay its log
+  /// lines and call _onDone -- deliberately not a hand-rolled QProcess/
+  /// QTimer state machine (an earlier version of this function was that,
+  /// and something about chaining several async QProcess calls back to
+  /// back was unreliable in practice in a way plain blocking QProcess
+  /// calls on a worker thread are not). QProcess's blocking API
+  /// (start()+waitForFinished()) is documented as safe to use from any
+  /// thread without that thread needing its own Qt event loop.
+  private: void UnloadRobotControllersAsync(
+      const std::string &_robotName, std::function<void(bool)> _onDone);
+
+  /// \brief The actual `ros2 control` sequence (blocking QProcess calls):
+  /// list, deactivate, unload each. Must not touch anything Qt-thread-only
+  /// (widgets, `this`'s QML-bound properties) -- it runs on a worker
+  /// thread (see UnloadRobotControllersAsync) and reports what it would
+  /// have logged via _log instead of calling AppendLog() directly.
+  private: static bool UnloadRobotControllersBlocking(
+      const std::string &_robotName,
+      std::vector<std::pair<QString, QString>> &_log);
 
   private: QProcess *StartLaunchProcess(
       const QString &_summary, const QStringList &_arguments);
@@ -296,6 +350,20 @@ class EduRobotManager : public gz::gui::Plugin
 
   private: std::vector<Robot> robots;
   private: std::string worldName;
+
+  /// \brief Robot names whose launch process group was just told to exit
+  /// (TerminateProcessGroup) but is not yet confirmed dead. See that
+  /// function's comment; checked by spawnRobot()/setRobotVisible(true)
+  /// before starting a new `ros2 launch` under the same name.
+  private: std::set<std::string> terminatingNames;
+
+  /// \brief Robot names with an UnloadRobotControllersAsync() chain
+  /// currently in flight. Checked by spawnRobot()/setRobotVisible(true)
+  /// for the same reason as terminatingNames -- without this guard, a
+  /// second hide/show for the same name could fire a second `ros2
+  /// control` chain against the same controller_manager while the first
+  /// is still running.
+  private: std::set<std::string> unloadingNames;
 
   /// \brief Whether sobit_edu_bringup is installed, resolved once in the
   /// constructor.

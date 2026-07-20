@@ -15,6 +15,7 @@ find_package(gz-msgs10 REQUIRED)
 find_package(gz-gui8 REQUIRED)
 find_package(gz-rendering8 REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core)
+find_package(Threads REQUIRED)
 
 # World-level system: while EduRobotManager has a robot 非表示/削除
 # ("hidden"), its gz entity is kept alive rather than actually removed
@@ -58,6 +59,7 @@ target_link_libraries(EduRobotManager
   gz-transport13::core
   gz-msgs10::core
   Qt5::Core
+  Threads::Threads
 )
 
 # Sidebar panel showing EduRobotManager's operation log.

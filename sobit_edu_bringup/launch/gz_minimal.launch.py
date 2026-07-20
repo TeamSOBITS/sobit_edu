@@ -1,5 +1,9 @@
 import os
 import sys
+import tempfile
+import xml.etree.ElementTree as ET
+
+import xacro
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 
 from launch import LaunchDescription
@@ -53,11 +57,31 @@ def generate_launch_description():
             'small_house.world'
         )
     elif world_model == 'rcjo2025':
-        world_file = os.path.join(get_package_share_directory(
+        rcjo2025_xacro = os.path.join(get_package_share_directory(
             'sobits_gazebo_worlds'),
             'worlds',
             'rcjo2025_arena.world.xacro'
         )
+        # EduRobotManager's 表示/非表示 (setRobotVisible()) needs
+        # edu_robot_freeze_system attached to the world -- see
+        # EduRobotFreezeSystem.cc. rcjo2025_arena.world.xacro is shared
+        # with sobit_mini/sobit_light/sobit_pro's own gz_minimal.launch.py
+        # and none of them ship that plugin, so it must not be added to
+        # that file itself (or their gz sim would fail to find it at
+        # startup) -- everything sobit_edu-specific stays in this
+        # package. Expand the xacro exactly as sobits_gazebo_worlds wrote
+        # it (no args overridden), then splice the plugin into the
+        # resulting <world> element here instead.
+        expanded = xacro.process_file(rcjo2025_xacro).toxml()
+        world_root = ET.fromstring(expanded)
+        ET.SubElement(
+            world_root.find('world'), 'plugin',
+            filename='edu_robot_freeze_system',
+            name='edu_gz_gui::EduRobotFreezeSystem')
+        world_file = os.path.join(
+            tempfile.gettempdir(), 'sobit_edu_rcjo2025_arena.sdf')
+        with open(world_file, 'w') as sdf_file:
+            sdf_file.write(ET.tostring(world_root, encoding='unicode'))
 
     # gui.config wires up two, separately-docked panel groups. Neither one
     # pre-spawns anything -- EDU only appears once "Spawn" is pressed in
@@ -76,8 +100,8 @@ def generate_launch_description():
     # sobits_gazebo_worlds/launch/world.launch.py, needed here again
     # because that fix is local to that launch file's own process tree.
     # EduRobotManager's hide/show also needs its companion gz-sim System
-    # plugin (edu_robot_freeze_system, declared in rcjo2025_arena.world.xacro)
-    # to be found via GZ_SIM_SYSTEM_PLUGIN_PATH.
+    # plugin (edu_robot_freeze_system, spliced into the rcjo2025 world
+    # above) to be found via GZ_SIM_SYSTEM_PLUGIN_PATH.
     gui_config_path = os.path.join(
         get_package_share_directory('sobit_edu_bringup'), 'config', 'gui.config')
     human_gui_plugin_dir = os.path.join(
