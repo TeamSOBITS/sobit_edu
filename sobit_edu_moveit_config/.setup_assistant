@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: sobit_edu_description
+    relative_path: robots/sobit_edu.urdf.xacro
+  srdf:
+    relative_path: config/sobit_edu.srdf
+  package_settings:
+    author_name: ""
+    author_email: ""
+    generated_timestamp: 1781018772
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

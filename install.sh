@@ -85,7 +85,8 @@ sudo apt install -y \
     ros-$ROS_DISTRO-ros-gz-interfaces \
     ros-$ROS_DISTRO-topic-tools \
     ros-$ROS_DISTRO-twist-stamper
-
+    ros-$ROS_DISTRO-moveit \
+    ros-$ROS_DISTRO-moveit-ros-perception \
 
 # Set up environment variables
 echo "" >> /home/$USERNAME/.bashrc
