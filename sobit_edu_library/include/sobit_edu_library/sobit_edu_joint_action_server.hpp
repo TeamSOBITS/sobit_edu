@@ -74,6 +74,9 @@ struct DH_modified
     std::cos(Alpha)*std::sin(Theta), std::cos(Alpha)*std::cos(Theta), -std::sin(Alpha), -std::sin(Alpha)*D,
     std::sin(Alpha)*std::sin(Theta), std::sin(Alpha)*std::cos(Theta), std::cos(Alpha), std::cos(Alpha)*D,
     0.0, 0.0, 0.0, 1.0).finished()){}
+    // Matrix3d getRotation() const { return matrix.block<3, 3>(0, 0); }
+    // Vector3d getTranslation() const { return matrix.block<3, 1>(0, 3); }
+  
 };
 
 class JointActionServer : public rclcpp::Node
@@ -177,11 +180,15 @@ private:
   void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg);
 
   //基礎ヤコビ行列を計算する関数
-  Matrix<double, 6,6> cal_Jv(const VectorXd &current_joint_rad);
-  //重み行列の対角要素
-  VectorXd b{{1.0/arm_upper_link, 1.0/arm_upper_link, 1.0/arm_upper_link, 1.0/(2*M_PI), 1.0/(2*M_PI), 1.0/(2*M_PI)}};///(2*M_PI)
+  Matrix<double, 6,8> cal_Jv(const VectorXd &current_joint_rad);
+  //x, y, z, row, pitch, yawの誤差重み行列の対角要素
+  VectorXd b{{0.1, 0.1, 1000.0, 10.0, 10.0, 10.0}};
+  //更新則の減衰行列
+  double bias = 0.1*arm_upper_link*arm_upper_link;
+  VectorXd b_bar{{bias, bias, bias, bias, bias, bias, bias*10, 0.001*arm_upper_link*arm_upper_link}};
 
-  //
+  VectorXd q_d {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+
   MatrixXd W_E;
   MatrixXd W_N_bar;
 
@@ -197,8 +204,14 @@ private:
   //誤差を計算
   void cal_e(VectorXd& e, VectorXd& q, const geometry_msgs::msg::TransformStamped &goal_coord);
 
-  // 勾配kを計算する関数
+  // main勾配kを計算する関数
   void cal_k(VectorXd& k, const MatrixXd& J, const VectorXd& e);
+
+  // ヌル空間射影オペレータを計算する関数
+  void cal_P(MatrixXd& P, const MatrixXd& I,const MatrixXd& J);
+
+  // 勾配ksを計算する関数
+  void cal_ks(VectorXd& ks, VectorXd& q);
 
   // 減衰因子行列を計算する関数
   void cal_W_N(MatrixXd& W_N, const VectorXd& e);
