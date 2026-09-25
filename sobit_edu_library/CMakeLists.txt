@@ -26,6 +26,7 @@ include_directories(include)
 
 # Library
 add_library(${PROJECT_NAME} SHARED
+  src/ik_library.cpp
   src/sobit_edu_joint_action_server.cpp
   src/sobit_edu_wheel_action_server.cpp
 )

@@ -16,6 +16,7 @@
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/quaternion.h"
 #include "geometry_msgs/msg/vector3.h"
 #include "geometry_msgs/msg/point.h"
@@ -26,13 +27,21 @@
 #include <rclcpp_components/register_node_macro.hpp>
 #include <Eigen/Dense>
 
+#include "sobit_edu_library/ik_library.hpp"
+
 
 namespace sobit_edu
 {
 
-using namespace Eigen;
+// 運動学の方式(パラメータ kinematics_method で選ぶ)
+enum class KinematicsMethod
+{
+  Trigonometric,  // "trigonometric" (既定): 2次元・三角関数(IKLibrary::inverse_kinematics_trigonometric)
+  Jacobian,       // "jacobian"            : 2次元・ヤコビ行列(IKLibrary::inverse_kinematics_jacobian)
+  IKLibrary,      // "ik_library"          : 8自由度・LM法(IKLibrary::inverse_kinematics)
+};
 
-struct PoseParams 
+struct PoseParams
 {
   std::string pose_name;
   double arm_shoulder_roll;
@@ -44,39 +53,6 @@ struct PoseParams
   double hand;
   double head_camera_pan;
   double head_camera_tilt;
-};
-
-enum JointIds
-{
-  ArmShoulderRollJoint,
-  ArmShoulderPitchJoint,
-  ArmElbowPitchJoint,
-  ArmForearmRollJoint,
-  ArmWristPitchJoint,
-  ArmWristRollJoint,
-  HandJoint,
-  HeadCameraPanJoint,
-  HeadCameraTiltJoint,
-  JointNum
-};
-
-//修正DHパラメータ
-struct DH_modified
-{
-  double A;
-  double Alpha;
-  double D;
-  double Theta;
-  Matrix4d trans_coord;
-
-  DH_modified(double a, double alpha, double d, double zero) : A(a), Alpha(alpha), D(d), Theta(zero), trans_coord(( Eigen::Matrix4d()<< 
-    std::cos(Theta), -std::sin(Theta), 0.0, A, 
-    std::cos(Alpha)*std::sin(Theta), std::cos(Alpha)*std::cos(Theta), -std::sin(Alpha), -std::sin(Alpha)*D,
-    std::sin(Alpha)*std::sin(Theta), std::sin(Alpha)*std::cos(Theta), std::cos(Alpha), std::cos(Alpha)*D,
-    0.0, 0.0, 0.0, 1.0).finished()){}
-    // Matrix3d getRotation() const { return matrix.block<3, 3>(0, 0); }
-    // Vector3d getTranslation() const { return matrix.block<3, 1>(0, 3); }
-  
 };
 
 class JointActionServer : public rclcpp::Node
@@ -98,11 +74,16 @@ public:
     const geometry_msgs::msg::Quaternion& quat);
   geometry_msgs::msg::Quaternion get_quat_from_euler(
     const geometry_msgs::msg::Vector3& rpy);
+  // jazzy-devel 版の2次元運動学(q = {shoulder_pitch, elbow_pitch, wrist_pitch})
   geometry_msgs::msg::TransformStamped forward_kinematics(
-    const VectorXd &target_joint_rad_eigen);  // target_yaw should be eliminated in the future.
-  std::vector<double> inverse_kinematics(
+    const std::vector<double> &target_joint_rad,
+    const double target_yaw);
+  std::vector<double> inverse_kinematics_trigonometric(
     const geometry_msgs::msg::TransformStamped &goal_coord,
-    const std::vector<double> &current_joint_rad);  // target_yaw should be eliminated in the future.
+    const double target_yaw);
+  std::vector<double> inverse_kinematics_jacobian(
+    const geometry_msgs::msg::TransformStamped &goal_coord,
+    const double target_yaw);
   trajectory_msgs::msg::JointTrajectory set_joints(
     const std::vector<std::string> &target_joint_names,
     const std::vector<double> &target_joint_rad,
@@ -138,13 +119,12 @@ private:
     "head_camera_tilt_joint",
   };
 
+  // jazzy-devel 版の2次元運動学で使う寸法(IKLibrary の8自由度モデルとは別に持つ)
   static constexpr double base_to_shoulder_x = 0.12561;
   static constexpr double base_to_shoulder_z = 0.55505;
   static constexpr double arm_upper_link = 0.128;
   static constexpr double arm_lower_link = 0.146;
   static constexpr double arm_gripper_link = 0.1834;
-  static constexpr double arm_shoulder_derr = 0.022;
-  static constexpr double arm_elbow_to_lower = arm_lower_link - arm_shoulder_derr;
 
   std::vector<PoseParams> poses_;
   std::map<std::string, double> init_joint_state_;
@@ -179,45 +159,36 @@ private:
 
   void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg);
 
-  //基礎ヤコビ行列を計算する関数
-  Matrix<double, 6,8> cal_Jv(const VectorXd &current_joint_rad);
-  //x, y, z, row, pitch, yawの誤差重み行列の対角要素
-  VectorXd b{{0.1, 0.1, 1000.0, 10.0, 10.0, 10.0}};
-  //更新則の減衰行列
-  double bias = 0.1*arm_upper_link*arm_upper_link;
-  VectorXd b_bar{{bias, bias, bias, bias, bias, bias, bias*10, 0.001*arm_upper_link*arm_upper_link}};
+  IKLibrary ik_library_;
+  KinematicsMethod kinematics_method_ = KinematicsMethod::Trigonometric;
 
-  VectorXd q_d {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+  // get_hand_to_coord / get_hand_to_tf 共通: base_footprint 基準の目標から関節角と足回りの移動量を求め，
+  // 応答に詰める。kinematics_method_ に応じて下の方式別の関数を呼び分ける
+  template<typename ResponseT>
+  void solve_hand_to_target(
+    const geometry_msgs::msg::TransformStamped &goal_coord,
+    ResponseT &response);
 
-  MatrixXd W_E;
-  MatrixXd W_N_bar;
+  // 方式別の逆運動学。成功なら true を返し，関節名・関節角・足回りの移動量(move_pose)を埋める
+  bool solve_hand_to_target_2dof(
+    const geometry_msgs::msg::TransformStamped &goal_coord,
+    std::vector<std::string> &target_joint_names,
+    std::vector<double> &target_joint_rad,
+    geometry_msgs::msg::Pose &move_pose);
+  bool solve_hand_to_target_8dof(
+    const geometry_msgs::msg::TransformStamped &goal_coord,
+    std::vector<std::string> &target_joint_names,
+    std::vector<double> &target_joint_rad,
+    geometry_msgs::msg::Pose &move_pose);
 
-  // eの収束条件
-  double threshold_e = 1e-10; 
-  // qの収束条件
-  double threshold_q = 1e-10; 
-  // 最大反復回数
-  int maxIterations = 15000;
-  // 反復回数
-  int iteration = 0;
-
-  //誤差を計算
-  void cal_e(VectorXd& e, VectorXd& q, const geometry_msgs::msg::TransformStamped &goal_coord);
-
-  // main勾配kを計算する関数
-  void cal_k(VectorXd& k, const MatrixXd& J, const VectorXd& e);
-
-  // ヌル空間射影オペレータを計算する関数
-  void cal_P(MatrixXd& P, const MatrixXd& I,const MatrixXd& J);
-
-  // 勾配ksを計算する関数
-  void cal_ks(VectorXd& ks, VectorXd& q);
-
-  // 減衰因子行列を計算する関数
-  void cal_W_N(MatrixXd& W_N, const VectorXd& e);
-
-  // 疑似ヤコビ行列を計算する関数
-  void cal_H(MatrixXd &H, const MatrixXd &J, const MatrixXd &W_N);
+  // 足回り(ベース)の移動量。2自由度方式: 旋回=目標の方位，前後=腕のFKで届いた手先と目標の差
+  geometry_msgs::msg::Pose calc_base_motion_2dof(
+    const geometry_msgs::msg::TransformStamped &goal_coord,
+    const std::vector<double> &target_joint_rad,
+    double target_yaw);
+  // 足回り(ベース)の移動量。8自由度方式: IKLibrary の解の q[6](旋回), q[7](前後)をそのまま使う
+  geometry_msgs::msg::Pose calc_base_motion_8dof(
+    const std::vector<double> &ik_result);
 
 }; // class JointActionServer
 
