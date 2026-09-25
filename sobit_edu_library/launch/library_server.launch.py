@@ -10,16 +10,22 @@ from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
     arg_robot_name = DeclareLaunchArgument('robot_name', default_value='sobit_edu')
     arg_enable_gz = DeclareLaunchArgument('enable_gz', default_value='False')
+    arg_kinematics_method = DeclareLaunchArgument(
+        'kinematics_method', default_value='jacobian',
+        choices=['trigonometric', 'jacobian', 'ik_library'],
+        description='Kinematics method of joint_action_server')
 
     return LaunchDescription([
         arg_robot_name,
         arg_enable_gz,
+        arg_kinematics_method,
         OpaqueFunction(function = launch_node),
     ])
 
 def launch_node(context, *args, **kwargs):
     robot_name = LaunchConfiguration('robot_name').perform(context)
     enable_gz = LaunchConfiguration('enable_gz').perform(context)
+    kinematics_method = LaunchConfiguration('kinematics_method').perform(context)
 
     pose_config = os.path.join(
         get_package_share_directory("sobit_edu_library"),
@@ -34,6 +40,7 @@ def launch_node(context, *args, **kwargs):
         namespace=robot_name,
         parameters=[pose_config,
             {"use_sim_time": True if enable_gz == 'True' else False},
+            {"kinematics_method": kinematics_method},
         ],
         output="screen",
     )

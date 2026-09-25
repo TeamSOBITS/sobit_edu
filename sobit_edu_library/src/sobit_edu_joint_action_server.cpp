@@ -3,11 +3,43 @@
 
 namespace sobit_edu{
 
+namespace
+{
+// geometry_msgs::TransformStamped -> IKLibrary の姿勢(ROS非依存)
+Pose3d to_pose3d(const geometry_msgs::msg::TransformStamped &tf)
+{
+  Pose3d pose;
+  pose.position = Vector3d(
+    tf.transform.translation.x,
+    tf.transform.translation.y,
+    tf.transform.translation.z);
+  pose.orientation = Quaterniond(
+    tf.transform.rotation.w,
+    tf.transform.rotation.x,
+    tf.transform.rotation.y,
+    tf.transform.rotation.z);
+  return pose;
+}
+}  // namespace
+
 JointActionServer::JointActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
 : Node("joint_action_server", options),
   tf_buffer_(std::make_shared<tf2_ros::Buffer>(this->get_clock())),
   tf_listener_(std::make_shared<tf2_ros::TransformListener>(*tf_buffer_))
 {
+  // Select the kinematics method (unknown value -> fail to start)
+  const std::string kinematics_method = this->declare_parameter("kinematics_method", std::string("trigonometric"));
+
+  if (kinematics_method == "trigonometric")   kinematics_method_ = KinematicsMethod::Trigonometric;
+  else if (kinematics_method == "jacobian")   kinematics_method_ = KinematicsMethod::Jacobian;
+  else if (kinematics_method == "ik_library") kinematics_method_ = KinematicsMethod::IKLibrary;
+  else {
+    const std::string msg = "Unknown kinematics_method: '" + kinematics_method + "' (valid: trigonometric, jacobian, ik_library)";
+    RCLCPP_FATAL(this->get_logger(), "%s", msg.c_str());
+    throw std::invalid_argument(msg);
+  }
+  RCLCPP_INFO(this->get_logger(), "Kinematics method: %s", kinematics_method.c_str());
+
   // Configure the QoS profile
   rclcpp::QoS qos_profile(1); // depth = 1
   qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
@@ -433,57 +465,7 @@ void JointActionServer::serve_get_hand_to_coord(
     return;
   }
 
-  // target_yawにロボットの回転角度を代入
-  // calculate the target_yaw to move base of grasping object 
-  double target_linear, target_yaw;
-  
-  target_yaw = std::atan2(goal_coord.transform.translation.y,goal_coord.transform.translation.x);
-
-
-  // 3次元の逆運動学が完成したらtarget_yawはある一定の条件で0(=回転する必要なし)になる
-
-
-  // Inverse kinematics to get the target joint rad
-  std::vector<std::string> target_joint_names = {"arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_wrist_pitch_joint"};
-  std::vector<double> target_joint_rad = inverse_kinematics(goal_coord, target_yaw);
-
-  // If inverse kinematics is outside the range of possible
-  // もし逆運動学可能範囲外ならば・・・
-  if (target_joint_rad.size() == 0) {
-
-    response->success = false;
-    // TODO //
-    response->message = "[FAIL] The target position is too low or tall (z: 0.3[m] <= Grasp Able <= 0.8[m])";
-    response->target_joint_names.clear();
-    response->target_joint_rad.clear();
-
-    return;
-  }
-
-  geometry_msgs::msg::TransformStamped hand_pose = forward_kinematics(target_joint_rad, target_yaw);
-
-  if (std::sqrt(std::pow(hand_pose.transform.translation.x,2)+std::pow(hand_pose.transform.translation.y,2)) < std::sqrt(std::pow(goal_coord.transform.translation.x,2)+std::pow(goal_coord.transform.translation.y,2))) {
-    target_linear =  std::sqrt(std::pow(hand_pose.transform.translation.x - goal_coord.transform.translation.x,2) + std::pow(hand_pose.transform.translation.y - goal_coord.transform.translation.y,2));
-  } else {
-    target_linear = -std::sqrt(std::pow(hand_pose.transform.translation.x - goal_coord.transform.translation.x,2) + std::pow(hand_pose.transform.translation.y - goal_coord.transform.translation.y,2));
-  }
-
-  response->move_pose.position.x = target_linear;
-  response->move_pose.position.y = 0.0;
-  response->move_pose.position.z = 0.0;
-
-  geometry_msgs::msg::Vector3 euler;
-  euler.x = 0.0;
-  euler.y = 0.0;
-  euler.z = target_yaw;
-  response->move_pose.orientation = get_quat_from_euler(euler);
-
-  response->success = true;
-  response->message = "[SUCCESS] The coord is grasp able.";
-  response->target_joint_names = target_joint_names;
-  response->target_joint_rad = target_joint_rad;
-
-  return;
+  solve_hand_to_target(goal_coord, *response);
 }
 
 void JointActionServer::serve_get_hand_to_tf(
@@ -543,31 +525,104 @@ void JointActionServer::serve_get_hand_to_tf(
     return;
   }
 
-  // target_yawにロボットの回転角度を代入
-  // calculate the target_yaw to move base of grasping object 
-  double target_linear, target_yaw;
-  target_yaw = std::atan2(goal_coord.transform.translation.y,goal_coord.transform.translation.x);
+  solve_hand_to_target(goal_coord, *response);
+}
 
-  // 3次元の逆運動学が完成したらtarget_yawはある一定の条件で0(=回転する必要なし)になる
+template<typename ResponseT>
+void JointActionServer::solve_hand_to_target(
+  const geometry_msgs::msg::TransformStamped &goal_coord,
+  ResponseT &response)
+{
+  std::vector<std::string> target_joint_names;
+  std::vector<double> target_joint_rad;
+  geometry_msgs::msg::Pose move_pose;
 
-
-  // Inverse kinematics to get the target joint rad
-  std::vector<std::string> target_joint_names = {"arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_wrist_pitch_joint"};
-  std::vector<double> target_joint_rad = inverse_kinematics(goal_coord, target_yaw);
+  // 方式に応じて，腕の逆運動学と足回りの計算を呼び分ける
+  bool solved = false;
+  switch (kinematics_method_) {
+    case KinematicsMethod::Trigonometric:
+    case KinematicsMethod::Jacobian:
+      solved = solve_hand_to_target_2dof(goal_coord, target_joint_names, target_joint_rad, move_pose);
+      break;
+    case KinematicsMethod::IKLibrary:
+      solved = solve_hand_to_target_8dof(goal_coord, target_joint_names, target_joint_rad, move_pose);
+      break;
+  }
 
   // If inverse kinematics is outside the range of possible
   // もし逆運動学可能範囲外ならば・・・
-  if (target_joint_rad.size() == 0) {
-
-    response->success = false;
+  if (!solved) {
+    response.success = false;
     // TODO //
-    response->message = "[FAIL] The target position is too low or tall (z: 0.3[m] <= Grasp Able <= 0.8[m])";
-    response->target_joint_names.clear();
-    response->target_joint_rad.clear();
-
+    response.message = "[FAIL] The target position is too low or tall (z: 0.3[m] <= Grasp Able <= 0.8[m])";
+    response.target_joint_names.clear();
+    response.target_joint_rad.clear();
     return;
   }
 
+  response.move_pose = move_pose;
+  response.success = true;
+  response.message = "[SUCCESS] The coord is grasp able.";
+  response.target_joint_names = target_joint_names;
+  response.target_joint_rad = target_joint_rad;
+}
+
+// 2自由度方式(jazzy-devel 版): 腕は肩ピッチ・肘ピッチ・手首ピッチで高さだけ合わせ，旋回・前後は足回りで合わせる
+bool JointActionServer::solve_hand_to_target_2dof(
+  const geometry_msgs::msg::TransformStamped &goal_coord,
+  std::vector<std::string> &target_joint_names,
+  std::vector<double> &target_joint_rad,
+  geometry_msgs::msg::Pose &move_pose)
+{
+  // target_yawにロボットの回転角度を代入
+  // calculate the target_yaw to move base of grasping object
+  double target_yaw = std::atan2(goal_coord.transform.translation.y,goal_coord.transform.translation.x);
+
+  // Inverse kinematics to get the target joint rad
+  if (kinematics_method_ == KinematicsMethod::Trigonometric) {
+    target_joint_rad = inverse_kinematics_trigonometric(goal_coord, target_yaw);
+  } else {
+    target_joint_rad = inverse_kinematics_jacobian(goal_coord, target_yaw);
+  }
+  if (target_joint_rad.size() == 0) return false;
+
+  target_joint_names = {"arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_wrist_pitch_joint"};
+  move_pose = calc_base_motion_2dof(goal_coord, target_joint_rad, target_yaw);
+  return true;
+}
+
+// 8自由度方式(IKLibrary): 腕6関節とベースの旋回・前後をまとめてLM法で解く
+bool JointActionServer::solve_hand_to_target_8dof(
+  const geometry_msgs::msg::TransformStamped &goal_coord,
+  std::vector<std::string> &target_joint_names,
+  std::vector<double> &target_joint_rad,
+  geometry_msgs::msg::Pose &move_pose)
+{
+  // Inverse kinematics to get the target joint rad
+  const std::vector<std::string> arm_joint_names = {"arm_shoulder_roll_joint", "arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_forearm_roll_joint", "arm_wrist_pitch_joint", "arm_wrist_roll_joint"};
+
+  //  Get current joint state from kCurrentJointState
+  std::vector<double> current_joint_rad;
+  for (size_t i = 0; i < arm_joint_names.size(); i++) {
+    // current_joint_rad.push_back(this->curt_joint_state_[kJointNames[i]]);
+    current_joint_rad.push_back(0.0);
+  }
+
+  std::vector<double> ik_result = ik_library_.inverse_kinematics(to_pose3d(goal_coord), current_joint_rad);
+  if (ik_result.size() == 0) return false;
+
+  target_joint_names = arm_joint_names;
+  target_joint_rad.assign(ik_result.begin(), ik_result.begin() + std::min<size_t>(6, ik_result.size()));
+  move_pose = calc_base_motion_8dof(ik_result);
+  return true;
+}
+
+geometry_msgs::msg::Pose JointActionServer::calc_base_motion_2dof(
+  const geometry_msgs::msg::TransformStamped &goal_coord,
+  const std::vector<double> &target_joint_rad,
+  double target_yaw)
+{
+  double target_linear;
   geometry_msgs::msg::TransformStamped hand_pose = forward_kinematics(target_joint_rad, target_yaw);
 
   if (std::sqrt(std::pow(hand_pose.transform.translation.x,2)+std::pow(hand_pose.transform.translation.y,2)) < std::sqrt(std::pow(goal_coord.transform.translation.x,2)+std::pow(goal_coord.transform.translation.y,2))) {
@@ -576,22 +631,36 @@ void JointActionServer::serve_get_hand_to_tf(
     target_linear = -std::sqrt(std::pow(hand_pose.transform.translation.x - goal_coord.transform.translation.x,2) + std::pow(hand_pose.transform.translation.y - goal_coord.transform.translation.y,2));
   }
 
-  response->move_pose.position.x = target_linear;
-  response->move_pose.position.y = 0.0;
-  response->move_pose.position.z = 0.0;
+  geometry_msgs::msg::Pose move_pose;
+  move_pose.position.x = target_linear;
+  move_pose.position.y = 0.0;
+  move_pose.position.z = 0.0;
 
   geometry_msgs::msg::Vector3 euler;
   euler.x = 0.0;
   euler.y = 0.0;
   euler.z = target_yaw;
-  response->move_pose.orientation = get_quat_from_euler(euler);
+  move_pose.orientation = get_quat_from_euler(euler);
+  return move_pose;
+}
 
-  response->success = true;
-  response->message = "[SUCCESS] The coord is grasp able.";
-  response->target_joint_names = target_joint_names;
-  response->target_joint_rad = target_joint_rad;
+geometry_msgs::msg::Pose JointActionServer::calc_base_motion_8dof(
+  const std::vector<double> &ik_result)
+{
+  double target_yaw = ik_result[6];
+  double target_linear = ik_result[7];
 
-  return;
+  geometry_msgs::msg::Pose move_pose;
+  move_pose.position.x = target_linear;
+  move_pose.position.y = 0.0;
+  move_pose.position.z = 0.0;
+
+  geometry_msgs::msg::Vector3 euler;
+  euler.x = 0.0;
+  euler.y = 0.0;
+  euler.z = target_yaw;
+  move_pose.orientation = get_quat_from_euler(euler);
+  return move_pose;
 }
 
 void JointActionServer::joint_state_callback(
@@ -640,7 +709,13 @@ trajectory_msgs::msg::JointTrajectory JointActionServer::set_joints(
   return joint_trajectory;
 }
 
-// ここは，もしも今後逆運動学が3次元に発展したときに，それに対応させるために3次元での順運動学を算出
+
+// ============================================================
+// jazzy-devel 版の2次元(鉛直面内3リンク)運動学。origin/jazzy-devel から移植(数式・定数・分岐は変更なし)。
+// jazzy-devel 版の inverse_kinematics 内でコメントアウトされていた「三角関数」と，有効だった「ヤコビ行列」を
+// それぞれ別の関数にした
+// ============================================================
+
 geometry_msgs::msg::TransformStamped JointActionServer::forward_kinematics(
   const std::vector<double> &target_joint_rad,
   const double target_yaw)
@@ -684,61 +759,64 @@ geometry_msgs::msg::TransformStamped JointActionServer::forward_kinematics(
   return final_coord;
 }
 
-std::vector<double> JointActionServer::inverse_kinematics(
+// 三角関数
+std::vector<double> JointActionServer::inverse_kinematics_trigonometric(
   const geometry_msgs::msg::TransformStamped &goal_coord,  // 'goal_coord' is the coordinates of robot base.
   const double target_yaw)
-// 三角関数
-// {
+{
 
-//   (void)target_yaw;
+  (void)target_yaw;
 
-//   // "arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_wrist_pitch_joint"
-//   // return msg
-//   std::vector<double> target_joint_rad = {0.0, 0.0, 0.0};
+  // "arm_shoulder_pitch_joint","arm_elbow_pitch_joint", "arm_wrist_pitch_joint"
+  // return msg
+  std::vector<double> target_joint_rad = {0.0, 0.0, 0.0};
 
-//   if (goal_coord.transform.translation.z < (base_to_shoulder_z + arm_upper_link*std::cos(3*M_PI/4)-arm_lower_link)) {
-//     RCLCPP_WARN(this->get_logger(), "The target position is too low (%.2f[m] < min:%.2f[m])", goal_coord.transform.translation.z, (base_to_shoulder_z + arm_upper_link*std::cos(3*M_PI/4)-arm_lower_link));
-//     target_joint_rad.clear();
-//     return target_joint_rad;
-//   }
-//   if ((base_to_shoulder_z + arm_upper_link + arm_lower_link*std::cos(M_PI/12)) < goal_coord.transform.translation.z) {
-//     RCLCPP_WARN(this->get_logger(), "The target position is too tall (max:%.2f[m] < %.2f[m])", (base_to_shoulder_z + arm_upper_link + arm_lower_link*std::cos(M_PI/12)), goal_coord.transform.translation.z);
-//     target_joint_rad.clear();
-//     return target_joint_rad;
-//   }
+  if (goal_coord.transform.translation.z < (base_to_shoulder_z + arm_upper_link*std::cos(3*M_PI/4)-arm_lower_link)) {
+    RCLCPP_WARN(this->get_logger(), "The target position is too low (%.2f[m] < min:%.2f[m])", goal_coord.transform.translation.z, (base_to_shoulder_z + arm_upper_link*std::cos(3*M_PI/4)-arm_lower_link));
+    target_joint_rad.clear();
+    return target_joint_rad;
+  }
+  if ((base_to_shoulder_z + arm_upper_link + arm_lower_link*std::cos(M_PI/12)) < goal_coord.transform.translation.z) {
+    RCLCPP_WARN(this->get_logger(), "The target position is too tall (max:%.2f[m] < %.2f[m])", (base_to_shoulder_z + arm_upper_link + arm_lower_link*std::cos(M_PI/12)), goal_coord.transform.translation.z);
+    target_joint_rad.clear();
+    return target_joint_rad;
+  }
 
-//   double target_z = goal_coord.transform.translation.z - base_to_shoulder_z;
+  double target_z = goal_coord.transform.translation.z - base_to_shoulder_z;
 
-//   if (target_z < -(arm_upper_link+arm_lower_link)*std::cos(M_PI/4.)) {
-//     target_joint_rad[0] = 3*M_PI/4.;
+  if (target_z < -(arm_upper_link+arm_lower_link)*std::cos(M_PI/4.)) {
+    target_joint_rad[0] = 3*M_PI/4.;
 
-//   } else if (target_z < -arm_lower_link) {
-//     target_joint_rad[0] = std::atan2(std::sqrt(std::pow(arm_upper_link+arm_lower_link, 2) - std::pow(target_z, 2)), target_z);
+  } else if (target_z < -arm_lower_link) {
+    target_joint_rad[0] = std::atan2(std::sqrt(std::pow(arm_upper_link+arm_lower_link, 2) - std::pow(target_z, 2)), target_z);
 
-//   } else if (target_z <= 0.) {
-//     target_joint_rad[0] = M_PI/2.;
+  } else if (target_z <= 0.) {
+    target_joint_rad[0] = M_PI/2.;
 
-//   } else if (target_z < arm_upper_link*std::cos(M_PI/4.)) {
-//     target_joint_rad[0] = M_PI/4.;
+  } else if (target_z < arm_upper_link*std::cos(M_PI/4.)) {
+    target_joint_rad[0] = M_PI/4.;
 
-//   } else {
-//     target_joint_rad[0] = 0.0;
+  } else {
+    target_joint_rad[0] = 0.0;
 
-//   }
+  }
 
-//   geometry_msgs::msg::Point elbow_pt, wrist_pt;
-//   elbow_pt.x = arm_upper_link*std::sin(target_joint_rad[0]);
-//   elbow_pt.z = arm_upper_link*std::cos(target_joint_rad[0]);
-//   wrist_pt.x = elbow_pt.x + std::sqrt(std::pow(arm_lower_link, 2) - std::pow(target_z-elbow_pt.z, 2));
-//   wrist_pt.z = target_z;
-//   target_joint_rad[1] = std::atan2(wrist_pt.x-elbow_pt.x, wrist_pt.z-elbow_pt.z) - M_PI/2. - target_joint_rad[0];
+  geometry_msgs::msg::Point elbow_pt, wrist_pt;
+  elbow_pt.x = arm_upper_link*std::sin(target_joint_rad[0]);
+  elbow_pt.z = arm_upper_link*std::cos(target_joint_rad[0]);
+  wrist_pt.x = elbow_pt.x + std::sqrt(std::pow(arm_lower_link, 2) - std::pow(target_z-elbow_pt.z, 2));
+  wrist_pt.z = target_z;
+  target_joint_rad[1] = std::atan2(wrist_pt.x-elbow_pt.x, wrist_pt.z-elbow_pt.z) - M_PI/2. - target_joint_rad[0];
 
-//   target_joint_rad[2] = -target_joint_rad[0] -target_joint_rad[1];
-//   return target_joint_rad;
+  target_joint_rad[2] = -target_joint_rad[0] -target_joint_rad[1];
+  return target_joint_rad;
 
-// }
+}
 
 // ヤコビ行列
+std::vector<double> JointActionServer::inverse_kinematics_jacobian(
+  const geometry_msgs::msg::TransformStamped &goal_coord,  // 'goal_coord' is the coordinates of robot base.
+  const double target_yaw)
 {
   (void)target_yaw;
 
@@ -799,6 +877,5 @@ std::vector<double> JointActionServer::inverse_kinematics(
 
   return target_joint_rad;
 }
+
 } // namespace sobit_edu
-
-
