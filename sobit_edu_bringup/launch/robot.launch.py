@@ -38,6 +38,8 @@ def generate_launch_description():
     # stopped -- see UnloadRobotControllers). Skips (re)spawning the model
     # and goes straight to (re)starting the ROS-side nodes.
     arg_spawn_entity = DeclareLaunchArgument('spawn_entity', default_value='True')
+    # 腕の姿勢リスト(library_server に渡す). 空なら sobit_edu_library/config/pose_list.yaml
+    arg_pose_config = DeclareLaunchArgument('pose_config', default_value='')
 
     return LaunchDescription([
         arg_robot_name,
@@ -56,6 +58,7 @@ def generate_launch_description():
         arg_enable_gz_imu,
         arg_enable_gz_head_cam_color,
         arg_enable_gz_head_cam_depth,
+        arg_pose_config,
         OpaqueFunction(function = launch_gz),
     ])
 
@@ -80,6 +83,7 @@ def launch_gz(context, *args, **kwargs):
     enable_gz_imu            = LaunchConfiguration('enable_gz_imu').perform(context)
     enable_gz_head_cam_color = LaunchConfiguration('enable_gz_head_cam_color').perform(context)
     enable_gz_head_cam_depth = LaunchConfiguration('enable_gz_head_cam_depth').perform(context)
+    pose_config = LaunchConfiguration('pose_config').perform(context)
 
     # Find Dynamixel Port name and Kobuki Port name from DXL_SE_PORT/KOBUKI_SE_PORT environment variable
     dxl_se_port = ''
@@ -420,9 +424,11 @@ def launch_gz(context, *args, **kwargs):
                 'library_server.launch.py'
             ])
         ]),
+        # イベント(OnProcessExit)で後から読み込むので、値をここで確定させて明示的に渡す
         launch_arguments={
             'robot_name': robot_name,
             'enable_gz': enable_gz,
+            'pose_config': pose_config,
         }.items(),
     )
 

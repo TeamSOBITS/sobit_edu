@@ -10,10 +10,13 @@ from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
     arg_robot_name = DeclareLaunchArgument('robot_name', default_value='sobit_edu')
     arg_enable_gz = DeclareLaunchArgument('enable_gz', default_value='False')
+    # 姿勢リストのファイル. 空なら sobit_edu_library/config/pose_list.yaml
+    arg_pose_config = DeclareLaunchArgument('pose_config', default_value='')
 
     return LaunchDescription([
         arg_robot_name,
         arg_enable_gz,
+        arg_pose_config,
         OpaqueFunction(function = launch_node),
     ])
 
@@ -21,7 +24,7 @@ def launch_node(context, *args, **kwargs):
     robot_name = LaunchConfiguration('robot_name').perform(context)
     enable_gz = LaunchConfiguration('enable_gz').perform(context)
 
-    pose_config = os.path.join(
+    pose_config = LaunchConfiguration('pose_config').perform(context) or os.path.join(
         get_package_share_directory("sobit_edu_library"),
         "config",
         "pose_list.yaml",
