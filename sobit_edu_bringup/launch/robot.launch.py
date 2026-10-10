@@ -40,6 +40,9 @@ def generate_launch_description():
     arg_spawn_entity = DeclareLaunchArgument('spawn_entity', default_value='True')
     # 腕の姿勢リスト(library_server に渡す). 空なら sobit_edu_library/config/pose_list.yaml
     arg_pose_config = DeclareLaunchArgument('pose_config', default_value='')
+    # Xtion の rgb / depth optical frame の静的 TF(openni2_camera の tfs.launch.py)を出すか.
+    # URDF が同じ枠を持っているので、False にすると親が二重にならない(ロボカフェは False)
+    arg_publish_camera_tfs = DeclareLaunchArgument('publish_camera_tfs', default_value='True')
 
     return LaunchDescription([
         arg_robot_name,
@@ -59,6 +62,7 @@ def generate_launch_description():
         arg_enable_gz_head_cam_color,
         arg_enable_gz_head_cam_depth,
         arg_pose_config,
+        arg_publish_camera_tfs,
         OpaqueFunction(function = launch_gz),
     ])
 
@@ -84,6 +88,7 @@ def launch_gz(context, *args, **kwargs):
     enable_gz_head_cam_color = LaunchConfiguration('enable_gz_head_cam_color').perform(context)
     enable_gz_head_cam_depth = LaunchConfiguration('enable_gz_head_cam_depth').perform(context)
     pose_config = LaunchConfiguration('pose_config').perform(context)
+    publish_camera_tfs = LaunchConfiguration('publish_camera_tfs').perform(context)
 
     # Find Dynamixel Port name and Kobuki Port name from DXL_SE_PORT/KOBUKI_SE_PORT environment variable
     dxl_se_port = ''
@@ -180,6 +185,7 @@ def launch_gz(context, *args, **kwargs):
                 launch_arguments={
                     'tf_prefix': robot_name,
                     'namespace': 'head_camera',
+                    'publish_camera_tfs': publish_camera_tfs,
                 }.items()
             )
         elif (head_camera_name == "azure_kinect"):

@@ -37,6 +37,7 @@ import launch_ros.actions
 import launch_ros.descriptions
 from launch.substitutions import LaunchConfiguration, ThisLaunchFileDir, PathJoinSubstitution
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 import os
@@ -89,15 +90,22 @@ def generate_launch_description():
             output='screen',
     )
 
+    # openni2_camera の tfs.launch.py は rgb / depth の optical frame に別の親を与える静的 TF を出す.
+    # URDF がすでにその枠(head_camera_rgb_link -> rgb_optical_frame など)を持っているので、
+    # 両方あると木が輪になることがある. URDF だけで足りるときは publish_camera_tfs:=False にする
+    publish_camera_tfs = DeclareLaunchArgument('publish_camera_tfs', default_value='True')
+
     tfs = IncludeLaunchDescription(
         # PythonLaunchDescriptionSource(PathJoinSubstitution(["/opt/ros/humble/share/openni2_camera/launch", "tfs.launch.py"])),
         PythonLaunchDescriptionSource(PathJoinSubstitution([os.path.join(get_package_share_directory('openni2_camera'), 'launch', 'tfs.launch.py')])),
         launch_arguments={namespace_param_name: namespace, tf_prefix_param_name: tf_prefix}.items(),
+        condition=IfCondition(LaunchConfiguration('publish_camera_tfs')),
     )
 
     return launch.LaunchDescription([
         namespace_launch_arg,
         tf_prefix_launch_arg,
+        publish_camera_tfs,
         container,
         tfs,
     ])
